@@ -93,6 +93,7 @@ main()
   .then(() => prisma.$disconnect())
   .catch(async (err) => {
     console.error("[catalog-sync] failed:", err instanceof Error ? err.message : err);
+    if (err instanceof Error && err.stack) console.error(err.stack.split("\n").slice(1, 6).join("\n"));
     console.error("[catalog-sync] staged pages are kept; run the same command again to resume");
     await prisma.$disconnect().catch(() => {});
     process.exit(1);

@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { Pause, Play, Repeat } from "lucide-react";
+import { FlapRow } from "@/components/ui/Flap";
 import { Tag } from "@/components/ui/Tag";
 import { cn } from "@/lib/utils/cn";
 import { frozenTime } from "@/lib/motion/env";
@@ -221,7 +222,7 @@ export function TheaterStage({
 
   const paused = !playing;
   const label = finished ? labels.replay : paused && (userPaused || !started) ? labels.play : labels.pause;
-  const KnobIcon = finished ? RotateCcw : label === labels.play ? Play : Pause;
+  const KnobIcon = finished ? Repeat : label === labels.play ? Play : Pause;
   const shown = reduced ? -1 : chapter;
 
   return (
@@ -231,13 +232,7 @@ export function TheaterStage({
       </div>
       <div className="mt-4 flex min-h-11 items-center gap-4">
         {!reduced && captions.length > 0 ? (
-          <span aria-hidden="true" className="inline-flex shrink-0 items-center text-[0.8125rem]">
-            <span className="tumbler-slot">{pad(Math.max(1, shown + 1))[0]}</span>
-            <span className="tumbler-slot">{pad(Math.max(1, shown + 1))[1]}</span>
-            <span className="px-1 font-mono text-ink-muted">/</span>
-            <span className="tumbler-slot">{pad(captions.length)[0]}</span>
-            <span className="tumbler-slot">{pad(captions.length)[1]}</span>
-          </span>
+          <FlapRow text={`${pad(Math.max(1, shown + 1))}/${pad(captions.length)}`} size="xs" label={`Step ${Math.max(1, shown + 1)} of ${captions.length}`} className="shrink-0" />
         ) : null}
         <p aria-hidden="true" className="m-0 min-w-0 flex-1 truncate text-step-0 text-ink">
           <span key={shown} className="motion-safe:animate-fade-in">
@@ -260,9 +255,7 @@ export function TheaterStage({
         <ol className={cn(reduced ? "m-0 mt-4 flex list-none flex-col gap-2 border-t border-line p-0 pt-4" : "sr-only")}>
           {captions.map((c, i) => (
             <li key={c} className="flex gap-3 text-ui-md text-ink">
-              <span aria-hidden="true" className="tumbler-slot text-[0.75rem]">
-                {i + 1}
-              </span>
+              <FlapRow text={String(i + 1)} size="xs" label="" className="mt-0.5 shrink-0" />
               <span>{c}</span>
             </li>
           ))}

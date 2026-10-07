@@ -1,32 +1,30 @@
 import { interactiveDesktop, type MotionEnv } from "../env";
 import { addTick, clamp, lerpPerFrame } from "../ticker";
-import { MOTION_DEPTH } from "../tokens";
+import { MOTION_DEPTH, MOTION_LIMITS } from "../tokens";
 
 type Layer = keyof typeof MOTION_DEPTH;
 
 interface Item {
   el: HTMLElement;
-  door: HTMLElement | null;
   target: HTMLElement;
   amp: number;
+  speed: number;
   scale: number;
-  s: number;
   x: number;
   y: number;
   visible: boolean;
 }
 
-const INNER = "[data-door-contents], [data-cover] img";
+const COVER = "[data-cover] img";
 const COVER_SCALE = 1.04;
 
 function itemFor(el: HTMLElement): Item | null {
   const layer = el.dataset.depth as Layer;
   const depth = MOTION_DEPTH[layer];
   if (!depth || depth.pointer === 0) return null;
-  const inner = layer === "D3" ? el.querySelector<HTMLElement>(INNER) : null;
-  const custom = Number(el.dataset.depthAmp);
-  const amp = Number.isFinite(custom) && custom > 0 ? custom : inner ? 4 : depth.pointer;
-  return { el, door: el.closest<HTMLElement>("[data-door]"), target: inner ?? el, amp: inner ? -amp : amp, scale: inner?.tagName === "IMG" ? COVER_SCALE : 1, s: 1, x: 0, y: 0, visible: false };
+  const cover = layer === "D3" ? el.querySelector<HTMLElement>(COVER) : null;
+  if (cover) return { el, target: cover, amp: -3, speed: 0, scale: COVER_SCALE, x: 0, y: 0, visible: false };
+  return { el, target: el, amp: depth.pointer, speed: depth.scroll, scale: 1, x: 0, y: 0, visible: false };
 }
 
 export function mountDepth(root: Document, env: MotionEnv): () => void {
@@ -40,27 +38,28 @@ export function mountDepth(root: Document, env: MotionEnv): () => void {
   let running = false;
   let stop: (() => void) | null = null;
 
-  const write = (item: Item) => {
-    item.target.style.translate = `${item.x.toFixed(2)}px ${item.y.toFixed(2)}px`;
-    if (item.scale !== 1) item.target.style.scale = item.s.toFixed(4);
+  const scrollOffset = (item: Item) => {
+    if (item.speed === 0) return 0;
+    const r = item.el.getBoundingClientRect();
+    const fromCenter = r.top - item.y + r.height / 2 - window.innerHeight / 2;
+    return clamp(-fromCenter * item.speed, -MOTION_LIMITS.depthMax, MOTION_LIMITS.depthMax);
   };
 
   const tick = (dt: number) => {
     let moving = false;
     for (const item of items) {
-      if (!item.visible || item.door?.hasAttribute("data-door-live")) continue;
+      if (!item.visible) continue;
       const tx = pointer.x * item.amp;
-      const ty = pointer.y * item.amp;
+      const ty = pointer.y * item.amp + scrollOffset(item);
       item.x = lerpPerFrame(item.x, tx, 0.1, dt);
       item.y = lerpPerFrame(item.y, ty, 0.1, dt);
-      item.s = lerpPerFrame(item.s, item.scale, 0.1, dt);
-      if (Math.abs(item.x - tx) > 0.02 || Math.abs(item.y - ty) > 0.02 || Math.abs(item.s - item.scale) > 0.0005) moving = true;
+      if (Math.abs(item.x - tx) > 0.02 || Math.abs(item.y - ty) > 0.02) moving = true;
       else {
         item.x = tx;
         item.y = ty;
-        item.s = item.scale;
       }
-      write(item);
+      item.target.style.translate = `${item.x.toFixed(2)}px ${item.y.toFixed(2)}px`;
+      if (item.scale !== 1) item.target.style.scale = String(item.scale);
     }
     if (!moving) running = false;
     return moving;
@@ -84,12 +83,15 @@ export function mountDepth(root: Document, env: MotionEnv): () => void {
       const item = items.find((i) => i.el === entry.target);
       if (item) item.visible = entry.isIntersecting;
     }
+    wake();
   });
   for (const item of items) io.observe(item.el);
   window.addEventListener("pointermove", onMove, { passive: true });
+  window.addEventListener("scroll", wake, { passive: true });
 
   return () => {
     window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("scroll", wake);
     io.disconnect();
     stop?.();
     for (const item of items) {

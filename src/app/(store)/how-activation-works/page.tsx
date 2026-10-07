@@ -63,7 +63,7 @@ export default async function HowActivationWorksPage() {
 
       <section aria-labelledby="payment-to-key" className="border-y border-line bg-surface-1">
         <div className="mx-auto max-w-container px-gutter py-16 lg:py-24">
-          <FeatureSpotlight scene="decrypt" headingId="payment-to-key" title="From payment to your board" description={<p className="m-0">{STORE_POLICY.delivery.emailNote}</p>} />
+          <FeatureSpotlight scene="depart" headingId="payment-to-key" title="From payment to your board" description={<p className="m-0">{STORE_POLICY.delivery.emailNote}</p>} />
         </div>
       </section>
 

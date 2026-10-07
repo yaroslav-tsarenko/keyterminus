@@ -42,15 +42,6 @@ export function interactiveDesktop(env: MotionEnv): boolean {
   return !env.reduced && env.desktop && env.finePointer;
 }
 
-export function webglAllowed(env: MotionEnv): boolean {
-  if (frozenTime() !== null) return !env.reduced;
-  return interactiveDesktop(env) && !env.saveData && !env.lowPower;
-}
-
-export function documentTop(el: Element): number {
-  return el.getBoundingClientRect().top + window.scrollY;
-}
-
 export function onIdle(task: () => void, timeout = 1200): () => void {
   if (typeof window.requestIdleCallback === "function") {
     const id = window.requestIdleCallback(task, { timeout });

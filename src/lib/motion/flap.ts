@@ -27,6 +27,24 @@ export function flapPath(from: string, to: string): string[] {
   return steps.slice(steps.length - FLAP_MAX_STEPS);
 }
 
+export function arrivalPath(target: string, steps = 4): string[] {
+  if (target === " ") return [];
+  const end = drumIndex(target);
+  const path = [" "];
+  if (DRUM.includes(target.toUpperCase())) {
+    for (let k = Math.min(steps, end - 1); k >= 1; k--) path.push(DRUM[end - k]);
+  }
+  path.push(target);
+  return path;
+}
+
+export function flapStepAt(path: string[], from: string, local: number, stepMs = FLAP_STEP_MS): { index: number; current: string; next: string; progress: number } | null {
+  if (path.length === 0 || local < 0) return null;
+  const index = Math.floor(local / stepMs);
+  if (index >= path.length) return null;
+  return { index, current: index === 0 ? from : path[index - 1], next: path[index], progress: (local - index * stepMs) / stepMs };
+}
+
 export interface FlapFrame {
   top: string;
   bottom: string;

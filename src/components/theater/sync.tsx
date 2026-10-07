@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import { Check } from "lucide-react";
-import { Lamp } from "@/components/ui/Lamp";
 import { cn } from "@/lib/utils/cn";
 
 type SyncValue = { chapter: number; setChapter: (i: number) => void; scene: string | null; setScene: (id: string | null) => void };
@@ -24,20 +23,18 @@ export function TheaterSteps({ steps, className, reduced = false }: { steps: str
   const sync = useTheaterSync();
   const active = reduced ? -1 : (sync?.chapter ?? -1);
   return (
-    <ol data-theater-steps="" className={cn("m-0 flex list-none flex-col border-t border-line p-0", className)}>
+    <ol data-theater-steps="" className={cn("th-steps", className)}>
       {steps.map((text, i) => {
-        const done = active > i;
-        const on = active === i;
+        const state = active > i ? "done" : active === i ? "current" : active < 0 ? "station" : "upcoming";
         return (
-          <li key={text} aria-current={on ? "step" : undefined} className={cn("flex items-start gap-3 border-b border-line py-3 transition-colors duration-[180ms]", on ? "text-ink" : done ? "text-ink-muted" : "text-ink-muted")}>
-            <span aria-hidden="true" className="tumbler-slot mt-px shrink-0 text-[0.8125rem]">
-              {done ? <Check size={14} className="text-ink" /> : i + 1}
+          <li key={text} data-state={state} aria-current={state === "current" ? "step" : undefined} className="th-step">
+            <span aria-hidden="true" className="th-step-stop">
+              {state === "done" ? <Check size={10} strokeWidth={3.5} /> : null}
             </span>
-            <span className="min-w-0 flex-1 text-ui-md leading-[1.45]">
+            <span className="th-step-text">
               <span className="sr-only">Step {i + 1}: </span>
               {text}
             </span>
-            <Lamp on={on} className={cn("mt-1.5", on ? "" : "invisible")} />
           </li>
         );
       })}

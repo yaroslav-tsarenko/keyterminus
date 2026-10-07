@@ -4,7 +4,7 @@ export type DeviceKind = "desktop" | "phone";
 export type TheaterDevice = DeviceKind | "auto";
 export type EaseName = "linear" | "inOut" | "out" | "in";
 
-export type SceneId = "pick" | "pay" | "decrypt" | "redeem" | "support";
+export type SceneId = "checkin" | "pay" | "depart" | "arrive" | "help";
 
 export type StringKeys<S> = { [K in keyof S]-?: S[K] extends string ? K : never }[keyof S] & string;
 export type NumberKeys<S> = { [K in keyof S]-?: S[K] extends number ? K : never }[keyof S] & string;
@@ -32,6 +32,7 @@ export type SceneDef<S> = {
   title: string;
   summary: string;
   url: string | ((s: S) => string | SceneAddress);
+  remark: string | ((s: S) => string);
   device: DeviceKind;
   initial: S;
   end?: Partial<S>;

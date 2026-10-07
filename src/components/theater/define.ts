@@ -72,6 +72,10 @@ export function urlFor<S>(scene: Pick<SceneDef<S>, "url">, state: S): SceneAddre
   return typeof raw === "string" ? { label: raw } : raw;
 }
 
+export function remarkOf<S>(scene: Pick<SceneDef<S>, "remark">, state: S): string {
+  return typeof scene.remark === "function" ? scene.remark(state) : scene.remark;
+}
+
 export function erase<S>(scene: SceneDef<S>): AnyScene {
   return scene as unknown as AnyScene;
 }

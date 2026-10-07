@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { MERCH, PLATFORM_BOARD, platformBoard } from "@/config/merchandising";
 import { catalogConfig } from "@/config/catalog";
 import { dealPercent, remarkFor } from "@/lib/catalog/remarks";
+import { boardTitle } from "@/lib/catalog/board-text";
+
+export { boardTitle };
 import type { RemarkKind } from "@/components/ui/Remark";
 
 export interface BoardCandidate {
@@ -82,14 +85,6 @@ export const homeBoardPool = cache(async (perPlatform: number = MERCH.homePoolPe
     ORDER BY "boardScore" DESC, "productId"`;
   return rows.map((r) => ({ ...r, boardScore: Number(r.boardScore ?? 0), price: Number(r.price), comparePrice: r.comparePrice == null ? null : Number(r.comparePrice) }));
 });
-
-export function boardTitle(title: string, cells: number): string {
-  const upper = title.toUpperCase().replace(/[™®©]/g, "").replace(/\s+/g, " ").trim();
-  if (upper.length <= cells) return upper;
-  const cut = upper.slice(0, cells + 1);
-  const space = cut.lastIndexOf(" ");
-  return (space > cells * 0.5 ? cut.slice(0, space) : upper.slice(0, cells)).replace(/[\s:–—-]+$/, "");
-}
 
 function isFresh(c: BoardCandidate, now: number): boolean {
   if (!c.releaseDate) return false;

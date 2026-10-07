@@ -1,11 +1,6 @@
-@keyframes word-settle {
-  from {
-    transform: translateY(0.32em);
-    opacity: 0.45;
-  }
+@keyframes hall-dim {
   to {
-    transform: none;
-    opacity: 1;
+    opacity: 0.06;
   }
 }
 
@@ -23,133 +18,134 @@
   }
 }
 
-[data-scene="reveal"][data-reveal="armed"] [data-reveal-item],
-[data-anim="plate"][data-plate="armed"] {
-  opacity: 0;
-}
-
-[data-door-gl] {
-  position: absolute;
-  inset: 0;
-  display: none;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 600ms var(--ease-std);
-}
-
-[data-door][data-door-mode="gl"] [data-door-gl] {
-  display: block;
-}
-
-[data-door][data-door-live] [data-door-gl] {
-  opacity: 1;
-}
-
-[data-door][data-door-live] [data-door-poster] {
-  visibility: hidden;
-  transition: visibility 0s linear 600ms;
-}
-
-[data-door][data-door-live] [data-door-interior] {
-  inset: 0;
-  display: block;
-  overflow: visible;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-  transform: none;
-}
-
-[data-door][data-door-live] [data-door-contents] {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: auto;
-  visibility: visible;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--dur-panel-close) var(--ease-std);
-}
-
-[data-door][data-door-live] [data-door-contents] > li {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-}
-
-[data-door][data-door-live] [data-door-contents] > li:not([data-mapped]) {
-  overflow: hidden;
-  clip-path: inset(50%);
-}
-
-[data-door][data-door-live] [data-door-contents] a {
-  height: 100%;
-  padding: 0;
-  background: none;
-  box-shadow: none;
-}
-
-[data-door][data-door-live] [data-door-contents] [data-cover] {
-  height: 100%;
-  aspect-ratio: auto;
-  box-shadow: none;
-}
-
-[data-scene="vault-door"]:is([data-door-open], [data-door-focus]) [data-door][data-door-live] [data-door-contents] {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity var(--dur-reveal) var(--ease-std);
-}
-
-[data-door] .door-poster[data-door-poster][data-door-swing="armed"] [data-door-leaf] {
-  transform: rotateY(0deg);
-}
-
-[data-door] .door-poster[data-door-poster][data-door-swing="open"] [data-door-leaf] {
-  transform: rotateY(var(--door-open));
-}
-
-@media (min-width: 1024px) {
-  [data-scene="vault-door"][data-door-pin] {
-    overflow: clip;
-  }
-
-  [data-scene="vault-door"][data-door-pin] > [data-door-sticky] {
-    position: sticky;
-    top: var(--header-height-compact);
-  }
-}
-
-[data-index-trail] {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 1px;
-  height: 4px;
-  opacity: 0;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(to right, var(--color-accent) 0 1px, transparent 1px 8px);
-}
-
-[data-pin="releases"] {
+[data-scene="board"] {
   position: relative;
 }
 
+[data-board-root] {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-board-root] [data-board-gl] {
+  z-index: -1;
+}
+
+canvas[data-board-canvas] {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms var(--ease-std);
+}
+
+[data-board-root][data-gl-ready] canvas[data-board-canvas] {
+  opacity: 1;
+}
+
+[data-board-root][data-gl-ready] {
+  background-color: transparent;
+  border-color: transparent;
+  transition:
+    background-color 0s linear 400ms,
+    border-color 0s linear 400ms;
+}
+
+[data-board-root][data-gl-ready] [data-board-dom] [data-flap] {
+  opacity: 0;
+  transition: opacity 0s linear 400ms;
+}
+
+[data-flip-row] .flap-leaf {
+  animation-duration: var(--dur-flap);
+}
+
+[data-route-marker] {
+  position: absolute;
+  z-index: 2;
+  width: 10px;
+  height: 4px;
+  background-color: var(--color-accent);
+  pointer-events: none;
+}
+
+[data-scene="routes"]:has(.route:hover) .route:not(:hover) .route-seg line {
+  stroke: var(--color-rule);
+}
+
+[data-rail-bar] {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-rail-bar] > [data-rail-thumb] {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 100%;
+  transform-origin: 0 50%;
+}
+
+[data-rail][data-rail-static] [data-rail-bar] {
+  visibility: hidden;
+}
+
+[data-rail-track][data-dragging] {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+  user-select: none;
+}
+
+[data-rail-track][data-dragging] a {
+  pointer-events: none;
+}
+
+[data-anim="sign"][data-sign="armed"],
+[data-rise="armed"] {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  [data-anim="words"] [data-word] {
-    display: inline-block;
-    animation: word-settle var(--dur-panel) var(--ease-sign) calc(var(--i, 0) * 40ms) backwards;
-  }
-
-  [data-scene="reveal"][data-reveal="in"] [data-reveal-item] {
-    animation: sign-in var(--dur-reveal) var(--ease-sign) calc(var(--i, 0) * 70ms) backwards;
-  }
-
-  [data-anim="plate"][data-plate="in"] {
+  [data-anim="sign"][data-sign="in"] {
     animation: sign-in var(--dur-reveal) var(--ease-sign) backwards;
+  }
+
+  [data-rise="armed"] {
+    transform: translateY(6px);
+  }
+
+  [data-trace="armed"] .route-seg:not([data-dashed]) line {
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+  }
+
+  [data-trace="armed"] :is(.route-seg[data-dashed], .route-bar, .route-terminus-label) {
+    opacity: 0;
+  }
+
+  [data-trace="armed"] .route-stop {
+    transform: scale(0);
+  }
+
+  [data-trace="in"] .route-seg:not([data-dashed]) line {
+    stroke-dasharray: 1 1;
+    animation: route-draw var(--trace-dur, 180ms) linear var(--trace-delay, 0ms) both;
+  }
+
+  [data-trace="in"] .route-stop {
+    animation: stop-in 160ms var(--ease-sign) var(--trace-delay, 0ms) both;
+  }
+
+  [data-trace="in"] :is(.route-seg[data-dashed], .route-bar, .route-terminus-label) {
+    animation: fade-in 160ms var(--ease-std) var(--trace-delay, 0ms) both;
+  }
+
+  [data-scene="routes"] .route-seg line {
+    transition: stroke var(--dur-micro) var(--ease-std);
   }
 
   dialog[data-phase="open"]::backdrop {
@@ -172,37 +168,25 @@
   [data-stepper] [data-step-summary] {
     animation: panel-drop var(--dur-ui) var(--ease-sign) backwards;
   }
-
-  @media (hover: hover) and (pointer: fine) {
-    [data-peek] {
-      opacity: 0;
-      transform: translateX(16px);
-      transition:
-        opacity var(--dur-ui) var(--ease-std),
-        transform var(--dur-ui) var(--ease-sign);
-    }
-
-    [data-peek-row]:is(:hover, :focus-within) [data-peek] {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
-    [data-pin="releases"][data-pin-live] {
-      position: sticky;
-      top: var(--pin-top, var(--header-height-compact));
-    }
-
-    [data-pin="releases"][data-pin-live] :is([data-pin-viewport], [data-release-scroller]) {
-      overflow: hidden;
-      scroll-snap-type: none;
-    }
-
-    [data-pin="releases"][data-pin-live] :is([data-pin-track], [data-release-track]) {
-      will-change: transform;
-    }
-  }
-
 }
 
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+    [data-scene="board"]:has([data-gl-ready]) {
+      view-timeline: --hall block;
+    }
+
+    [data-scene="board"]:has([data-gl-ready])::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      background-color: var(--color-hinge);
+      opacity: 0;
+      pointer-events: none;
+      animation: hall-dim linear both;
+      animation-timeline: --hall;
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}

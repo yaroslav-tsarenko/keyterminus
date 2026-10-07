@@ -29,7 +29,7 @@ export function ResultsSettle({ keys }: { keys: string[] }) {
       if (rect.top > fold || rect.bottom < 0) continue;
       card.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], {
         duration: MOTION_DURATION.panel,
-        easing: cssEase("latch"),
+        easing: cssEase("sign"),
         delay: Math.min(step, MAX_STAGGERED) * (MOTION_STAGGER.rows / 2),
         fill: "backwards",
       });

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { addTick } from "@/lib/motion/ticker";
 import { frozenTime } from "@/lib/motion/env";
-import { urlFor } from "../define";
+import { remarkOf, urlFor } from "../define";
 import { Frame } from "../frame";
 import type { AnyScene, DeviceKind, Step } from "../types";
 import { presetFor, type Point, type Rect } from "./geometry";
@@ -291,6 +291,7 @@ export default function TheaterEngine({ scene, device, playing, loop, restartKey
     <Frame
       device={device}
       address={urlFor(scene, state)}
+      remark={remarkOf(scene, state)}
       vars={presetFor(device)}
       contentRef={contentRef}
       overlay={
@@ -303,7 +304,7 @@ export default function TheaterEngine({ scene, device, playing, loop, restartKey
           <div ref={cursorRef} className="th-cursor" data-mode={device === "phone" ? "touch" : "pointer"}>
             <span ref={ringRef} className="th-ring" />
             <svg data-shape="pointer" width="22" height="26" viewBox="0 0 22 26" aria-hidden="true">
-              <path d="M2 2v19l5-4.6 3.6 7.6 3.4-1.5-3.6-7.5H17z" className="th-cursor-fill" strokeWidth="1.25" strokeLinejoin="miter" />
+              <path d="M2 2v19l5-4.6 3.6 7.6 3.4-1.5-3.6-7.5H17z" className="th-cursor-fill" strokeWidth="1.5" strokeLinejoin="round" />
             </svg>
             <span data-shape="text" />
             <span data-shape="touch" />

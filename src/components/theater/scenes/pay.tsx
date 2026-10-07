@@ -1,15 +1,14 @@
 "use client";
 
-import { Check, CreditCard, ShieldCheck } from "lucide-react";
+import { Check, CreditCard, Landmark, Lock, Minus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Choice";
 import { Input } from "@/components/ui/Field";
 import { FlapLoader } from "@/components/ui/Flap";
 import { RouteLine } from "@/components/ui/RouteLine";
 import { Tag } from "@/components/ui/Tag";
-import { Lamp } from "@/components/ui/Lamp";
 import { Cover } from "@/components/product/Cover";
-import { LabelRow, productFace } from "@/components/product/ProductCard";
+import { GateLine, productFace } from "@/components/product/ProductCard";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
 import { PriceDisplay } from "@/components/shared/PriceDisplay/PriceDisplay";
 import { PaymentLogos } from "@/components/shared/PaymentLogos/PaymentLogos";
@@ -35,9 +34,9 @@ function CheckoutHeader({ phone }: { phone: boolean }) {
   return (
     <div className={cn("flex shrink-0 items-center justify-between border-b border-line bg-rig", phone ? "h-14 px-4" : "h-16 px-6")}>
       <Wordmark className="h-[26px] w-auto text-ink" />
-      <span className="inline-flex items-center gap-2 text-ui-sm font-[560] text-ink">
-        <ShieldCheck size={18} aria-hidden="true" />
-        Secure checkout
+      <span className="inline-flex items-center gap-2 font-display text-ui-md font-bold text-ink">
+        <Lock size={18} aria-hidden="true" />
+        <span className="pt-0.5">Secure checkout</span>
       </span>
     </div>
   );
@@ -60,14 +59,14 @@ function Review({ s, phone }: { s: S; phone: boolean }) {
             { key: "review", label: "Review & pay", state: "current" },
           ]}
         />
-        <p className="m-0 mt-6 font-display text-step-3 font-[600] text-ink [font-stretch:112.5%]">{copy.review}</p>
+        <p className="m-0 mt-8 font-display text-step-3 font-extrabold leading-[1.06] text-ink">{copy.review}</p>
         <div className="mt-4 flex gap-4 border-y border-line py-3">
-          <div className="w-[52px] shrink-0">
+          <div className="w-[52px] shrink-0 overflow-hidden rounded-sign">
             <Cover alt="" compact art={<SampleCover title={face.title} compact />} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="m-0 text-ui-md font-[640] text-ink">{face.title}</p>
-            <LabelRow face={face} edition className="mt-1" />
+            <p className="m-0 font-display text-ui-md font-bold text-ink">{face.title}</p>
+            <GateLine face={face} edition className="mt-1.5" />
             <p className="m-0 mt-1 text-ui-sm text-ink-muted">Region: Global. {face.regionSentence}.</p>
           </div>
           <PriceDisplay price={SAMPLE_ORDER.total} size="sm" />
@@ -91,7 +90,7 @@ function Review({ s, phone }: { s: S; phone: boolean }) {
         </div>
       </div>
       {phone ? null : (
-        <aside className="plate self-start p-5">
+        <aside className="self-start rounded-card border border-line bg-surface-1 p-5">
           <p className="eyebrow m-0">Summary</p>
           <dl className="m-0 mt-3 font-mono text-data">
             <div className="flex justify-between border-b border-line py-2">
@@ -123,11 +122,11 @@ function Hosted({ s, focus, phone }: { s: S; focus: string | null; phone: boolea
   const total = formatPrice(convert(SAMPLE_ORDER.total), currency);
   return (
     <div className={cn("relative flex h-full items-start justify-center bg-surface-1", phone ? "p-4" : "p-10")}>
-      <div className="th-pop w-full max-w-[440px] bg-raised p-6 shadow-lg">
+      <div className="th-pop w-full max-w-[440px] rounded-card bg-raised p-6 shadow-overlay">
         <div className="flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-2 text-ui-md font-[560] text-ink">
+          <span className="inline-flex items-center gap-2 font-display text-ui-md font-bold text-ink">
             <CreditCard size={18} aria-hidden="true" />
-            {copy.hostedTitle}
+            <span className="pt-0.5">{copy.hostedTitle}</span>
           </span>
           <Tag variant="info" size="sm">
             Illustration
@@ -144,17 +143,17 @@ function Hosted({ s, focus, phone }: { s: S; focus: string | null; phone: boolea
             <Field demo="cvc" label={copy.cvc} value={s.cvc} focused={focus === "cvc"} mask />
           </div>
         </div>
-        <span data-demo="submit" className="mt-5 flex h-12 w-full items-center justify-center bg-deal text-ui-md font-[640] text-on-deal">
+        <span data-demo="submit" className="mt-5 flex h-12 w-full items-center justify-center rounded-control bg-ink font-display text-ui-md font-bold text-surface">
           {copy.submit} {total}
         </span>
-        <p className="m-0 mt-3 text-ui-xs text-ink-muted">{copy.hostedNote}</p>
+        <p className="m-0 mt-3 text-ui-sm text-ink-muted">{copy.hostedNote}</p>
       </div>
       {s.step === "challenge" ? (
         <div className="absolute inset-0 flex items-center justify-center bg-scrim p-4">
-          <div className="th-pop w-full max-w-[360px] bg-raised p-6 shadow-xl">
-            <p className="m-0 flex items-center gap-2 text-ui-md font-[640] text-ink">
-              <ShieldCheck size={18} aria-hidden="true" />
-              {copy.bankTitle}
+          <div className="th-pop w-full max-w-[360px] rounded-card bg-raised p-6 shadow-xl">
+            <p className="m-0 flex items-center gap-2 font-display text-ui-md font-bold text-ink">
+              <Landmark size={18} aria-hidden="true" />
+              <span className="pt-0.5">{copy.bankTitle}</span>
             </p>
             <p className="m-0 mt-1 text-ui-sm text-ink-muted">{copy.bankNote}</p>
             <div className="mt-5 flex min-h-12 items-center gap-3 border-t border-line pt-4 text-ui-md text-ink">
@@ -182,7 +181,7 @@ function Confirmed({ phone }: { phone: boolean }) {
     <div className={cn("th-slide h-full", phone ? "flex flex-col gap-5 p-4" : "grid grid-cols-[minmax(0,1fr)_380px] gap-10 px-10 py-8")}>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3">
-          <p className="m-0 font-display text-step-5 font-[700] leading-none text-ink [font-stretch:112.5%]">{copy.confirmed}</p>
+          <p className="m-0 font-display text-step-5 font-extrabold leading-none tracking-[-0.02em] text-ink">{copy.confirmed}</p>
           <Tag variant="success" size="sm">
             Paid
           </Tag>
@@ -190,17 +189,17 @@ function Confirmed({ phone }: { phone: boolean }) {
         <p className="m-0 mt-3 font-mono text-data text-ink-muted">{copy.orderTitle}</p>
         <OrderTimeline status="paid" createdAt={SAMPLE_ORDER.createdAt} paidAt={SAMPLE_ORDER.paidAt} demo size="large" className="mt-8" />
       </div>
-      <div data-demo="confirmation" className="plate self-start p-5">
+      <div data-demo="confirmation" className="sign-plate self-start p-5">
         <p className="eyebrow m-0">{copy.received}</p>
         <ul className="m-0 mt-3 list-none p-0">
           {copy.receivedRows.map((r) => (
             <li key={r} className="flex items-center gap-3 border-b border-line py-2.5 text-ui-md text-ink">
-              <Lamp on />
+              <Check size={16} aria-hidden="true" />
               {r}
             </li>
           ))}
           <li className="flex items-center gap-3 py-2.5 text-ui-md text-ink-muted">
-            <Lamp on={false} />
+            <Minus size={16} aria-hidden="true" />
             {copy.notReceived}
           </li>
         </ul>
@@ -225,6 +224,7 @@ export const pay = defineScene<S>({
   id: "pay",
   title: meta.title,
   summary: meta.summary,
+  remark: copy.remark,
   url: (s) => (s.step === "hosted" || s.step === "challenge" ? { label: STORE_POLICY.payment.providerName ? `secure payment page · ${STORE_POLICY.payment.providerName}` : copy.hostedUrl, external: true } : s.step === "confirmed" ? copy.orderUrl : copy.url),
   device: "desktop",
   initial: { region: false, terms: false, consent: false, step: "review", card: "", exp: "", cvc: "", approving: 0 },

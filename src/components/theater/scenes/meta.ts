@@ -8,6 +8,8 @@ export type SceneCopy = (typeof copy.scenes)[SceneId];
 export interface SceneMeta {
   id: SceneId;
   label: string;
+  remark: string;
+  duration: string;
   title: string;
   summary: string;
   url: string;
@@ -17,11 +19,11 @@ export interface SceneMeta {
 
 export const THEATER_COPY = copy;
 
-export const SCENE_ORDER: SceneId[] = ["pick", "pay", "decrypt", "redeem", "support"];
+export const SCENE_ORDER: SceneId[] = ["checkin", "pay", "depart", "arrive", "help"];
 
 export function sceneEnabled(id: SceneId): boolean {
   if (id === "pay") return STORE_POLICY.payment.hostedPage && STORE_POLICY.payment.threeDSecure;
-  if (id === "support") return STORE_POLICY.guarantee.faultyKey;
+  if (id === "help") return STORE_POLICY.guarantee.faultyKey;
   return true;
 }
 
@@ -38,6 +40,8 @@ export function sceneMeta(id: SceneId): SceneMeta {
   return {
     id,
     label: c.label,
+    remark: c.remark,
+    duration: c.duration,
     title: c.title,
     summary: fillCopy(c.summary),
     url: fillCopy(c.url),

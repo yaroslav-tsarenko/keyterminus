@@ -42,7 +42,7 @@ export function FeatureSpotlight({ scene, title, description, eyebrow, device = 
             title={meta.summary}
             captions={meta.captions}
             external
-            poster={<Poster device={device} address={{ label: meta.url }} />}
+            poster={<Poster device={device} address={{ label: meta.url }} remark={meta.remark} />}
             labels={{ play: THEATER_COPY.play, pause: THEATER_COPY.pause, replay: THEATER_COPY.replay, sample: THEATER_COPY.sampleData, illustration: THEATER_COPY.illustration }}
           />
         </div>

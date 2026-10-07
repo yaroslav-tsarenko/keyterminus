@@ -1,5 +1,3 @@
-import { MOTION_SPRING } from "./tokens";
-
 export type Tick = (dt: number, now: number) => boolean | void;
 
 const subscribers = new Set<Tick>();
@@ -34,32 +32,6 @@ export function damp(current: number, target: number, lambda: number, dt: number
 
 export function lerpPerFrame(current: number, target: number, perFrame: number, dtMs: number): number {
   return current + (target - current) * (1 - Math.pow(1 - perFrame, dtMs / (1000 / 60)));
-}
-
-export interface Spring {
-  value: number;
-  velocity: number;
-}
-
-export function spring(value = 0): Spring {
-  return { value, velocity: 0 };
-}
-
-export function stepSpring(s: Spring, target: number, dtMs: number): boolean {
-  let remaining = dtMs / 1000;
-  while (remaining > 0) {
-    const h = Math.min(remaining, 1 / 120);
-    const accel = MOTION_SPRING.stiffness * (target - s.value) - MOTION_SPRING.damping * s.velocity;
-    s.velocity += accel * h;
-    s.value += s.velocity * h;
-    remaining -= h;
-  }
-  const settled = Math.abs(target - s.value) < 0.005 && Math.abs(s.velocity) < 0.01;
-  if (settled) {
-    s.value = target;
-    s.velocity = 0;
-  }
-  return settled;
 }
 
 export function cubicBezier(x1: number, y1: number, x2: number, y2: number): (t: number) => number {

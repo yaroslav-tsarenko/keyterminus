@@ -1,18 +1,26 @@
 export const MOTION_DURATION = {
   micro: 120,
   ui: 180,
-  panel: 260,
-  panelClose: 200,
-  tumbler: 520,
-  reveal: 640,
-  reduced: 120,
-  cartFlight: 400,
-  decrypt: 900,
-  doorOpen: 1800,
+  panel: 240,
+  panelClose: 180,
+  flap: 70,
+  reveal: 560,
+  reduced: 100,
+  cartFlight: 380,
+  keyFlip: 1100,
+  boardPage: 7000,
+  boardFade: 400,
+  boardArrival: 900,
+  gateFlip: 140,
+  routeDraw: 700,
+  stopIn: 160,
+  routeMarker: 600,
+  nextStop: 420,
 } as const;
 
 export const MOTION_EASE = {
-  latch: [0.3, 0, 0.1, 1],
+  flap: [0.55, 0, 1, 0.45],
+  sign: [0.2, 0, 0, 1],
   std: [0.4, 0, 0.2, 1],
   inOut: [0.76, 0, 0.24, 1],
   outExpo: [0.16, 1, 0.3, 1],
@@ -24,26 +32,28 @@ export function cssEase(name: MotionEase): string {
   return `cubic-bezier(${MOTION_EASE[name].join(", ")})`;
 }
 
-export const MOTION_SPRING = { stiffness: 420, damping: 38 } as const;
-
 export const MOTION_DEPTH = {
   D0: { pointer: 0, scroll: 0 },
-  D1: { pointer: 3, scroll: 0.04 },
-  D2: { pointer: 6, scroll: 0.08 },
-  D3: { pointer: 10, scroll: 0.12 },
-  D4: { pointer: 12, scroll: 0.05 },
+  D1: { pointer: 2, scroll: 0.03 },
+  D2: { pointer: 4, scroll: 0.06 },
+  D3: { pointer: 6, scroll: 0.1 },
   L0: { pointer: 0, scroll: 0 },
 } as const;
 
-export const MOTION_STAGGER = { chars: 28, rows: 70, lockers: 60, words: 40, ticks: 3, items: 70, tumblers: 40 } as const;
+export const MOTION_STAGGER = { chars: 18, rows: 60, cards: 70, stops: 90, keyChars: 30 } as const;
 
 export const MOTION_LIMITS = {
-  lockerSwing: 24,
-  doorSwing: 108,
-  cardDrawer: 6,
+  flapMaxSteps: 10,
+  flapRebound: 3,
+  riffleAngle: 10,
+  riffleMin: 4,
+  riffleRadius: 60,
+  boardPitch: 12,
+  boardRest: 4,
   dprCap: 1.5,
-  pointerDoor: 6,
-  decryptGlyphs: 4,
+  pointerTilt: 2,
+  depthMax: 12,
+  railRise: 6,
   cartGhost: 40,
   cartGhostOpacity: 0.9,
 } as const;

@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import readline from "node:readline";
 import { catalogConfig } from "@/config/catalog";
 import type { Classified, RejectReason } from "./classify";
 import type { Candidate } from "./select";
@@ -30,6 +29,23 @@ export interface PageStats {
 export interface StoredSelection {
   created: number;
   candidates: Pick<Candidate, "esaId" | "dedupeKey" | "title" | "displayName" | "sell" | "alternates" | "descriptionFrom">[];
+}
+
+export async function* ndjsonLines(file: string): AsyncGenerator<string> {
+  let rest = "";
+  for await (const chunk of fs.createReadStream(file, { encoding: "utf-8" })) {
+    const parts = (rest + chunk).split("\n");
+    rest = parts.pop() ?? "";
+    for (const part of parts) {
+      const line = part.endsWith("\r") ? part.slice(0, -1) : part;
+      if (line) yield line;
+    }
+  }
+  if (rest) yield rest;
+}
+
+function ndjsonLine(value: unknown): string {
+  return JSON.stringify(value).replace(/[\u0085\u2028\u2029]/g, (ch) => `\\u${ch.charCodeAt(0).toString(16).padStart(4, "0")}`);
 }
 
 export class Staging {
@@ -109,7 +125,7 @@ export class Staging {
   }
 
   savePage(page: number, items: Classified[], stats: PageStats): void {
-    this.writeAtomic(`${this.pageName(page)}.ndjson`, items.map((item) => JSON.stringify(item)).join("\n") + (items.length ? "\n" : ""));
+    this.writeAtomic(`${this.pageName(page)}.ndjson`, items.map((item) => ndjsonLine(item)).join("\n") + (items.length ? "\n" : ""));
     this.writeAtomic(`${this.pageName(page)}.json`, JSON.stringify(stats));
   }
 
@@ -129,7 +145,7 @@ export class Staging {
     for (const page of this.pages()) {
       try {
         JSON.parse(fs.readFileSync(this.file(`${this.pageName(page)}.json`), "utf-8"));
-        for (const line of fs.readFileSync(this.file(`${this.pageName(page)}.ndjson`), "utf-8").split("\n")) if (line) JSON.parse(line);
+        for (const line of fs.readFileSync(this.file(`${this.pageName(page)}.ndjson`), "utf-8").split("\n")) if (line.trim()) JSON.parse(line);
       } catch {
         damaged.push(page);
       }
@@ -147,10 +163,7 @@ export class Staging {
 
   async *items(): AsyncGenerator<Classified> {
     for (const page of this.pages()) {
-      const stream = fs.createReadStream(this.file(`${this.pageName(page)}.ndjson`), { encoding: "utf-8" });
-      const lines = readline.createInterface({ input: stream, crlfDelay: Infinity });
-      for await (const line of lines) {
-        if (!line) continue;
+      for await (const line of ndjsonLines(this.file(`${this.pageName(page)}.ndjson`))) {
         const item = JSON.parse(line) as Classified & { releaseDate: string | null };
         yield { ...item, releaseDate: item.releaseDate ? new Date(item.releaseDate) : null };
       }

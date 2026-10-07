@@ -1,10 +1,10 @@
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import readline from "node:readline";
 import { syncCatalog, liveSource, type CatalogSource } from "../src/lib/esa/sync";
 import { refreshCatalog } from "../src/lib/esa/refresh";
 import { parseProducts } from "../src/lib/esa/client";
+import { ndjsonLines } from "../src/lib/esa/staging";
 import { catalogConfig } from "../src/config/catalog";
 import { prisma } from "../src/lib/prisma";
 import type { EsaProduct } from "../src/lib/esa/types";
@@ -25,10 +25,9 @@ function fixtureSource(file: string): CatalogSource {
       label: "fixture",
       kind: "stream",
       pages: async function* () {
-        const lines = readline.createInterface({ input: fs.createReadStream(absolute, { encoding: "utf-8" }), crlfDelay: Infinity });
         let page: unknown[] = [];
         let rejected = 0;
-        for await (const line of lines) {
+        for await (const line of ndjsonLines(absolute)) {
           if (!line.trim()) continue;
           page.push(JSON.parse(line));
           if (page.length < pageSize) continue;

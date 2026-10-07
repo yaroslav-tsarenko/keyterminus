@@ -1,0 +1,505 @@
+@import "tailwindcss";
+@import "./variables.css";
+@import "./animations.css";
+@import "./motion.css";
+
+@source not "../../package.json";
+@source not "../../README.md";
+@source not "../../scripts";
+@source not "../../.claude";
+@source not "../lib/esa";
+@source not "../../.env.example";
+
+@custom-variant dark ([data-theme="dark"] &);
+@custom-variant hover-device (@media (hover: hover) and (pointer: fine));
+@custom-variant touch-device {
+  @media (hover: none), (pointer: coarse) {
+    @slot;
+  }
+}
+
+@theme inline {
+  --color-surface: var(--color-bg);
+  --color-surface-1: var(--color-bg-secondary);
+  --color-surface-2: var(--color-bg-tertiary);
+  --color-surface-warm: var(--color-bg-warm);
+  --color-raised: var(--color-raised);
+  --color-plate: var(--color-plate);
+  --color-stage: var(--color-stage);
+  --color-on-stage: var(--color-on-stage);
+  --color-rig: var(--color-rig);
+  --color-floor: var(--color-floor);
+
+  --color-ink: var(--color-text);
+  --color-ink-muted: var(--color-text-secondary);
+  --color-ink-subtle: var(--color-text-tertiary);
+
+  --color-brand: var(--color-accent);
+  --color-brand-hover: var(--color-accent-hover);
+  --color-brand-soft: var(--color-accent-light);
+  --color-brand-2: var(--color-accent-2);
+  --color-on-brand: var(--color-on-accent);
+  --color-accent-ink: var(--color-accent-ink);
+  --color-accent-edge: var(--color-accent-edge);
+  --color-sale: var(--color-accent-3);
+  --color-steel-hi: var(--color-steel-hi);
+  --color-lamp-on: var(--color-lamp-on);
+  --color-lamp-off: var(--color-lamp-off);
+  --color-deal: var(--color-deal);
+  --color-on-deal: var(--color-on-deal);
+  --color-logo-strip: var(--color-logo-strip);
+  --color-platform: var(--platform);
+  --color-type: var(--type);
+
+  --color-rule: var(--color-rule);
+  --color-line: var(--color-border);
+  --color-line-hover: var(--color-border-hover);
+  --color-control: var(--color-border-control);
+  --color-focus: var(--color-focus);
+  --color-scrim: var(--color-scrim);
+
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: var(--color-info);
+  --color-success-tint: var(--color-success-tint);
+  --color-warning-tint: var(--color-warning-tint);
+  --color-danger-tint: var(--color-danger-tint);
+  --color-info-tint: var(--color-info-tint);
+  --color-on-danger: var(--color-on-danger);
+
+  --font-sans: var(--font-mona), "Mona Sans Variable", "Mona Fallback", "Segoe UI", sans-serif;
+  --font-display: var(--font-hubot), "Hubot Sans Variable", "Hubot Fallback", Verdana, sans-serif;
+  --font-mono: var(--font-redhat-mono), "Red Hat Mono Variable", "Red Hat Mono Fallback", ui-monospace, Menlo, Consolas, monospace;
+
+  --text-step--2: 0.75rem;
+  --text-step--1: 0.8125rem;
+  --text-step-0: 1rem;
+  --text-step-1: clamp(1.125rem, 1.08rem + 0.2vw, 1.2rem);
+  --text-step-2: clamp(1.25rem, 1.15rem + 0.45vw, 1.44rem);
+  --text-step-3: clamp(1.4375rem, 1.25rem + 0.85vw, 1.728rem);
+  --text-step-4: clamp(1.625rem, 1.35rem + 1.35vw, 2.074rem);
+  --text-step-5: clamp(1.875rem, 1.45rem + 2.05vw, 2.488rem);
+  --text-step-6: clamp(2.125rem, 1.5rem + 3.05vw, 2.986rem);
+  --text-display-xl: clamp(2.5rem, 0.9rem + 6.4vw, 5.5rem);
+  --text-ui-md: 0.9375rem;
+  --text-ui-sm: 0.875rem;
+  --text-ui-xs: 0.8125rem;
+  --text-data: 0.875rem;
+  --text-data-sm: 0.75rem;
+  --text-key: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+
+  --radius-xs: 0px;
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+  --radius-pill: var(--radius-pill);
+  --radius-control: var(--radius-control);
+  --radius-tray: var(--radius-tray);
+  --radius-round: 50%;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-card-hover: var(--shadow-card-hover);
+  --shadow-accent: var(--shadow-accent);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-panel-left: var(--shadow-panel-left);
+  --shadow-machined: var(--edge-machined);
+  --shadow-machined-pressed: var(--edge-machined-pressed);
+  --text-shadow-engrave: var(--engrave);
+
+  --spacing-gutter: var(--gutter);
+
+  --container-read: 720px;
+  --container-narrow: 1120px;
+  --container-container: 1360px;
+  --container-shop: 1360px;
+  --container-wide: 1560px;
+
+  --ease-latch: cubic-bezier(0.3, 0, 0.1, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    font-synthesis: none;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    font-stretch: 100%;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-stretch: 112.5%;
+    font-weight: 680;
+    font-synthesis: none;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-weight: 700;
+  }
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--selection-bg);
+    color: var(--selection-fg);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-hover);
+    border-radius: 0;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: var(--dur-reduced) !important;
+      transition-property: opacity, color, background-color, border-color !important;
+    }
+  }
+}
+
+@layer components {
+  .cover {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-color: var(--color-stage);
+    color: var(--color-on-stage);
+    box-shadow: inset 0 1px 0 rgb(0 0 0 / 0.35);
+  }
+
+  [data-theme="light"] .cover {
+    box-shadow: inset 0 1px 0 rgb(15 21 19 / 0.14);
+  }
+
+  .cover[data-fit="contain"] {
+    background-image: var(--steel-grain);
+  }
+
+  .deposit-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background-color: var(--color-plate);
+    box-shadow: var(--edge-machined), 0 0 0 1px var(--color-border);
+    transition: box-shadow var(--dur-ui) var(--ease-latch);
+  }
+
+  .deposit-box [data-drawer-face] {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-bg-tertiary);
+  }
+
+  .deposit-box [data-drawer-face] > .cover {
+    transition:
+      transform var(--dur-ui) var(--ease-latch),
+      opacity var(--dur-micro) var(--ease-std);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .deposit-box[data-drawer]:is(:hover, :focus-within) {
+      box-shadow: var(--shadow-card-hover), 0 0 0 1px var(--color-border-hover);
+    }
+
+    .deposit-box[data-drawer]:is(:hover, :focus-within) [data-drawer-face] > .cover {
+      transform: translateY(-6px);
+    }
+
+    .deposit-box[data-drawer]:is(:hover, :focus-within) [data-card-link] {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+    }
+  }
+
+  .deposit-box:has([data-card-link]:focus-visible) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .plate {
+    background-color: var(--color-plate);
+    box-shadow: var(--edge-machined), 0 0 0 1px var(--color-border);
+  }
+
+  .bolted {
+    position: relative;
+  }
+
+  .bolted > [data-bolt] {
+    position: absolute;
+    width: var(--bolt);
+    height: var(--bolt);
+    border-radius: 50%;
+    background-color: var(--color-border-control);
+    box-shadow: inset 1px 1px 0 color-mix(in srgb, var(--color-steel-hi) 25%, transparent);
+    pointer-events: none;
+  }
+
+  .bolted > [data-bolt="tl"] {
+    top: 10px;
+    left: 10px;
+  }
+
+  .bolted > [data-bolt="tr"] {
+    top: 10px;
+    right: 10px;
+  }
+
+  .bolted > [data-bolt="bl"] {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .bolted > [data-bolt="br"] {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .btn-text > [data-label] {
+    position: relative;
+  }
+
+  .btn-text > [data-label]::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-micro) var(--ease-latch);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn-text:not([aria-disabled="true"]):not(:disabled):hover > [data-label]::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .btn-text:active > [data-label]::after {
+    transform: scaleX(1);
+    background: var(--color-accent-ink);
+  }
+
+  .active-bar {
+    position: relative;
+  }
+
+  .active-bar::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-micro) var(--ease-latch);
+  }
+
+  .active-bar:is([aria-current], [data-active="true"], [aria-selected="true"])::after {
+    transform: scaleX(1);
+  }
+
+  .tumbler-slot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(1ch + 0.32em);
+    height: 1.45em;
+    overflow: hidden;
+    background-color: var(--color-bg-tertiary);
+    box-shadow: var(--edge-machined-pressed);
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-feature-settings: "calt" 0;
+    line-height: 1;
+    color: var(--color-text);
+  }
+
+  .tumbler-slot + .tumbler-slot {
+    border-left: 1px solid var(--color-border);
+  }
+}
+
+@utility steel-grain {
+  background-image: var(--steel-grain);
+}
+
+@utility eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  text-shadow: var(--engrave);
+}
+
+@utility label-caps {
+  font-family: var(--font-display);
+  font-weight: 680;
+  letter-spacing: 0.06em;
+  font-stretch: 125%;
+  text-transform: uppercase;
+}
+
+@utility data {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+@utility price {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@utility key-code {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-key);
+  letter-spacing: 0.08em;
+  font-feature-settings: "calt" 0;
+  font-variant-ligatures: none;
+  user-select: all;
+  word-break: break-all;
+}
+
+@utility tumbler {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-feature-settings: "calt" 0;
+  line-height: 1;
+}
+
+@utility display-wide {
+  font-family: var(--font-display);
+  font-stretch: 112.5%;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+@utility measure {
+  max-width: 68ch;
+}
+
+@utility meta {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+svg.lucide {
+  stroke-width: 1.75;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  flex-shrink: 0;
+}
+
+@media print {
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+}

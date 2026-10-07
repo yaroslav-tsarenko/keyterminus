@@ -1,0 +1,11 @@
+{
+  "siteDescription": "Game keys, DLC, gift cards and subscriptions for Steam, Epic, Xbox, PlayStation, Nintendo and more. Pay on a hosted card page; your key is delivered to your account, usually within minutes after payment is confirmed.",
+  "ogFrom": "From {price}",
+  "ogItems": "{count, plural, one {# item} other {# items}}",
+  "ogShop": "Shop",
+  "ogProductAlt": "{name} from {brand}",
+  "ogCategoryAlt": "{name} at {brand}",
+  "catalogTitle": "Game keys, subscriptions and gift cards",
+  "ogDelivery": "Delivered to your account",
+  "ogGuarantee": "Replaced or refunded if a key doesn't work"
+}

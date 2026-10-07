@@ -1,0 +1,155 @@
+{
+  "title": "Questions",
+  "metaTitle": "Questions about buying game keys, delivery and refunds",
+  "metaDescription": "Answers on ordering game keys, subscriptions and gift cards from {brand}: delivery to your account, regions, redeeming, refunds, card payment and your account.",
+  "lead": "Short answers about buying from {brand}. The full terms are in our <policies>policies</policies>.",
+  "home": "Home",
+  "groupsNav": "Question groups",
+  "stillNeedHelp": "Still need help?",
+  "stillNeedHelpBody": "Write to us and we reply {replyTime}. Support hours: {supportHours}.",
+  "contactUs": "Contact us",
+  "groups": {
+    "orders": {
+      "title": "Orders",
+      "items": {
+        "place": {
+          "q": "How do I place an order?",
+          "a": "Sign in, add products to your cart and go to checkout. Enter your contact and billing details, tick the two confirmation boxes and pay on our payment provider's secure page. We email your order confirmation and invoice once the payment is confirmed."
+        },
+        "account": {
+          "q": "Do I need an account to order?",
+          "a": "Yes. Keys are issued to your {brand} account and shown only to you, so checkout needs you to be signed in. Creating an account takes three short steps."
+        },
+        "limits": {
+          "q": "Is there a limit on how many keys I can buy?",
+          "a": "One order can hold up to {maxItems} keys and be worth up to {maxValue}. Gift cards and top-ups are limited to {cardLimit} per product per order and {cardLimit24h} keys or {cardValue24h} per customer in 24 hours. The limit for each product is shown on its page."
+        },
+        "change": {
+          "q": "Can I cancel my order?",
+          "a": "You can cancel free of charge before {cancelBefore}. Email {email} with your order number. Keys are usually issued within minutes, and once a key is issued the right to cancel no longer applies, as explained in our <returns>Refund policy</returns>."
+        },
+        "noEmail": {
+          "q": "I paid but did not get a confirmation email.",
+          "a": "Check your spam or promotions folder first. The confirmation is sent once the payment provider confirms the payment. Your order page in your account also shows the status. If your card was charged and nothing has arrived, contact us."
+        }
+      }
+    },
+    "delivery": {
+      "title": "Delivery and redeeming",
+      "items": {
+        "how": {
+          "q": "How do I receive my key?",
+          "a": "On the order page in your account. Open the order, select Reveal key and copy it. We email you when your keys are ready; for security the email does not contain the key itself."
+        },
+        "time": {
+          "q": "How long does delivery take?",
+          "a": "Keys are {usual}. A bank check or a security review can make it take longer. If we cannot issue a key within {deadlineHours} hours of payment confirmation, we refund it."
+        },
+        "region": {
+          "q": "What does the activation region mean?",
+          "a": "A Global key works on an account set to any country we serve. A Europe, United Kingdom, United States or North America key only activates on an account set to that region. The region is shown on every product page and in your cart."
+        },
+        "language": {
+          "q": "Which languages will the game have?",
+          "a": "The product page lists the languages the publisher states for that key. Some keys support only some languages; if a language matters to you, check the list before you buy."
+        },
+        "redeem": {
+          "q": "Where do I enter the key?",
+          "a": "On the platform named on the product page: for example Games, Activate a Product on Steam; Redeem code in the EA app; redeem.microsoft.com for Xbox. Step-by-step instructions for every platform are on <howto>How activation works</howto> and on your order page."
+        },
+        "safety": {
+          "q": "Is my key safe in my account?",
+          "a": "Keys are stored encrypted and only shown to the signed-in account that bought them, when you select Reveal key. Keep the key private until you redeem it: anyone who sees it can use it."
+        }
+      }
+    },
+    "returns": {
+      "title": "Refunds and the key guarantee",
+      "items": {
+        "when": {
+          "q": "When do you refund?",
+          "a": "If we cannot issue a key within {deadlineHours} hours of payment confirmation, if a key does not activate and no replacement is available, or if you cancel before {cancelBefore}. Refunds go to {refundMethod} within {refundDays} days. See our <returns>Refund policy</returns>."
+        },
+        "notWorking": {
+          "q": "My key doesn't work. What now?",
+          "a": "First check that the platform and region match your account. If it still fails, contact us within {claimDays} days of delivery with your order number and a screenshot of the error. We check it within {reviewDays} business days and replace the key or refund it. See the <warranty>Key guarantee</warranty>."
+        },
+        "withdrawal": {
+          "q": "What happens to the 14-day right to cancel?",
+          "a": "At checkout you ask us to start delivery straight away and acknowledge that the {withdrawalDays}-day right to cancel ends once a key is issued. This does not affect your rights if a key is not delivered, does not work or is not as described."
+        },
+        "refund": {
+          "q": "Can I return a key I don't want?",
+          "a": "Not once it has been issued and works as described, for example if you changed your mind or bought the wrong platform when the product page stated it correctly. Please check the platform, region and edition before you buy."
+        }
+      }
+    },
+    "payment": {
+      "title": "Payment",
+      "items": {
+        "methods": {
+          "q": "How can I pay?",
+          "a": "By {cardMethods} card. You enter your card details on our PCI DSS compliant payment provider's hosted page. We do not accept other payment methods."
+        },
+        "safe": {
+          "q": "Is my card information safe?",
+          "a": "We do not store or process full payment card data. All card payments are processed by our PCI DSS compliant payment provider. Your bank may ask you to confirm the payment with 3-D Secure, for example in your banking app."
+        },
+        "currencies": {
+          "q": "Which currencies can I pay in?",
+          "a": "{currencies}. You are charged in the currency selected at checkout. If your card is in another currency, your bank may add a conversion fee."
+        },
+        "vatNo": {
+          "q": "Do your prices include VAT?",
+          "a": "{company} is not registered for VAT, so we do not charge VAT and none is added at checkout."
+        },
+        "vatYes": {
+          "q": "Do your prices include VAT?",
+          "a": "Yes. Prices include VAT at the rate that applies to your order."
+        },
+        "when": {
+          "q": "When is my card charged?",
+          "a": "When you complete payment on the provider's page. We request delivery only after the payment is confirmed. If the payment is declined or cancelled, nothing is charged."
+        }
+      }
+    },
+    "products": {
+      "title": "Products",
+      "items": {
+        "what": {
+          "q": "What do you offer?",
+          "a": "Activation keys for games and DLC, subscription codes, gift cards and in-game top-ups, and software licence keys. Everything is digital; nothing is posted."
+        },
+        "subscriptions": {
+          "q": "Do subscriptions renew automatically?",
+          "a": "No. A subscription code gives access for the duration shown and we never charge you again. If you want it to continue, you renew it yourself with the platform."
+        },
+        "giftCards": {
+          "q": "Which gift card should I choose?",
+          "a": "The one for the region your platform account is set to. A card adds its value, in the currency shown, only to an account in that region."
+        },
+        "affiliation": {
+          "q": "Are you connected to the platforms or publishers?",
+          "a": "No. {brand} is an independent store, not affiliated with or endorsed by the platforms and publishers whose products it offers. Their names and logos belong to them."
+        }
+      }
+    },
+    "account": {
+      "title": "Your account",
+      "items": {
+        "who": {
+          "q": "Who can open an account?",
+          "a": "Anyone aged {minAge} or over who lives in a country we serve. We don't take orders from or open accounts in {restricted}, or in {territories}."
+        },
+        "password": {
+          "q": "I forgot my password.",
+          "a": "Use Forgot your password on the sign-in page. We email you a link to set a new one."
+        },
+        "delete": {
+          "q": "How do I close my account?",
+          "a": "Email {email} from the address on your account. We close it and delete your data except what we must keep by law, as explained in our <privacy>Privacy policy</privacy>. Keys you have already redeemed stay on the platforms where you redeemed them."
+        }
+      }
+    }
+  }
+}

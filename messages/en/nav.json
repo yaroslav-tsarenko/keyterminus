@@ -1,0 +1,15 @@
+{
+  "home": "Home",
+  "catalog": "Shop",
+  "cart": "Cart",
+  "account": "Account",
+  "login": "Sign in",
+  "register": "Create account",
+  "logout": "Sign out",
+  "admin": "Admin",
+  "search": "Search a game or gift card",
+  "allCategories": "All products",
+  "contact": "Contact us",
+  "faq": "Questions",
+  "policies": "Policies"
+}

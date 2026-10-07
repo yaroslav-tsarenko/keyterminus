@@ -1,0 +1,19 @@
+{
+  "notFound": "Nothing here",
+  "notFoundTitle": "This door doesn't open",
+  "notFoundSubtitle": "The page doesn't exist, or the key is no longer listed.",
+  "searchLabel": "Search games and gift cards",
+  "searchPlaceholder": "Search a game, gift card or publisher",
+  "searchSubmit": "Search",
+  "categoriesTitle": "Product types",
+  "helpTitle": "Help",
+  "backHome": "Back to home",
+  "serverError": "Something went wrong loading this page.",
+  "serverErrorTitle": "Something went wrong",
+  "serverErrorBody": "This is a fault on our side. Try again, or come back in a few minutes. If it keeps happening, email {email}.",
+  "errorReference": "Reference: {digest}",
+  "unauthorized": "Sign in to continue",
+  "forbidden": "You don't have access to this page",
+  "validationError": "Check the highlighted fields",
+  "networkError": "We couldn't reach the store. Check your connection and try again."
+}

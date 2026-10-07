@@ -124,6 +124,23 @@ export class Staging {
       .sort((a, b) => a - b);
   }
 
+  damagedPages(): number[] {
+    const damaged: number[] = [];
+    for (const page of this.pages()) {
+      try {
+        JSON.parse(fs.readFileSync(this.file(`${this.pageName(page)}.json`), "utf-8"));
+        for (const line of fs.readFileSync(this.file(`${this.pageName(page)}.ndjson`), "utf-8").split("\n")) if (line) JSON.parse(line);
+      } catch {
+        damaged.push(page);
+      }
+    }
+    return damaged;
+  }
+
+  dropPage(page: number): void {
+    for (const ext of [".json", ".ndjson"]) fs.rmSync(this.file(`${this.pageName(page)}${ext}`), { force: true });
+  }
+
   pageStats(page: number): PageStats {
     return JSON.parse(fs.readFileSync(this.file(`${this.pageName(page)}.json`), "utf-8")) as PageStats;
   }
@@ -142,6 +159,10 @@ export class Staging {
 
   saveSelection(selection: StoredSelection): void {
     this.writeAtomic("selection.json", JSON.stringify(selection));
+  }
+
+  clearSelection(): void {
+    fs.rmSync(this.file("selection.json"), { force: true });
   }
 
   readSelection(): StoredSelection | null {

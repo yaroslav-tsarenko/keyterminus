@@ -250,7 +250,13 @@ async function writeChunk(tx: Tx, chunk: WriteRow[], categories: Map<string, str
 
   const esaIds = chunk.map((c) => c.esaId);
   const esaProductIds = chunk.map((c) => c.esaProductId);
-  await tx.$executeRaw`DELETE FROM "SupplyItem" WHERE ("esaId" = ANY(${esaIds}) OR "esaProductId" = ANY(${esaProductIds})) AND NOT ("productId" = ANY(${ids}))`;
+  await tx.$executeRaw`
+    DELETE FROM "SupplyItem" s
+    WHERE (s."esaId" = ANY(${esaIds}::int[]) OR s."esaProductId" = ANY(${esaProductIds}::text[]) OR s."productId" = ANY(${ids}::text[]))
+      AND NOT EXISTS (
+        SELECT 1 FROM unnest(${ids}::text[], ${esaProductIds}::text[], ${esaIds}::int[]) AS n("productId", "esaProductId", "esaId")
+        WHERE n."productId" = s."productId" AND n."esaProductId" = s."esaProductId" AND n."esaId" = s."esaId"
+      )`;
   const supply = chunk.map((c) => {
     const id = productIdFor(c.dedupeKey);
     return Prisma.sql`(${`su_${id.slice(3)}`}, ${id}, ${c.esaProductId}, ${c.esaId}, ${c.offerId}, ${c.cost}, ${c.sell}, ${c.qty}, ${c.offers}, ${c.rawName}, ${c.rawPlatform}, ${c.rawRegion}, ${c.regionId}, ${JSON.stringify(c.alternates)}::jsonb, ${JSON.stringify(pricing.get(c.dedupeKey)!.log)}::jsonb, true, ${now}, ${now}, ${now})`;
@@ -403,7 +409,20 @@ async function runSync(source: CatalogSource, staging: Staging, options: SyncOpt
       ? previous
       : { version: 1, runId, source: source.id, label: source.label, startedAt: (options.now ?? new Date()).toISOString(), totalPages: null, itemCount: null, pagesDone: [], fetchComplete: false, chunksWritten: 0, finished: false };
   if (!previous || !run) staging.reset(manifest);
-  else log(`[catalog-sync] resuming run ${runId} started ${manifest.startedAt}`);
+  else {
+    log(`[catalog-sync] resuming run ${runId} started ${manifest.startedAt}`);
+    const listed = new Set(staging.pages());
+    const damaged = new Set([...staging.damagedPages(), ...manifest.pagesDone.filter((page) => !listed.has(page))]);
+    if (damaged.size) {
+      for (const page of damaged) staging.dropPage(page);
+      manifest.pagesDone = manifest.pagesDone.filter((page) => !damaged.has(page));
+      manifest.fetchComplete = false;
+      manifest.chunksWritten = 0;
+      staging.saveManifest(manifest);
+      staging.clearSelection();
+      log(`[catalog-sync] ${damaged.size} staged page${damaged.size === 1 ? " was" : "s were"} incomplete and will be fetched again`);
+    }
+  }
   const now = new Date(manifest.startedAt);
 
   try {

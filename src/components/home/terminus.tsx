@@ -18,7 +18,7 @@ export async function Terminus({ data }: { data: HomeData }) {
           <div className="min-w-0 lg:col-span-8">
             <SectionHeading id="terminus-title" title={t("title")} lead={t("line")} size="large" className="[&_h2]:max-w-[16ch]" />
             <div className="mt-8 max-w-[680px] max-sm:[&_button]:px-4">
-              <SearchForm query="" inputId="terminus-search" label={t("searchLabel")} placeholder={d("searchPlaceholder", { live: data.live.toLocaleString("en-GB") })} submit={d("searchSubmit")} />
+              <SearchForm query="" inputId="terminus-search" label={t("searchLabel")} placeholder={data.live > 0 ? d("searchPlaceholder", { live: data.live.toLocaleString("en-GB") }) : d("searchPlaceholderEmpty")} submit={d("searchSubmit")} />
             </div>
             {data.platforms.length ? (
               <nav aria-label={t("platformsLabel")} className="mt-8">

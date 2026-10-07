@@ -182,7 +182,7 @@ export function DeparturesBoard({ pages, live, legend }: { pages: BoardRowView[]
     return mode === "search" ? [priced(rows)] : pages.map(priced);
   }, [mode, rows, pages, price]);
 
-  const readout = mode === "search" ? (noMatch ? t("noResults", { query: results!.q }) : t("results", { query: results!.q })) : t("page", { page: page + 1, pages: count });
+  const readout = mode === "search" ? (noMatch ? t("noResults", { query: results!.q }) : t("results", { query: results!.q })) : count > 0 ? t("page", { page: page + 1, pages: count }) : "";
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("keyterminus:board", { detail: { page, paused, mode, query: mode === "search" ? results?.q ?? "" : "" } }));
@@ -221,7 +221,7 @@ export function DeparturesBoard({ pages, live, legend }: { pages: BoardRowView[]
                 setQuery("");
               }
             }}
-            placeholder={t("searchPlaceholder", { live: live.toLocaleString("en-GB") })}
+            placeholder={live > 0 ? t("searchPlaceholder", { live: live.toLocaleString("en-GB") }) : t("searchPlaceholderEmpty")}
             autoComplete="off"
             enterKeyHint="search"
             aria-describedby={`${inputId}-readout`}

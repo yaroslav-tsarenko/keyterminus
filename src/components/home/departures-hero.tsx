@@ -22,7 +22,9 @@ export async function DeparturesHero({ data }: { data: HomeData }) {
   const t = await getTranslations("home.departures");
   const live = data.live.toLocaleString("en-GB");
   const lead = [
-    t("leadSearch", { live, platforms: listPlatforms(data.platforms.slice(0, 4).map((p) => p.name), t("andMore")) }),
+    data.live > 0 && data.platforms.length > 0
+      ? t("leadSearch", { live, platforms: listPlatforms(data.platforms.slice(0, 4).map((p) => p.name), t("andMore")) })
+      : t("leadSearchEmpty"),
     STORE_POLICY.payment.hostedPage ? t("leadPayment") : null,
     t("leadDelivery"),
   ]

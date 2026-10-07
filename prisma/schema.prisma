@@ -161,6 +161,7 @@ model Product {
   item       KeyItem?
   supply     SupplyItem?
 
+  boardRank Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -170,6 +171,7 @@ model Product {
   @@index([sku])
   @@index([status, createdAt])
   @@index([status, updatedAt])
+  @@index([status, boardRank])
   @@index([status, id, price, comparePrice, quantity, trackInventory, createdAt, name, brand], map: "Product_catalog_idx")
   @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Product_name_trgm_idx")
   @@index([sku(ops: raw("gin_trgm_ops"))], type: Gin, map: "Product_sku_trgm_idx")
@@ -550,11 +552,16 @@ model KeyItem {
   faceValue          Decimal?  @db.Decimal(12, 2)
   faceCurrency       String?
   validity           String?
+  boardScore         Float?
+  boardRank          Int?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
   @@index([productType])
   @@index([platform])
+  @@index([boardRank])
+  @@index([platform, boardRank])
+  @@index([productType, platform, boardRank])
   @@index([region])
   @@index([releaseYear])
   @@index([releaseDate])

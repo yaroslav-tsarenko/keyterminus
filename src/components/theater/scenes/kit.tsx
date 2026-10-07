@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Archive, Search, UserKey } from "lucide-react";
 import { Wordmark } from "@/components/layout/BrandMark";
-import { Tumbler } from "@/components/ui/Tumbler";
+import { FlapCounter } from "@/components/ui/Flap";
 import { cn } from "@/lib/utils/cn";
 import type { DeviceKind } from "../types";
 
@@ -10,7 +10,7 @@ export function DemoHeader({ device, query = "", placeholder = "Search keys", fo
   return (
     <div className="shrink-0 border-b border-line bg-rig">
       <div className={cn("flex items-center gap-5", phone ? "h-14 px-4" : "h-16 px-6")}>
-        <Wordmark className={cn("shrink-0 text-ink", phone ? "h-[25px] w-auto" : "h-[29px] w-auto")} detail={phone ? "small" : "full"} />
+        <Wordmark className={cn("shrink-0 text-ink", phone ? "h-[25px] w-auto" : "h-[29px] w-auto")} />
         {phone ? <span className="flex-1" /> : null}
         <div
           data-demo="search"
@@ -36,7 +36,7 @@ export function DemoHeader({ device, query = "", placeholder = "Search keys", fo
         <span data-demo="cart" className="inline-flex items-center gap-2 text-ui-sm font-[560] text-ink">
           <Archive size={18} aria-hidden="true" />
           {phone ? null : "Cart"}
-          {cart > 0 ? <Tumbler value={cart} size="xs" className="[&_.tumbler-slot]:bg-brand [&_.tumbler-slot]:text-on-brand" /> : null}
+          {cart > 0 ? <FlapCounter value={cart} size="xs" className="[&_.tumbler-slot]:bg-brand [&_.tumbler-slot]:text-on-brand" /> : null}
         </span>
       </div>
       {phone ? (

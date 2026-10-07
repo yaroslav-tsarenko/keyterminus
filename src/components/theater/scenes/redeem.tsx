@@ -4,7 +4,7 @@ import { BadgeCheck, ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Choice";
 import { Input } from "@/components/ui/Field";
-import { Plate } from "@/components/ui/Plate";
+import { Tag } from "@/components/ui/Tag";
 import { ACTIVATION } from "@/config/activation";
 import { platformInfo } from "@/lib/catalog/platforms";
 import { cn } from "@/lib/utils/cn";
@@ -19,7 +19,7 @@ type S = { platform: string; menu: boolean; dialog: boolean; key: string; agreed
 
 const copy = THEATER_COPY.scenes.redeem;
 const meta = sceneMeta("redeem");
-const NEW_TITLE = "Lantern Coast";
+const NEW_TITLE = "Copperline Express";
 
 function guideFor(platform: string) {
   return ACTIVATION[(platform in ACTIVATION ? platform : "steam") as Platform];
@@ -40,7 +40,7 @@ function LibraryRow({ title, fresh }: { title: string; fresh?: boolean }) {
 function View({ s, device, focus }: SceneViewProps<S>) {
   const phone = device === "phone";
   const guide = guideFor(s.platform);
-  const tone = platformInfo(guide.platform).tone;
+  const tone = platformInfo(guide.platform).key;
   const [top, item] = guide.menuPath.length > 1 ? guide.menuPath : [guide.menuPath[0], guide.menuPath[0]];
   return (
     <div className={cn("flex h-full flex-col bg-surface-1", phone ? "p-3" : "p-8")} data-platform={tone}>
@@ -50,9 +50,9 @@ function View({ s, device, focus }: SceneViewProps<S>) {
             <span aria-hidden="true" className="size-1.5 bg-platform" />
             <span className="eyebrow text-ink">{guide.name}</span>
           </span>
-          <Plate variant="neutral" size="sm">
+          <Tag variant="neutral" size="sm">
             Illustration
-          </Plate>
+          </Tag>
         </div>
         <div className="relative flex h-10 shrink-0 items-center gap-1 border-b border-line bg-raised px-2">
           <span data-demo="menu-0" className={cn("inline-flex h-8 items-center gap-1.5 px-3 text-ui-sm font-[560]", s.menu ? "bg-plate text-ink shadow-machined" : "text-ink")}>

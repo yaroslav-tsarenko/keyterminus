@@ -6,46 +6,36 @@ import { isBlockedImageHost } from "@/lib/utils/supplier";
 export const OG_SIZE = { width: 1200, height: 630 };
 
 export const OG_PALETTE = {
-  room: "#0f1513",
-  rig: "#0c110f",
-  floor: "#080b0a",
-  plate: "#1e2725",
-  inset: "#090d0c",
-  ink: "#e4ebe7",
-  inkMuted: "#a2aea9",
-  inkFaint: "#87948f",
-  rule: "#3a4743",
-  line: "#26302d",
-  control: "#6c7a75",
-  steelHi: "#c9d3cf",
-  accent: "#46d39a",
+  floor: "#f4f1ea",
+  band: "#eae5da",
+  raised: "#fcfbf7",
+  ink: "#1b1c1d",
+  inkMuted: "#4b4842",
+  inkFaint: "#5d5951",
+  rule: "#b5ae9f",
+  line: "#d6d0c3",
+  board: "#222426",
+  boardEdge: "#3a3d41",
+  flap: "#2b2e31",
+  flapTop: "#2e3134",
+  hinge: "#0e0f10",
+  onBoard: "#f2ede1",
+  onBoardMuted: "#b0aba0",
+  remark: "#e9bb45",
+  bar: "#d29d1a",
 } as const;
 
-export const OG_PLATFORM: Record<string, string> = {
-  steam: "#9cc3e6",
-  epic: "#d3dad7",
-  ea: "#ff8f6b",
-  ubisoft: "#62b2f5",
-  gog: "#c99bf2",
-  battlenet: "#56cfe8",
-  xbox: "#8fd16b",
-  playstation: "#8ea7ff",
-  nintendo: "#ff7a86",
-  rockstar: "#f0c95a",
-  other: "#a2aea9",
-};
-
-type FontSpec = { name: string; file: string; weight: 400 | 500 | 600 | 700; style: "normal" };
+type FontSpec = { name: string; file: string; weight: 400 | 500 | 600 | 700 | 800; style: "normal" };
 
 const FONT_FILES: FontSpec[] = [
-  { name: "Hubot Sans", file: "hubot-sans-latin-112-700-normal.woff", weight: 700, style: "normal" },
-  { name: "Hubot Sans Wide", file: "hubot-sans-latin-125-600-normal.woff", weight: 600, style: "normal" },
-  { name: "Mona Sans", file: "mona-sans-latin-400-normal.woff", weight: 400, style: "normal" },
-  { name: "Mona Sans", file: "mona-sans-latin-600-normal.woff", weight: 600, style: "normal" },
-  { name: "Red Hat Mono", file: "red-hat-mono-latin-500-normal.woff", weight: 500, style: "normal" },
+  { name: "Overpass", file: "overpass-latin-400-normal.woff", weight: 400, style: "normal" },
+  { name: "Overpass", file: "overpass-latin-700-normal.woff", weight: 700, style: "normal" },
+  { name: "Overpass", file: "overpass-latin-800-normal.woff", weight: 800, style: "normal" },
+  { name: "Sometype Mono", file: "sometype-mono-latin-500-normal.woff", weight: 500, style: "normal" },
+  { name: "Sometype Mono", file: "sometype-mono-latin-600-normal.woff", weight: 600, style: "normal" },
 ];
 
-let fontCache: Promise<{ name: string; data: ArrayBuffer; weight: 400 | 500 | 600 | 700; style: "normal" }[]> | null = null;
+let fontCache: Promise<{ name: string; data: ArrayBuffer; weight: 400 | 500 | 600 | 700 | 800; style: "normal" }[]> | null = null;
 
 export function ogFonts() {
   fontCache ??= Promise.all(

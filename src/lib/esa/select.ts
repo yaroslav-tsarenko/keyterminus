@@ -1,4 +1,6 @@
 import { catalogConfig, type CatalogConfig } from "@/config/catalog";
+import { ROUTE_WEIGHT, UNTAGGED_ROUTE_WEIGHT } from "@/config/merchandising";
+import { CONSOLE_FACTOR, MULTI_PLATFORM_FACTOR, RECENCY_BOOST, RECENCY_HALF_LIFE_YEARS } from "@/lib/catalog/board-weights";
 import type { ProductTypeKey } from "@/lib/keys/taxonomy";
 import { normalizeKey, stableHash, type Classified, type RejectReason } from "./classify";
 import { computeSellPrice } from "./pricing";
@@ -17,7 +19,7 @@ export function liteOf(item: Classified): LiteItem {
     productType: item.productType,
     platform: item.platform,
     releaseYear: item.releaseYear,
-    genres: item.genres.slice(0, 1),
+    genres: item.genres.slice(0, 8),
     cost: item.cost,
     qty: item.qty,
     faceValue: item.faceValue,
@@ -82,8 +84,15 @@ export function buildCandidates(
     return letters.length ? letters.replace(/[^A-Z]/g, "").length / letters.length : 0;
   };
   const picked: Candidate[] = [];
+  const tolerance = config.selection.weights.offerTolerance;
+  const salt = config.selection.weights.salt;
   for (const list of groups.values()) {
     list.sort((a, b) => a.cost - b.cost || b.qty - a.qty || a.esaId - b.esaId);
+    const ceiling = list[0].cost * (1 + tolerance);
+    const close = list.filter((c) => c.cost <= ceiling + 1e-9);
+    const best = close.sort((a, b) => b.qty - a.qty || stableHash(`${salt}|${a.esaId}`).localeCompare(stableHash(`${salt}|${b.esaId}`)))[0];
+    const rest = list.filter((c) => c !== best);
+    list.splice(0, list.length, best, ...rest);
     const named = [...list].sort((a, b) => capsRatio(a.title) - capsRatio(b.title))[0];
     picked.push({
       ...list[0],
@@ -155,92 +164,102 @@ export function priceBand(price: number, bands: number[] = catalogConfig.pricing
   return index === -1 ? bands.length : index;
 }
 
-function interleave<T>(queues: T[][]): T[] {
-  const out: T[] = [];
-  const cursors = queues.map(() => 0);
-  let remaining = queues.reduce((sum, q) => sum + q.length, 0);
-  while (remaining > 0) {
-    for (let i = 0; i < queues.length; i++) {
-      if (cursors[i] < queues[i].length) {
-        out.push(queues[i][cursors[i]++]);
-        remaining--;
-      }
-    }
-  }
-  return out;
+function dedupeParts(dedupeKey: string) {
+  const [type = "", base = "", edition = "", platform = "", region = ""] = dedupeKey.split("|");
+  return { type, base, edition, platform, region };
 }
 
-function bucketed(pool: Candidate[], keyOf: (c: Candidate) => string, priority: (c: Candidate) => string): Candidate[] {
-  const buckets = new Map<string, Candidate[]>();
-  for (const c of pool) {
-    const key = keyOf(c);
-    const list = buckets.get(key) ?? [];
-    list.push(c);
-    buckets.set(key, list);
-  }
-  return interleave(
-    [...buckets.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([, list]) => list.sort((a, b) => priority(a).localeCompare(priority(b)))),
-  );
+function saltedUnit(salt: string, key: string): number {
+  return parseInt(stableHash(`${salt}|${key}`).slice(0, 8), 16) / 0xffffffff;
 }
 
-export function selectCatalog(candidates: Candidate[], existing: Set<string> = new Set(), config: CatalogConfig = catalogConfig): Candidate[] {
-  const priority = (c: Candidate) =>
-    `${config.selection.keepExisting && existing.has(c.dedupeKey) ? "0" : "1"}${c.hasCover ? "0" : "1"}${String(9 - Math.min(9, Math.floor(Math.log10(c.qty + 1) * 3))).padStart(1, "0")}${stableHash(c.dedupeKey)}`;
+export function candidateBoardScore(c: Pick<Candidate, "genres" | "releaseYear" | "platform">, multiPlatform: boolean, now = new Date()): number {
+  const genre = c.genres.length ? Math.max(...c.genres.map((g) => ROUTE_WEIGHT[g] ?? UNTAGGED_ROUTE_WEIGHT)) : UNTAGGED_ROUTE_WEIGHT;
+  const age = c.releaseYear ? Math.max(0, now.getUTCFullYear() + now.getUTCMonth() / 12 - (c.releaseYear + 0.5)) : null;
+  const recency = age === null ? 1 : 1 + RECENCY_BOOST * Math.pow(0.5, age / RECENCY_HALF_LIFE_YEARS);
+  const console = c.platform === "xbox" || c.platform === "playstation" || c.platform === "nintendo" ? CONSOLE_FACTOR : 1;
+  return genre * recency * console * (multiPlatform ? MULTI_PLATFORM_FACTOR : 1);
+}
+
+export function selectionScores(candidates: Candidate[], stable: Set<string>, config: CatalogConfig = catalogConfig): Map<string, number> {
+  const w = config.selection.weights;
+  const platformsByBase = new Map<string, Set<string>>();
+  for (const c of candidates) {
+    const { type, base, platform } = dedupeParts(c.dedupeKey);
+    const key = `${type}|${base}`;
+    const set = platformsByBase.get(key) ?? new Set<string>();
+    set.add(platform);
+    platformsByBase.set(key, set);
+  }
+  const scores = new Map<string, number>();
+  for (const c of candidates) {
+    const { type, base, edition, region } = dedupeParts(c.dedupeKey);
+    const multi = (platformsByBase.get(`${type}|${base}`)?.size ?? 0) >= 2;
+    const editionWeight = edition ? (w.edition.find((e) => e.match.test(edition))?.weight ?? 1) : w.plainEdition;
+    const zoneWeight = w.zone[priceBand(c.sell, config.pricing.bands)] ?? 1;
+    const stock = w.stock.min + (w.stock.max - w.stock.min) * Math.min(1, Math.log10(c.qty + 1) / 3);
+    const score =
+      candidateBoardScore(c, multi) *
+      (w.region[region as keyof typeof w.region] ?? 1) *
+      zoneWeight *
+      editionWeight *
+      stock *
+      (stable.has(c.dedupeKey) ? w.stability : 1) *
+      (1 + w.jitter * saltedUnit(w.salt, c.dedupeKey));
+    scores.set(c.dedupeKey, score);
+  }
+  return scores;
+}
+
+export function selectCatalog(candidates: Candidate[], stable: Set<string> = new Set(), config: CatalogConfig = catalogConfig): Candidate[] {
+  const scores = selectionScores(candidates, stable, config);
+  const ranked = [...candidates].sort((a, b) => (scores.get(b.dedupeKey) ?? 0) - (scores.get(a.dedupeKey) ?? 0) || a.dedupeKey.localeCompare(b.dedupeKey));
   const titleKey = (c: Candidate) => `${c.productType}|${normalizeKey(c.title)}`;
+  const workKey = (c: Candidate) => {
+    const { type, base, platform } = dedupeParts(c.dedupeKey);
+    return `${type}|${base}|${platform}`;
+  };
   const selected: Candidate[] = [];
   const chosen = new Set<string>();
   const perTitle = new Map<string, number>();
+  const perWork = new Map<string, number>();
   const take = (c: Candidate) => {
     const key = titleKey(c);
+    const work = workKey(c);
     const n = perTitle.get(key) ?? 0;
-    if (n >= config.selection.maxPerTitle) return false;
+    const e = perWork.get(work) ?? 0;
+    if (n >= config.selection.maxPerTitle || e >= config.selection.editionsPerWork) return false;
     perTitle.set(key, n + 1);
+    perWork.set(work, e + 1);
     selected.push(c);
+    chosen.add(c.dedupeKey);
     return true;
   };
 
   for (const quota of config.quotas) {
-    const pool = candidates.filter((c) => c.productType === (quota.type as ProductTypeKey));
-    const byPlatform = new Map<string, Candidate[]>();
-    for (const c of pool) {
-      const list = byPlatform.get(c.platform) ?? [];
-      list.push(c);
-      byPlatform.set(c.platform, list);
-    }
-    const genreKey = (c: Candidate) => `${c.genres[0] ?? "-"}|${priceBand(c.sell, config.pricing.bands)}`;
-    const queues = [...byPlatform.keys()].sort().map((platform) => bucketed(byPlatform.get(platform)!, genreKey, priority));
-    const platformCap = quota.platformShare ? Math.ceil(quota.cap * quota.platformShare) : quota.cap;
+    const pool = ranked.filter((c) => c.productType === (quota.type as ProductTypeKey));
+    const caps = new Map(Object.entries(quota.platformShares ?? {}).map(([platform, share]) => [platform, Math.ceil(quota.cap * (share ?? 1))]));
     const perPlatform = new Map<string, number>();
     let count = 0;
-
-    for (const c of interleave(queues)) {
+    for (const c of pool) {
       if (count >= quota.cap) break;
       const used = perPlatform.get(c.platform) ?? 0;
-      if (used >= platformCap) continue;
+      const cap = caps.get(c.platform);
+      if (cap !== undefined && used >= cap) continue;
       if (!take(c)) continue;
-      chosen.add(c.dedupeKey);
       perPlatform.set(c.platform, used + 1);
       count++;
-    }
-    if (count < quota.cap) {
-      for (const c of interleave(queues)) {
-        if (count >= quota.cap) break;
-        if (chosen.has(c.dedupeKey)) continue;
-        if (!take(c)) continue;
-        chosen.add(c.dedupeKey);
-        count++;
-      }
     }
   }
 
   const limit = Math.min(config.target.max, config.quotas.reduce((sum, q) => sum + q.cap, 0));
   if (selected.length < limit && config.selection.spillover.length) {
-    const spill = config.selection.spillover.map((type) => bucketed(candidates.filter((c) => c.productType === type && !chosen.has(c.dedupeKey)), (c) => c.platform, priority));
-    for (const c of interleave(spill)) {
-      if (selected.length >= limit) break;
-      if (take(c)) chosen.add(c.dedupeKey);
+    for (const type of config.selection.spillover) {
+      for (const c of ranked) {
+        if (selected.length >= limit) break;
+        if (c.productType !== type || chosen.has(c.dedupeKey)) continue;
+        take(c);
+      }
     }
   }
 

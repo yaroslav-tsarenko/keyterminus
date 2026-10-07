@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { FileDown } from "lucide-react";
-import { ReadoutLoader } from "@/components/ui/ReadoutLoader";
+import { ArrowDownToLine } from "lucide-react";
+import { PageLoader } from "@/components/ui/Flap";
 import { Button } from "@/components/ui/Button";
-import { Tumbler } from "@/components/ui/Tumbler";
 import { ProductRow } from "@/components/product/ProductCard";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
-import { KeyPlate, type KeyPlateStatus } from "@/components/account/KeyPlate";
+import { KeyBoard, type KeyBoardStatus } from "@/components/account/KeyBoard";
 import { orderTimelineStatus } from "../OrderHistory/OrderHistory";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { TotalsList } from "@/components/checkout/TotalsList";
@@ -24,7 +23,7 @@ import { formatOrderDate } from "../format";
 
 const POLL_MS = 15_000;
 
-export function keyPlateStatus(status: string): KeyPlateStatus {
+export function keyBoardStatus(status: string): KeyBoardStatus {
   if (status === "delivered") return "ready";
   if (status === "refunded" || status === "refund_pending" || status === "failed") return "refunded";
   return "issuing";
@@ -42,7 +41,7 @@ export function OrderKeys({ order, line }: { order: OrderView; line: OrderView["
     return (
       <div className="flex flex-col gap-4">
         {delivery.keys.map((k, i) => (
-          <KeyPlate
+          <KeyBoard
             key={k.id}
             keyId={k.id}
             title={line.name}
@@ -62,7 +61,7 @@ export function OrderKeys({ order, line }: { order: OrderView; line: OrderView["
       </div>
     );
   }
-  if (delivery.inFlight) return <KeyPlate keyId={line.id} title={line.name} productSlug={line.slug} keyInfo={line.key} status="issuing" orderNumber={order.number} />;
+  if (delivery.inFlight) return <KeyBoard keyId={line.id} title={line.name} productSlug={line.slug} keyInfo={line.key} status="issuing" orderNumber={order.number} />;
   return null;
 }
 
@@ -78,7 +77,7 @@ export function OrderDetail({ id }: { id: string }) {
     return () => window.clearInterval(timer);
   }, [polling, refresh]);
 
-  if (loading) return <ReadoutLoader block label={t("loading")} />;
+  if (loading) return <PageLoader block label={t("loading")} />;
   if (error || !order) {
     return (
       <div>
@@ -94,7 +93,7 @@ export function OrderDetail({ id }: { id: string }) {
       <AccountPageHeader
         title={
           <>
-            Order <Tumbler value={order.number} size="md" label={order.number} motion className="ml-1 align-[0.12em]" />
+            Order <span className="font-mono font-semibold tracking-[-0.02em]">{order.number}</span>
           </>
         }
         aside={<OrderStatus state={order.state} />}
@@ -155,13 +154,13 @@ export function OrderDetail({ id }: { id: string }) {
             <p className="m-0 mt-3 text-ui-sm text-ink-muted">{t("paymentMethod")}</p>
           </section>
         </div>
-        <section aria-labelledby="order-totals" className="plate self-start p-6">
-          <h2 id="order-totals" className="m-0 mb-5 text-step-2 leading-none text-ink">
+        <section aria-labelledby="order-totals" className="self-start rounded-card border border-line bg-raised p-6">
+          <h2 id="order-totals" className="m-0 mb-5 text-step-2 font-bold leading-none text-ink">
             {t("totalsTitle")}
           </h2>
           <TotalsList totals={order.totals} currency={order.currency} showCurrencyCode totalSize="md" />
           {order.invoiceAvailable ? (
-            <Button as="a" href={`/api/account/orders/${encodeURIComponent(order.id)}/invoice`} download variant="ghost" size="sm" startContent={<FileDown size={16} aria-hidden="true" />} className="mt-5">
+            <Button as="a" href={`/api/account/orders/${encodeURIComponent(order.id)}/invoice`} download variant="ghost" size="sm" startContent={<ArrowDownToLine size={16} aria-hidden="true" />} className="mt-5">
               {t("invoiceDownload")}
             </Button>
           ) : null}
@@ -169,7 +168,7 @@ export function OrderDetail({ id }: { id: string }) {
       </div>
 
       <div className="mt-12 flex flex-col gap-3 border-t border-line pt-8">
-        <h2 className="m-0 text-step-2 leading-none text-ink">Need help with this order?</h2>
+        <h2 className="m-0 text-step-2 font-bold leading-none text-ink">Need help with this order?</h2>
         <p className="m-0 text-ink-muted">{t("helpBody")}</p>
         <Button as={Link} href={`/contact?order=${encodeURIComponent(order.number)}`} variant="outline" className="mt-2 self-start">
           {t("helpAction")}

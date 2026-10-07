@@ -2,7 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 
-const THEME_INIT = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="dark"}var d=document.documentElement;d.setAttribute("data-theme",t);d.classList.toggle("dark",t==="dark")}catch(e){}})();`;
+export const THEME_STORAGE_KEY = "keyterminus-theme";
+
+export const THEME_INIT = `(function(){try{var d=document.documentElement;var t=null;try{t=localStorage.getItem("${THEME_STORAGE_KEY}")}catch(e){}if(t!=="light"&&t!=="dark"){t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}d.setAttribute("data-theme",t);d.classList.toggle("dark",t==="dark")}catch(e){}})();`;
 
 const subscribe = () => () => {};
 

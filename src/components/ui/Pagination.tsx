@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "./Button";
 
@@ -25,7 +25,7 @@ export interface PaginationProps {
   className?: string;
 }
 
-const textLinkCls = "inline-flex min-h-10 items-center gap-1.5 text-ui-sm font-[560] text-ink decoration-1 underline-offset-4 hover-device:hover:underline";
+const textLinkCls = "inline-flex min-h-10 items-center gap-1.5 text-ui-md font-semibold text-ink underline decoration-link decoration-2 underline-offset-4 hover-device:hover:text-accent-ink hover-device:hover:decoration-[3px]";
 
 export function Pagination({ page, totalPages, onPageChange, hrefForPage, className }: PaginationProps) {
   if (totalPages <= 1) return null;
@@ -47,20 +47,20 @@ export function Pagination({ page, totalPages, onPageChange, hrefForPage, classN
 
   const prev =
     page > 1 ? (
-      control(page - 1, (<><ArrowLeft size={16} aria-hidden="true" />Previous</>), { className: cn(textLinkCls, "cursor-pointer") })
+      control(page - 1, (<><ArrowBigLeft size={16} aria-hidden="true" />Previous</>), { className: cn(textLinkCls, "cursor-pointer") })
     ) : (
       <span className={cn(textLinkCls, "cursor-not-allowed text-ink-subtle no-underline")} aria-disabled="true">
-        <ArrowLeft size={16} aria-hidden="true" />
+        <ArrowBigLeft size={16} aria-hidden="true" />
         Previous
       </span>
     );
   const next =
     page < totalPages ? (
-      control(page + 1, (<>Next<ArrowRight size={16} aria-hidden="true" /></>), { className: cn(textLinkCls, "cursor-pointer") })
+      control(page + 1, (<>Next<ArrowBigRight size={16} aria-hidden="true" /></>), { className: cn(textLinkCls, "cursor-pointer") })
     ) : (
       <span className={cn(textLinkCls, "cursor-not-allowed text-ink-subtle no-underline")} aria-disabled="true">
         Next
-        <ArrowRight size={16} aria-hidden="true" />
+        <ArrowBigRight size={16} aria-hidden="true" />
       </span>
     );
 
@@ -72,12 +72,12 @@ export function Pagination({ page, totalPages, onPageChange, hrefForPage, classN
           typeof token === "number" ? (
             <li key={token}>
               {token === page ? (
-                <span aria-current="page" className="relative flex size-10 items-center justify-center font-mono text-data text-ink after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-brand">
+                <span aria-current="page" className="relative flex size-10 items-center justify-center rounded-control font-mono text-data font-semibold text-ink after:absolute after:inset-x-1.5 after:bottom-0 after:h-[3px] after:bg-brand">
                   {token}
                 </span>
               ) : (
                 control(token, token, {
-                  className: "flex size-10 cursor-pointer items-center justify-center font-mono text-data text-ink-muted transition-colors duration-[120ms] hover-device:hover:bg-raised hover-device:hover:text-ink",
+                  className: "flex size-10 cursor-pointer items-center justify-center rounded-control font-mono text-data text-ink-muted transition-colors duration-[120ms] hover-device:hover:bg-surface-1 hover-device:hover:text-ink",
                   label: `Page ${token}`,
                 })
               )}
@@ -105,7 +105,7 @@ export function LoadMore({ shown, total, step, onLoadMore, loading, className }:
         Showing {shown.toLocaleString("en-GB")} of {total.toLocaleString("en-GB")}
       </p>
       <Button variant="outline" onPress={onLoadMore} isLoading={loading}>
-        Load {Math.min(step ?? total - shown, total - shown)} more
+        Show {Math.min(step ?? total - shown, total - shown)} more
       </Button>
     </div>
   );

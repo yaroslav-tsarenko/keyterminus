@@ -56,7 +56,7 @@ export function toNumber(value: Numeric): number {
 }
 
 export function displayOrderNumber(orderNumber: string): string {
-  return orderNumber.slice(-8).toUpperCase();
+  return `KT-${orderNumber.slice(-8).toUpperCase()}`;
 }
 
 export function orderCurrency(order: Pick<OrderAmountsSource, "currency">): string {

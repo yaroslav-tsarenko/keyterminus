@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode, Ref } from "react";
-import { Plate } from "@/components/ui/Plate";
+import { Tag } from "@/components/ui/Tag";
 import { cn } from "@/lib/utils/cn";
 import { frameStyle, presetFor, type FrameVars } from "./engine/geometry";
 import type { DeviceKind, SceneAddress } from "./types";
@@ -24,9 +24,9 @@ export function Frame({ device, address, sampleLabel = "Sample data", vars, fram
         <span className={cn("th-address", address.external && "th-address-external")} data-external={address.external || undefined}>
           <span className="truncate">{address.label}</span>
         </span>
-        <Plate variant="neutral" size="sm" className="th-sample">
+        <Tag variant="neutral" size="sm" className="th-sample">
           {sampleLabel}
-        </Plate>
+        </Tag>
       </div>
       <div className="th-screen">
         <div ref={contentRef} className="th-content">

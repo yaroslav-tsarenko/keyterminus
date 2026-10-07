@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ArrowRight } from "lucide-react";
+import { ArrowBigRight } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { Alert } from "@/components/ui/Alert";
-import { SkeletonBar } from "@/components/ui/ReadoutLoader";
+import { SkeletonBar } from "@/components/ui/Flap";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { ProductRow } from "@/components/product/ProductCard";
 import { formatPrice } from "@/lib/utils/format-price";
@@ -17,7 +17,7 @@ import { useAccountData } from "./useAccountData";
 import { LoadError } from "./LoadError";
 import { formatOrderDate } from "./format";
 
-const linkCls = "inline-flex min-h-10 items-center gap-1.5 text-ui-md font-[560] text-ink decoration-1 underline-offset-4 hover-device:hover:underline";
+const linkCls = "btn-text inline-flex min-h-10 items-center gap-1.5 text-ui-md font-semibold text-ink";
 
 export function AccountOverview() {
   const t = useTranslations("account.overview");
@@ -38,7 +38,7 @@ export function AccountOverview() {
           <p className="m-0 flex flex-wrap gap-x-2 text-ui-md text-ink">
             {hidden > 0 ? (
               <>
-                <Link href="/account/keys" className="underline decoration-line-hover underline-offset-4 hover-device:hover:decoration-ink">
+                <Link href="/account/keys" className="underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
                   <span className="font-mono">{hidden}</span> {hidden === 1 ? "key" : "keys"} not revealed yet
                 </Link>
                 <span aria-hidden="true" className="text-ink-subtle">
@@ -46,7 +46,7 @@ export function AccountOverview() {
                 </span>
               </>
             ) : null}
-            <Link href="/account/orders" className="underline decoration-line-hover underline-offset-4 hover-device:hover:decoration-ink">
+            <Link href="/account/orders" className="underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
               <span className="font-mono">{orderCount}</span> {orderCount === 1 ? "order" : "orders"}
             </Link>
           </p>
@@ -85,15 +85,15 @@ export function AccountOverview() {
                   {latest.number} · {formatOrderDate(latest.createdAt)}
                 </span>
                 <Link href={`/account/orders/${latest.id}`} className={`${linkCls} ml-auto`}>
-                  {t("view")}
+                  <span data-label="">{t("view")}</span>
                   <span className="sr-only"> {latest.number}</span>
-                  <ArrowRight size={16} aria-hidden="true" />
+                  <ArrowBigRight size={16} aria-hidden="true" />
                 </Link>
               </div>
             </ProductRow>
             {data && data.orders.length > 1 ? (
               <Link href="/account/orders" className={`${linkCls} mt-3`}>
-                {t("allOrders", { count: data.orders.length })}
+                <span data-label="">{t("allOrders", { count: data.orders.length })}</span>
               </Link>
             ) : null}
           </div>
@@ -104,20 +104,20 @@ export function AccountOverview() {
 
       <nav aria-label="Account shortcuts" className="flex flex-wrap gap-x-8 gap-y-1">
         <Link href="/account/keys" className={linkCls}>
-          Keys
-          <ArrowRight size={16} aria-hidden="true" />
+          <span data-label="">Keys</span>
+          <ArrowBigRight size={16} aria-hidden="true" />
         </Link>
         <Link href="/account/orders" className={linkCls}>
-          Orders
-          <ArrowRight size={16} aria-hidden="true" />
+          <span data-label="">Orders</span>
+          <ArrowBigRight size={16} aria-hidden="true" />
         </Link>
         <Link href="/account/profile" className={linkCls}>
-          Profile
-          <ArrowRight size={16} aria-hidden="true" />
+          <span data-label="">Profile</span>
+          <ArrowBigRight size={16} aria-hidden="true" />
         </Link>
         <Link href="/account/wishlist" className={linkCls}>
-          Pinned
-          <ArrowRight size={16} aria-hidden="true" />
+          <span data-label="">Saved</span>
+          <ArrowBigRight size={16} aria-hidden="true" />
         </Link>
       </nav>
     </div>

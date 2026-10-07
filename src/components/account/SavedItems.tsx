@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { CardGrid, CardGridSkeleton, ProductCard, type CatalogProduct } from "@/components/product/ProductCard";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
-import { Tumbler } from "@/components/ui/Tumbler";
+import { FlapCounter } from "@/components/ui/Flap";
 import { AccountPageHeader } from "./AccountSidebar/AccountSidebar";
 import { useAccountData } from "./useAccountData";
 import { LoadError } from "./LoadError";
@@ -16,7 +16,7 @@ export function SavedItems() {
 
   return (
     <div>
-      <AccountPageHeader title={t("title")} aside={count ? <Tumbler value={count} size="sm" label={`${count} pinned`} /> : null} />
+      <AccountPageHeader title={t("title")} aside={count ? <FlapCounter value={count} size="sm" label={`${count} saved`} /> : null} />
       {loading ? (
         <CardGridSkeleton count={3} columns={3} />
       ) : error ? (

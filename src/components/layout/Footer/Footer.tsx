@@ -7,11 +7,12 @@ import { BRAND } from "@/lib/brand";
 import { openCookieSettings } from "@/lib/consent";
 import { useStoreIndex } from "@/lib/hooks/useStoreIndex";
 import { Accordion, AccordionItem } from "@/components/ui/Accordion";
-import { TickBand } from "@/components/ui/Dial";
+import { RouteLine } from "@/components/ui/RouteLine";
+import { PlatformTile } from "@/components/ui/PlatformTile";
 import { PaymentLogos } from "@/components/shared/PaymentLogos/PaymentLogos";
 import { CredentialsSheet } from "@/components/layout/Credentials/CredentialsSheet";
 
-const linkCls = "text-ui-md text-ink decoration-1 underline-offset-4 hover-device:hover:underline";
+const linkCls = "text-ui-md text-ink decoration-link decoration-2 underline-offset-[3px] hover-device:hover:underline hover-device:hover:text-accent-ink";
 
 const SOCIAL = [
   { label: "Instagram", href: process.env.NEXT_PUBLIC_INSTAGRAM_URL },
@@ -24,21 +25,23 @@ const COLUMNS: { title: string; links: { href: string; label: string }[]; cookie
     title: "Shop",
     links: [
       { href: "/catalog/games", label: "Games" },
-      { href: "/catalog/dlc", label: "DLC" },
       { href: "/catalog/gift-cards", label: "Gift cards" },
       { href: "/catalog/subscriptions", label: "Subscriptions" },
-      { href: "/deals", label: "Deals" },
-      { href: "/new-releases", label: "New releases" },
+      { href: "/catalog/dlc", label: "DLC" },
+      { href: "/catalog/top-ups", label: "Top-ups" },
+      { href: "/catalog/software", label: "Software" },
+      { href: "/deals", label: "Price cuts" },
+      { href: "/new-releases", label: "New arrivals" },
       { href: "/catalog", label: "All keys" },
     ],
   },
   {
-    title: "Your keys",
+    title: "Your account",
     links: [
-      { href: "/account", label: "Account" },
       { href: "/account/keys", label: "Keys" },
       { href: "/account/orders", label: "Orders" },
-      { href: "/account/wishlist", label: "Pinned" },
+      { href: "/account/wishlist", label: "Saved" },
+      { href: "/account/profile", label: "Profile" },
       { href: "/cart", label: "Cart" },
     ],
   },
@@ -55,7 +58,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[]; cookie
   {
     title: "Legal",
     links: [
-      { href: "/policies/terms", label: "Terms & conditions" },
+      { href: "/policies/terms", label: "Terms and conditions" },
       { href: "/policies/privacy", label: "Privacy policy" },
       { href: "/policies/returns", label: "Refund policy" },
       { href: "/policies/cookies", label: "Cookie policy" },
@@ -65,8 +68,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[]; cookie
   },
 ];
 
-const DISCLAIMER =
-  "Keyrook is an independent store. It is not affiliated with or endorsed by the platforms or publishers of the products it lists. Game titles, platform names and cover art belong to their respective owners.";
+const DISCLAIMER = `${BRAND.name} is an independent store and is not affiliated with or endorsed by Valve, Microsoft, Sony Interactive Entertainment, Nintendo, Epic Games, CD PROJEKT, Electronic Arts, Ubisoft, Blizzard Entertainment or Rockstar Games. Game titles, platform names and cover art belong to their owners.`;
 
 function LinkList({ links, cookie }: { links: { href: string; label: string }[]; cookie?: boolean }) {
   return (
@@ -89,26 +91,19 @@ function LinkList({ links, cookie }: { links: { href: string; label: string }[];
   );
 }
 
-function PlatformIndex() {
+function PlatformLine() {
   const index = useStoreIndex();
   const platforms = index?.platforms ?? [];
-  if (!platforms.length) return <div className="h-14" aria-hidden="true" />;
+  if (!platforms.length) return <div className="h-24" aria-hidden="true" />;
   return (
-    <nav aria-label="Platforms" data-platform-index="" className="relative pt-6">
-      <ul className="no-scrollbar -mx-gutter m-0 flex list-none gap-x-7 overflow-x-auto px-gutter pb-3 lg:mx-0 lg:flex-wrap lg:justify-between lg:overflow-visible lg:px-0">
-        {platforms.map((p) => (
-          <li key={p.key} data-platform={p.tone} className="shrink-0">
-            <Link href={`/platform/${p.slug}`} className="inline-flex min-h-10 items-center gap-2 underline-offset-4 hover-device:hover:underline">
-              <span aria-hidden="true" className="size-1.5 bg-platform" />
-              <span className="eyebrow text-ink">{p.short}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-      <div className="relative h-2">
-        <TickBand className="absolute inset-x-0 bottom-px" major={false} tone="faint" />
-        <span className="absolute inset-x-0 bottom-0 h-px bg-line" />
-      </div>
+    <nav aria-label="Platforms" data-platform-line="" className="pt-10">
+      <RouteLine
+        data-route-line="footer"
+        orientation="responsive"
+        className="footer-line"
+        stops={platforms.map((p) => ({ key: p.key, href: `/platform/${p.slug}`, label: p.short, leading: <PlatformTile number={p.number} size="sm" /> }))}
+        terminus={{ label: "All keys", href: "/catalog" }}
+      />
     </nav>
   );
 }
@@ -119,12 +114,12 @@ function StoreFooter() {
   return (
     <footer data-print-hide="" data-floor="" className="mt-auto bg-floor text-ink">
       <div className="mx-auto max-w-wide px-gutter">
-        <PlatformIndex />
+        <PlatformLine />
 
-        <nav aria-label="Footer" className="mt-14 hidden grid-cols-4 lg:grid">
-          {COLUMNS.map((col, i) => (
-            <div key={col.title} className={i === 0 ? "pr-10" : "border-l border-line px-10"}>
-              <h2 className="eyebrow m-0 mb-5">{col.title}</h2>
+        <nav aria-label="Footer" className="mt-16 hidden grid-cols-4 gap-8 lg:grid">
+          {COLUMNS.map((col) => (
+            <div key={col.title}>
+              <h2 className="eyebrow m-0 mb-4">{col.title}</h2>
               <LinkList links={col.links} cookie={col.cookie} />
             </div>
           ))}
@@ -140,9 +135,9 @@ function StoreFooter() {
           </Accordion>
         </nav>
 
-        <CredentialsSheet className="mt-12 lg:mt-16" />
+        <CredentialsSheet className="mt-12 lg:mt-14" />
 
-        <p className="m-0 mt-6 max-w-[96ch] text-ui-sm text-ink-muted">{DISCLAIMER}</p>
+        <p className="measure m-0 mt-6 text-ui-sm text-ink-muted">{DISCLAIMER}</p>
 
         <div className="mt-8 flex flex-col items-center gap-5 border-t border-line py-6 lg:flex-row lg:justify-between">
           <p className="order-last m-0 text-ui-sm text-ink-muted lg:order-first">

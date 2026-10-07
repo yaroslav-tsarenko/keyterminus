@@ -1,28 +1,26 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Copy, CopyCheck, Eye, EyeOff, MessageSquareWarning, SquareArrowOutUpRight } from "lucide-react";
+import { Check, Copy, EyeOff, MessageCircleWarning, MoveUpRight, OctagonX, ScanEye } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
-import { Plate } from "@/components/ui/Plate";
-import { Lamp, Bolts } from "@/components/ui/Lamp";
-import { DialLoader } from "@/components/ui/Dial";
+import { Flap, FlapLoader } from "@/components/ui/Flap";
 import { Modal } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Field";
 import { Alert } from "@/components/ui/Alert";
-import { LabelRow, productFace } from "@/components/product/ProductCard";
+import { GateLine, productFace } from "@/components/product/ProductCard";
 import { ActivationStepList } from "@/components/product/ActivationSteps";
 import { activationFor } from "@/config/activation";
 import { STORE_POLICY } from "@/config/store-policy";
 import { useAuth } from "@/providers/AuthProvider";
 import type { KeySummary } from "@/lib/keys/taxonomy";
-import { runDecrypt } from "@/lib/motion/decrypt";
-import { decryptGlyph } from "@/lib/keys/decrypt";
+import { flapDuration, flapFrame } from "@/lib/motion/flap";
 
-export type KeyPlateStatus = "issuing" | "ready" | "reported" | "replaced" | "refunded";
+export type KeyBoardStatus = "issuing" | "ready" | "reported" | "replaced" | "refunded";
+export type KeyPlateStatus = KeyBoardStatus;
 
 const MASKS: Record<string, number[]> = {
   xbox: [5, 5, 5, 5, 5],
@@ -31,23 +29,23 @@ const MASKS: Record<string, number[]> = {
 };
 
 const SEPARATOR = /[-–—\s]/;
+const REVEAL_MS = 1100;
 
-function maskFor(platform: string | null | undefined): string {
-  const groups = MASKS[platform ?? ""] ?? [5, 5, 5];
-  return groups.map((n) => "•".repeat(n)).join("-");
+function maskGroups(platform: string | null | undefined): number[] {
+  return MASKS[platform ?? ""] ?? [5, 5, 5];
 }
 
-function groupsOf(value: string): string[][] {
-  const groups: string[][] = [];
-  let current: string[] = [];
+function groupsOf(value: string): string[] {
+  const groups: string[] = [];
+  let current = "";
   for (const ch of Array.from(value)) {
+    current += ch;
     if (SEPARATOR.test(ch)) {
-      if (current.length) groups.push(current);
-      groups.push([ch]);
-      current = [];
-    } else current.push(ch);
+      groups.push(current);
+      current = "";
+    }
   }
-  if (current.length) groups.push(current);
+  if (current) groups.push(current);
   return groups;
 }
 
@@ -66,81 +64,64 @@ export function spellOut(value: string): string {
     .join(" ");
 }
 
-export function KeySlots({ value, masked, progress, className, demoId }: { value: string; masked: boolean; progress?: number; className?: string; demoId?: string }) {
-  const groups = groupsOf(value);
-  const decrypting = !masked && progress !== undefined && progress < 1;
+export function KeyFlaps({ value, masked, platform, progress, className, demoId }: { value: string; masked: boolean; platform?: string | null; progress?: number; className?: string; demoId?: string }) {
+  if (masked || !value) {
+    return (
+      <div data-key-flaps="" data-demo={demoId} aria-hidden="true" className={cn("flex flex-wrap gap-x-3 gap-y-2 text-key", className)}>
+        {maskGroups(platform).map((n, gi) => (
+          <span key={gi} className="flap-row">
+            {Array.from({ length: n }, (_, i) => (
+              <Flap key={i} char=" " size="key" />
+            ))}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  const total = flapDuration("", value, value.length);
+  const t = progress === undefined ? Infinity : progress * total;
   let index = 0;
   return (
-    <div data-key-slots="" data-demo={demoId} aria-hidden="true" className={cn("flex flex-wrap items-center gap-y-2 key-code text-key", className)}>
-      {groups.map((group, gi) =>
-        group.length === 1 && SEPARATOR.test(group[0]) ? (
-          <span key={`s${gi}`} className="px-1 font-mono text-ink-muted sm:px-1.5">
-            {group[0] === " " ? " " : "–"}
-          </span>
-        ) : (
-          <span key={`g${gi}`} className="inline-flex">
-            {group.map((ch) => {
-              const i = index++;
-              const glyph = decrypting ? decryptGlyph(value, valueIndex(groups, gi, i), progress) : null;
-              return (
-                <span
-                  key={i}
-                  data-slot={i}
-                  data-char={masked ? undefined : ch}
-                  data-phase={glyph?.phase}
-                  className={cn("tumbler-slot", (masked || glyph?.phase === "masked" || glyph?.phase === "scramble") && "text-ink-muted", glyph?.phase === "settled" && "text-accent-ink")}
-                >
-                  {glyph ? glyph.char : ch}
-                </span>
-              );
-            })}
-          </span>
-        ),
-      )}
+    <div data-key-flaps="" data-demo={demoId} aria-hidden="true" className={cn("flex flex-wrap gap-y-2 text-key", className)}>
+      {groupsOf(value).map((group, gi) => (
+        <span key={gi} className="flap-row mr-[3px]">
+          {Array.from(group).map((ch) => {
+            const i = index++;
+            const frame = t === Infinity ? null : flapFrame(" ", ch, i, t);
+            const shown = frame ? (frame.done ? ch : frame.bottom) : ch;
+            return <Flap key={i} char={shown} size="key" />;
+          })}
+        </span>
+      ))}
     </div>
   );
 }
 
-function valueIndex(groups: string[][], groupIndex: number, slotIndex: number): number {
-  let seen = 0;
-  let position = 0;
-  for (let g = 0; g < groups.length; g++) {
-    const group = groups[g];
-    const separator = group.length === 1 && SEPARATOR.test(group[0]);
-    if (separator) {
-      position += 1;
-      continue;
-    }
-    if (g === groupIndex) return position + (slotIndex - seen);
-    seen += group.length;
-    position += group.length;
-  }
-  return position;
-}
+export const KeySlots = KeyFlaps;
 
 function stamp(iso: string | null | undefined) {
   if (!iso) return null;
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
-const STATUS_TAG: Record<KeyPlateStatus, { label: string; variant: "success" | "warning" | "info" | "neutral" } | null> = {
+const STATUS: Record<KeyBoardStatus, { label: string; tone: string } | null> = {
   issuing: null,
-  ready: { label: "Ready", variant: "success" },
-  reported: { label: "Reported", variant: "warning" },
-  replaced: { label: "Replaced", variant: "info" },
-  refunded: { label: "Refunded", variant: "neutral" },
+  ready: { label: "Ready", tone: "bg-board-success text-board-success" },
+  reported: { label: "Reported", tone: "bg-board-warning text-board-warning" },
+  replaced: { label: "Replaced", tone: "bg-board-info text-board-info" },
+  refunded: { label: "Refunded", tone: "bg-on-board-muted text-on-board-muted" },
 };
 
 const REASONS = ["Already redeemed", "Invalid key", "Wrong region", "Wrong product", "Other"];
 
-export interface KeyPlateProps {
+export interface KeyBoardProps {
   keyId: string;
   title: string;
   productSlug?: string | null;
   keyInfo?: KeySummary | null;
   index?: number;
   total?: number;
-  status: KeyPlateStatus;
+  status: KeyBoardStatus;
   keyType?: string;
   revealedBefore?: boolean;
   issuedAt?: string | null;
@@ -156,9 +137,30 @@ export interface KeyPlateProps {
   children?: ReactNode;
 }
 
+export type KeyPlateProps = KeyBoardProps;
+
 type Revealed = { value: string; type: string; revealedAt: string | null };
 
-export function KeyPlate({
+function useReveal(active: boolean): number | undefined {
+  const [progress, setProgress] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    if (!active) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / REVEAL_MS);
+      setProgress(p);
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else setProgress(undefined);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active]);
+  return progress;
+}
+
+export function KeyBoard({
   keyId,
   title,
   productSlug,
@@ -178,16 +180,15 @@ export function KeyPlate({
   demoValue,
   demoState,
   className,
-}: KeyPlateProps) {
+}: KeyBoardProps) {
   const face = productFace(title, keyInfo ?? null);
   const guide = activationFor(keyInfo?.platform);
   const { user } = useAuth();
   const baseId = useId();
   const copyRef = useRef<HTMLButtonElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
-  const plateRef = useRef<HTMLElement>(null);
-  const decryptNext = useRef(false);
   const [revealed, setRevealed] = useState<Revealed | null>(null);
+  const [revealCount, setRevealCount] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<"ok" | "failed" | null>(null);
@@ -196,21 +197,20 @@ export function KeyPlate({
   const [reportOpen, setReportOpen] = useState(false);
   const [reported, setReported] = useState(status === "reported");
   const firstReveal = revealed?.revealedAt ?? revealedAt ?? null;
-  const effective: KeyPlateStatus = reported && status === "ready" ? "reported" : status;
-  const tag = STATUS_TAG[effective];
+  const effective: KeyBoardStatus = reported && status === "ready" ? "reported" : status;
+  const badge = STATUS[effective];
   const controlled = demo && demoState ? demoState : null;
   const masked = controlled ? controlled.masked : !revealed;
   const value = controlled ? (controlled.masked ? "" : (demoValue ?? "")) : (revealed?.value ?? "");
   const copyState = controlled ? (controlled.copied ? "ok" : null) : copied;
   const pin = /\bPIN[:\s]+(\S+)/i.exec(value);
   const code = pin ? value.slice(0, pin.index).replace(/[\s:,;-]+(code)?$/i, "").replace(/^code[:\s]+/i, "").trim() : value;
+  const flipping = useReveal(revealCount > 0 && !controlled);
+  const progress = controlled && !controlled.masked ? controlled.decrypt : flipping;
 
-  useLayoutEffect(() => {
-    if (!revealed || !decryptNext.current) return;
-    decryptNext.current = false;
-    const slots = Array.from(plateRef.current?.querySelectorAll<HTMLElement>("[data-key-slots] [data-slot]") ?? []);
-    return runDecrypt(slots, () => copyRef.current?.focus());
-  }, [revealed]);
+  useEffect(() => {
+    if (revealCount > 0) copyRef.current?.focus();
+  }, [revealCount]);
 
   const reveal = async () => {
     if (demo) {
@@ -222,12 +222,12 @@ export function KeyPlate({
     try {
       const res = await fetch(`/api/account/keys/${encodeURIComponent(keyId)}`, { method: "POST", cache: "no-store" });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok || typeof body.key !== "string") throw new Error(res.status === 429 ? "Too many requests. Wait a minute and try again." : "We couldn't show this key. Contact us with your order number.");
-      decryptNext.current = true;
+      if (!res.ok || typeof body.key !== "string") throw new Error(res.status === 429 ? "Too many requests. Wait a minute and try again." : "We couldn’t show this key. Contact us with your order number.");
       setRevealed({ value: body.key, type: typeof body.type === "string" ? body.type : keyType, revealedAt: typeof body.revealedAt === "string" ? body.revealedAt : null });
+      setRevealCount((n) => n + 1);
       setAnnounce("Key revealed");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "We couldn't show this key.");
+      setError(err instanceof Error ? err.message : "We couldn’t show this key.");
     } finally {
       setBusy(false);
     }
@@ -254,41 +254,51 @@ export function KeyPlate({
   };
 
   const isImage = (revealed?.type ?? keyType) === "image" || /^data:image\//.test(value);
+  const linkCls = "btn-text min-h-10 cursor-pointer text-ui-sm font-semibold text-on-board";
+
+  if (effective === "replaced") {
+    return (
+      <article data-key-board="" data-status="replaced" className={cn("w-full max-w-[760px] border-b border-line py-3", className)}>
+        <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 text-ui-md text-ink-muted">
+          <span className="font-semibold text-ink line-through decoration-ink-subtle">{face.title}</span>
+          <span>Replaced{issuedAt ? ` on ${stamp(issuedAt)}` : ""}. The replacement key is on its own board.</span>
+        </p>
+      </article>
+    );
+  }
 
   return (
     <article
-      ref={plateRef}
-      data-key-plate=""
-      data-decrypt=""
+      data-key-board=""
+      data-surface="board"
       data-issued={justIssued ? "" : undefined}
       data-state={masked ? "masked" : "revealed"}
       data-status={effective}
-      data-platform={face.tone}
-      className={cn("plate bolted steel-grain relative w-full max-w-[760px] p-4 sm:p-7", effective === "refunded" && "bg-surface-1 [background-image:none]", className)}
+      className={cn("board relative w-full max-w-[760px] p-4 sm:p-5", className)}
     >
-      <Bolts size={8} />
       <p aria-live="polite" className="sr-only">
         {announce}
       </p>
-      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
           {total && total > 1 && index ? (
-            <span className="eyebrow">
+            <span className="label-caps text-on-board-muted">
               Key {index} of {total}
             </span>
           ) : null}
-          <LabelRow face={face} />
+          <GateLine face={face} surface="board" />
         </div>
-        {tag ? (
-          <Plate variant={tag.variant} size="sm">
-            {tag.label}
-          </Plate>
+        {badge ? (
+          <span className={cn("inline-flex items-center gap-2 font-display text-ui-sm font-bold", badge.tone.split(" ")[1])}>
+            <span aria-hidden="true" className={cn("size-1.5", badge.tone.split(" ")[0])} />
+            <span className="pt-px">{badge.label}</span>
+          </span>
         ) : null}
       </header>
 
-      <h3 className="m-0 mt-3 px-2 font-sans text-step-1 font-[640] leading-[1.3] tracking-normal text-ink [font-stretch:100%]">
+      <h3 className="m-0 mt-3 font-display text-step-1 font-bold leading-[1.3] tracking-normal text-on-board">
         {productSlug && !demo ? (
-          <Link href={`/product/${productSlug}`} className="underline-offset-4 hover-device:hover:underline">
+          <Link href={`/product/${productSlug}`} className="decoration-remark decoration-2 underline-offset-[3px] hover-device:hover:underline">
             {face.title}
           </Link>
         ) : (
@@ -296,20 +306,20 @@ export function KeyPlate({
         )}
       </h3>
 
-      <div className="mt-5 px-2">
+      <div className="mt-5">
         {effective === "issuing" ? (
           <div className="flex flex-col gap-3">
-            <KeySlots value={maskFor(keyInfo?.platform).replace(/•/g, " ")} masked />
-            <p className="m-0 flex items-center gap-3 text-ui-md text-ink-muted">
-              <DialLoader label="Issuing your key" />
-              Usually within minutes after payment is confirmed.
-            </p>
+            <KeyFlaps value="" masked platform={keyInfo?.platform} />
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <FlapLoader label="Issuing your key" showLabel className="font-display text-ui-md font-bold [&_.meta]:text-on-board" />
+              <p className="m-0 text-ui-md text-on-board-muted">Usually within minutes after payment is confirmed.</p>
+            </div>
           </div>
         ) : effective === "refunded" ? (
-          <p className="m-0 text-ui-md text-ink">Refunded to your card{refundedAt ? ` on ${stamp(refundedAt)}` : ""}.</p>
+          <p className="m-0 text-ui-md text-on-board">Refunded to your card{refundedAt ? ` on ${stamp(refundedAt)}` : ""}.</p>
         ) : isImage && revealed ? (
           <div className="flex flex-col gap-3">
-            <div className="cover relative aspect-[16/9] max-w-[480px]">
+            <div className="relative aspect-[16/9] max-w-[480px] overflow-hidden rounded-board bg-flap">
               <Image src={value} alt={`Key image for ${face.title}`} fill unoptimized sizes="480px" className="object-contain" />
             </div>
             <div className="flex flex-wrap gap-3">
@@ -328,9 +338,9 @@ export function KeyPlate({
               ["PIN", pin[1]],
             ].map(([label, part]) => (
               <div key={label} className="flex flex-wrap items-center gap-4">
-                <dt className="eyebrow w-12">{label}</dt>
+                <dt className="label-caps w-12 text-on-board-muted">{label}</dt>
                 <dd className="m-0 flex flex-wrap items-center gap-3">
-                  <KeySlots value={part} masked={false} />
+                  <KeyFlaps value={part} masked={false} progress={progress} />
                   <Button variant="outline" size="sm" onPress={() => copy(part)} startContent={<Copy size={16} aria-hidden="true" />}>
                     Copy {label === "PIN" ? "PIN" : "code"}
                   </Button>
@@ -340,33 +350,33 @@ export function KeyPlate({
           </dl>
         ) : (
           <>
-            <KeySlots value={masked ? maskFor(keyInfo?.platform) : value} masked={masked} progress={controlled && !controlled.masked ? controlled.decrypt : undefined} demoId={demo ? "key" : undefined} />
+            <KeyFlaps value={value} masked={masked} platform={keyInfo?.platform} progress={progress} demoId={demo ? "key" : undefined} />
             {revealed ? (
-              <span ref={textRef} className="sr-only key-code">
+              <span ref={textRef} className="key-code sr-only">
                 {value}
               </span>
             ) : (
-              <span className="sr-only">Key hidden. Choose Reveal key to show it.</span>
+              <span className="sr-only">The key is hidden. Choose Reveal key to show it.</span>
             )}
           </>
         )}
       </div>
 
       {effective === "ready" || effective === "reported" ? (
-        <div className="mt-6 flex flex-wrap items-center gap-3 px-2">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
           {masked ? (
-            <Button onPress={reveal} isLoading={busy} startContent={<Eye size={18} aria-hidden="true" />} data-demo={demo ? "reveal" : undefined}>
+            <Button onPress={reveal} isLoading={busy} startContent={<ScanEye size={18} aria-hidden="true" />} data-demo={demo ? "reveal" : undefined}>
               Reveal key
             </Button>
           ) : (
             <>
               {!isImage && !pin ? (
-                <Button ref={copyRef} variant="outline" onPress={() => copy(value)} startContent={copyState === "ok" ? <CopyCheck size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />} data-demo={demo ? "copy" : undefined}>
+                <Button ref={copyRef} variant="outline" onPress={() => copy(value)} startContent={copyState === "ok" ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />} data-demo={demo ? "copy" : undefined}>
                   {copyState === "ok" ? "Copied" : "Copy key"}
                 </Button>
               ) : null}
               {guide?.redeemUrl ? (
-                <Button as="a" href={guide.redeemUrl} target="_blank" rel="noopener noreferrer" variant="outline" endContent={<SquareArrowOutUpRight size={16} aria-hidden="true" />} data-demo={demo ? "redeem" : undefined}>
+                <Button as="a" href={guide.redeemUrl} target="_blank" rel="noopener noreferrer" variant="outline" endContent={<MoveUpRight size={16} aria-hidden="true" />} data-demo={demo ? "redeem" : undefined}>
                   Redeem on {guide.name}
                 </Button>
               ) : null}
@@ -377,52 +387,52 @@ export function KeyPlate({
           )}
         </div>
       ) : null}
-      {copied === "failed" ? <p className="m-0 mt-2 px-2 text-ui-sm text-ink-muted">Press Ctrl+C / ⌘C to copy.</p> : null}
+      {copied === "failed" ? <p className="m-0 mt-2 text-ui-sm text-on-board-muted">Press Ctrl+C / ⌘C to copy.</p> : null}
       {error ? (
-        <Alert tone="danger" className="mx-2 mt-4">
+        <p role="alert" className="m-0 mt-4 flex items-start gap-2 text-ui-md text-board-danger">
+          <OctagonX size={16} aria-hidden="true" className="mt-0.5" />
           {error}
-        </Alert>
+        </p>
       ) : null}
       {effective === "reported" ? (
-        <p className="m-0 mt-4 flex items-center gap-2 px-2 text-ui-md text-ink">
-          <Lamp on={false} />
+        <p className="m-0 mt-4 text-ui-md text-on-board">
           We’re checking it. We reply {STORE_POLICY.support.replyTime}.
         </p>
       ) : null}
 
       {issuedAt || firstReveal ? (
-        <p className="m-0 mt-5 px-2 font-mono text-[0.75rem] text-ink-muted">
+        <p className="m-0 mt-5 font-mono text-[0.75rem] text-on-board-muted">
           {[issuedAt ? `Issued ${stamp(issuedAt)}` : null, firstReveal ? `First revealed ${stamp(firstReveal)}` : revealedBefore ? "Revealed before" : null].filter(Boolean).join(" · ")}
         </p>
       ) : null}
 
       {effective !== "issuing" && effective !== "refunded" ? (
-        <div className="mt-5 border-t border-line px-2 pt-3">
+        <div className="mt-4 border-t border-board-edge pt-2">
           <div className="flex flex-wrap gap-x-6 gap-y-1">
             {guide ? (
-              <button type="button" aria-expanded={open === "steps"} aria-controls={`${baseId}-steps`} onClick={() => setOpen((o) => (o === "steps" ? null : "steps"))} className="btn-text min-h-10 cursor-pointer text-ui-sm font-[560] text-ink">
+              <button type="button" aria-expanded={open === "steps"} aria-controls={`${baseId}-steps`} onClick={() => setOpen((o) => (o === "steps" ? null : "steps"))} className={linkCls}>
                 <span data-label="">How to redeem on {guide.name}</span>
               </button>
             ) : null}
             {activationNotes.length ? (
-              <button type="button" aria-expanded={open === "notes"} aria-controls={`${baseId}-notes`} onClick={() => setOpen((o) => (o === "notes" ? null : "notes"))} className="btn-text min-h-10 cursor-pointer text-ui-sm font-[560] text-ink">
+              <button type="button" aria-expanded={open === "notes"} aria-controls={`${baseId}-notes`} onClick={() => setOpen((o) => (o === "notes" ? null : "notes"))} className={linkCls}>
                 <span data-label="">Activation notes from the publisher</span>
               </button>
             ) : null}
             {revealed && !isImage ? (
-              <button type="button" aria-expanded={open === "spell"} aria-controls={`${baseId}-spell`} onClick={() => setOpen((o) => (o === "spell" ? null : "spell"))} className="btn-text min-h-10 cursor-pointer text-ui-sm font-[560] text-ink">
+              <button type="button" aria-expanded={open === "spell"} aria-controls={`${baseId}-spell`} onClick={() => setOpen((o) => (o === "spell" ? null : "spell"))} className={linkCls}>
                 <span data-label="">Spell it out</span>
               </button>
             ) : null}
           </div>
           {open === "steps" && guide ? (
-            <div id={`${baseId}-steps`} className="pb-2 pt-2">
-              <p className="m-0 mb-2 text-ui-sm text-ink-muted">You need {guide.need}.</p>
+            <div id={`${baseId}-steps`} className="pb-2 pt-2 text-on-board [&_*]:text-on-board">
+              <p className="m-0 mb-2 text-ui-sm">You need {guide.need}.</p>
               <ActivationStepList guide={guide} size="sm" />
             </div>
           ) : null}
           {open === "notes" ? (
-            <div id={`${baseId}-notes`} className="flex flex-col gap-2 pb-2 pt-2 text-ui-sm text-ink">
+            <div id={`${baseId}-notes`} className="flex flex-col gap-2 pb-2 pt-2 text-ui-sm text-on-board">
               {activationNotes.map((n, i) => (
                 <p key={i} className="m-0 whitespace-pre-line">
                   {n}
@@ -431,13 +441,13 @@ export function KeyPlate({
             </div>
           ) : null}
           {open === "spell" && revealed ? (
-            <p id={`${baseId}-spell`} className="m-0 pb-2 pt-2 font-mono text-data leading-[1.8] text-ink [font-feature-settings:'calt'_0]">
+            <p id={`${baseId}-spell`} className="m-0 pb-2 pt-2 font-mono text-data leading-[1.8] text-on-board [font-feature-settings:'calt'_0]">
               {spellOut(value)}
             </p>
           ) : null}
           {effective === "ready" ? (
-            <button type="button" onClick={() => (demo ? undefined : setReportOpen(true))} data-demo={demo ? "report" : undefined} className="btn-text mt-1 inline-flex min-h-10 cursor-pointer items-center gap-2 text-ui-sm font-[560] text-ink-muted hover-device:hover:text-ink">
-              <MessageSquareWarning size={16} aria-hidden="true" />
+            <button type="button" onClick={() => (demo ? undefined : setReportOpen(true))} data-demo={demo ? "report" : undefined} className="btn-text mt-1 inline-flex min-h-10 cursor-pointer items-center gap-2 text-ui-sm font-semibold text-on-board-muted hover-device:hover:text-on-board">
+              <MessageCircleWarning size={16} aria-hidden="true" />
               <span data-label="">Key not working? Report it</span>
             </button>
           ) : null}
@@ -462,6 +472,8 @@ export function KeyPlate({
     </article>
   );
 }
+
+export const KeyPlate = KeyBoard;
 
 function ReportDialog({ open, onClose, onSent, title, keyId, orderNumber, name, email }: { open: boolean; onClose: () => void; onSent: () => void; title: string; keyId: string; orderNumber: string; name: string; email: string }) {
   const [reason, setReason] = useState("");
@@ -490,7 +502,7 @@ function ReportDialog({ open, onClose, onSent, title, keyId, orderNumber, name, 
       if (!res.ok) throw new Error();
       onSent();
     } catch {
-      setError("We couldn't send your report. Try again, or email us with your order number.");
+      setError("We couldn’t send your report. Try again, or email us with your order number.");
     } finally {
       setBusy(false);
     }
@@ -499,7 +511,7 @@ function ReportDialog({ open, onClose, onSent, title, keyId, orderNumber, name, 
     <Modal
       open={open}
       onClose={onClose}
-      title="Report a key that doesn't work"
+      title="Report a key that doesn’t work"
       description={`We check it and reply ${STORE_POLICY.support.replyTime}. ${STORE_POLICY.guarantee.headline}.`}
       footer={
         <>

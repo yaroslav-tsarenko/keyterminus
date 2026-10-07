@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Cover } from "@/components/product/Cover";
 import { PriceDisplay } from "@/components/shared/PriceDisplay/PriceDisplay";
 import { Lamp } from "@/components/ui/Lamp";
-import { Tumbler } from "@/components/ui/Tumbler";
+import { FlapCounter } from "@/components/ui/Flap";
 import { cn } from "@/lib/utils/cn";
 import { HomeHeading } from "./parts";
 import type { HomePlatform } from "./types";
@@ -41,7 +41,7 @@ function Locker({ p, keysLabel, fromLabel, label }: { p: HomePlatform; keysLabel
           </span>
           <span className="flex flex-col gap-2" data-depth="D4">
             <span className="flex items-baseline gap-2">
-              <Tumbler value={p.count} size={wide ? "md" : "sm"} label={`${p.count.toLocaleString("en-GB")} ${keysLabel}`} motion />
+              <FlapCounter value={p.count} size={wide ? "md" : "sm"} label={`${p.count.toLocaleString("en-GB")} ${keysLabel}`} />
               <span className="eyebrow">{keysLabel}</span>
             </span>
             {p.minPrice !== null ? (

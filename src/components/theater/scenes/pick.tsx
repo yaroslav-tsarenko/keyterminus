@@ -43,7 +43,7 @@ function Browse({ phone }: { phone: boolean }) {
       <p className="eyebrow m-0 mb-3">{copy.browse}</p>
       <div className={cn("grid", phone ? "grid-cols-2 gap-2" : "grid-cols-6 gap-3")}>
         {platforms.map((p) => (
-          <span key={p.slug} data-platform={p.tone} className="flex h-24 flex-col justify-between border border-line bg-plate p-3 shadow-machined">
+          <span key={p.slug} data-platform={p.key} className="flex h-24 flex-col justify-between border border-line bg-plate p-3 shadow-machined">
             <span aria-hidden="true" className="size-1.5 bg-platform" />
             <span className="label-caps text-[0.8125rem] leading-[1.1] text-ink">{p.short}</span>
           </span>

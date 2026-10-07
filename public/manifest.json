@@ -1,15 +1,15 @@
 {
   "id": "/",
-  "name": "Keyrook",
-  "short_name": "Keyrook",
-  "description": "Game keys, DLC, subscriptions and gift cards with platform, region and languages shown before you pay.",
+  "name": "Keyterminus",
+  "short_name": "Keyterminus",
+  "description": "Game keys, DLC, gift cards and subscriptions for every major platform, delivered to your account.",
   "lang": "en-GB",
   "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0F1513",
-  "theme_color": "#0C110F",
+  "background_color": "#F4F1EA",
+  "theme_color": "#222426",
   "categories": [
     "shopping"
   ],

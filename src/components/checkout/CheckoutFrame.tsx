@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowBigLeft, Lock } from "lucide-react";
 import { Wordmark } from "@/components/layout/BrandMark";
 import { CurrencySelect } from "@/components/layout/Header/CurrencySelect";
 import { PaymentLogos } from "@/components/shared/PaymentLogos/PaymentLogos";
@@ -15,18 +15,18 @@ export function CheckoutHeader() {
   const t = useTranslations("checkout.frame");
   return (
     <header data-header="" data-header-state="checkout" data-print-hide="" className="shrink-0 border-b border-line bg-rig text-ink">
-      <div className="mx-auto flex h-[var(--header-height-mobile)] max-w-narrow items-center justify-between gap-4 px-gutter lg:h-[var(--header-tier-1)]">
+      <div className="mx-auto flex h-[var(--header-height-mobile)] max-w-narrow items-center justify-between gap-4 px-gutter lg:h-[var(--bar-height)]">
         <Link href="/" aria-label={t("home", { brand: BRAND.name })} className="flex shrink-0 items-center text-ink">
-          <Wordmark className="h-[32px] w-auto lg:h-[39px]" />
+          <Wordmark className="h-[26px] w-auto lg:h-[30px]" />
         </Link>
-        <p className="label-caps m-0 flex items-center gap-2 whitespace-nowrap text-[0.75rem] text-ink sm:text-[0.8125rem]">
-          <ShieldCheck size={16} aria-hidden="true" className="shrink-0" />
-          <span className="max-[389px]:sr-only">{t("secure")}</span>
+        <p className="m-0 flex items-center gap-2 whitespace-nowrap font-display text-ui-md font-bold text-ink">
+          <Lock size={16} aria-hidden="true" className="shrink-0" />
+          <span className="pt-0.5 max-[429px]:sr-only">{t("secure")}</span>
         </p>
         <div className="flex items-center gap-2">
-          <CurrencySelect className="max-sm:hidden" />
-          <Link href="/cart" className="inline-flex min-h-11 items-center gap-1.5 text-ui-md font-[560] text-ink decoration-1 underline-offset-4 hover-device:hover:underline">
-            <ArrowLeft size={16} aria-hidden="true" />
+          <CurrencySelect size="md" className="max-sm:hidden [&_select]:h-9" />
+          <Link href="/cart" className="inline-flex min-h-11 items-center gap-1.5 text-ui-md font-semibold text-ink underline decoration-link decoration-2 underline-offset-4 hover-device:hover:text-accent-ink">
+            <ArrowBigLeft size={16} aria-hidden="true" />
             <span className="max-sm:sr-only">{t("backToBag")}</span>
           </Link>
         </div>
@@ -48,13 +48,13 @@ export function CheckoutFooter() {
               <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-1 p-0">
                 {POLICY_LINKS.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="text-ui-sm text-ink underline-offset-4 hover-device:hover:underline">
+                    <Link href={link.href} className="text-ui-sm text-ink underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
                       {tp(link.key)}
                     </Link>
                   </li>
                 ))}
                 <li>
-                  <button type="button" onClick={() => openCookieSettings()} className="cursor-pointer text-ui-sm text-ink underline-offset-4 hover-device:hover:underline">
+                  <button type="button" onClick={() => openCookieSettings()} className="cursor-pointer text-ui-sm text-ink underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
                     {t("cookieSettings")}
                   </button>
                 </li>
@@ -65,7 +65,7 @@ export function CheckoutFooter() {
             </p>
             <p className="meta m-0 text-ink-muted">{t("copyright", { year, brand: BRAND.name })}</p>
           </div>
-          <PaymentLogos height={24} strip className="self-start md:self-center" />
+          <PaymentLogos height={28} strip className="self-start md:self-center" />
         </div>
       </div>
     </footer>

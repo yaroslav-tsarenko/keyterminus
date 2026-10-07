@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { PLATFORMS } from "@/lib/keys/taxonomy";
+import { PLATFORM_ORDER, orderIndex } from "@/config/merchandising";
 
 const LIVE = Prisma.sql`p."status" = 'ACTIVE'::"ProductStatus" AND p."quantity" > 0`;
 
@@ -61,12 +61,13 @@ export async function subscriptionTimetable(limit = 40): Promise<Timetable> {
     if (!row.cells[d.key]) row.cells[d.key] = { slug: r.slug, price: r.price };
     byRow.set(key, row);
   }
-  const order = (p: string) => PLATFORMS.findIndex((x) => x.key === p);
+  const order = (p: string) => orderIndex(PLATFORM_ORDER, p);
   const regionOrder = ["global", "europe", "uk", "us", "north-america"];
+  const width = (row: TimetableRow) => Object.keys(row.cells).length;
   return {
     columns: [...columns.values()].sort((a, b) => a.order - b.order).map(({ key, label }) => ({ key, label })),
     rows: [...byRow.values()]
-      .sort((a, b) => order(a.platform) - order(b.platform) || a.service.localeCompare(b.service, "en-GB") || regionOrder.indexOf(a.region) - regionOrder.indexOf(b.region))
+      .sort((a, b) => order(a.platform) - order(b.platform) || width(b) - width(a) || a.service.localeCompare(b.service, "en-GB") || regionOrder.indexOf(a.region) - regionOrder.indexOf(b.region))
       .slice(0, limit),
   };
 }
@@ -92,6 +93,11 @@ export async function giftCardGroups(): Promise<GiftCardGroup[]> {
     if (!group.products.some((p) => p.value !== null && p.value === r.faceValue)) group.products.push({ id: r.id, slug: r.slug, value: r.faceValue, currency: r.faceCurrency, price: r.price });
     groups.set(key, group);
   }
-  const order = (p: string) => PLATFORMS.findIndex((x) => x.key === p);
-  return [...groups.values()].sort((a, b) => order(a.platform) - order(b.platform) || a.region.localeCompare(b.region));
+  const order = (p: string) => orderIndex(PLATFORM_ORDER, p);
+  const regionOrder = ["global", "europe", "uk", "us", "north-america"];
+  const region = (r: string) => {
+    const i = regionOrder.indexOf(r);
+    return i < 0 ? regionOrder.length : i;
+  };
+  return [...groups.values()].sort((a, b) => order(a.platform) - order(b.platform) || region(a.region) - region(b.region) || b.products.length - a.products.length);
 }

@@ -1,29 +1,18 @@
-@keyframes plate-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes panel-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes rise-in {
+@keyframes sign-in {
   from {
     opacity: 0;
     transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panel-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
   to {
     opacity: 1;
@@ -40,48 +29,54 @@
   }
 }
 
-@keyframes tumbler-roll {
+@keyframes flap-fall {
   from {
-    transform: translateY(100%);
+    transform: rotateX(0deg);
   }
   to {
-    transform: translateY(0);
+    transform: rotateX(-90deg);
   }
 }
 
-@keyframes tumbler-roll-out {
+@keyframes flap-land {
   from {
-    transform: translateY(0);
+    transform: rotateX(90deg);
   }
   to {
-    transform: translateY(-100%);
+    transform: rotateX(0deg);
   }
 }
 
-@keyframes bolt-shoot {
-  from {
-    transform: translateX(var(--bolt-from, -4px));
+@keyframes flap-tick {
+  0% {
+    transform: rotateX(0deg);
   }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes lamp-lit {
-  from {
-    opacity: 0;
-  }
-  to {
+  25% {
+    transform: rotateX(-90deg);
     opacity: 1;
   }
+  25.01%,
+  100% {
+    transform: rotateX(0deg);
+    opacity: 0;
+  }
 }
 
-@keyframes dial-step {
+@keyframes route-draw {
   from {
-    transform: rotate(0deg);
+    stroke-dashoffset: 1;
   }
   to {
-    transform: rotate(360deg);
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes stop-in {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
   }
 }
 
@@ -121,22 +116,15 @@
   }
 }
 
-@utility animate-plate-in {
-  animation: plate-in var(--dur-reveal) var(--ease-latch) both;
+@utility animate-sign-in {
+  animation: sign-in var(--dur-ui) var(--ease-sign) both;
   @media (prefers-reduced-motion: reduce) {
     animation: fade-in var(--dur-reduced) linear both;
   }
 }
 
-@utility animate-panel-in {
-  animation: panel-in var(--dur-ui) var(--ease-latch) both;
-  @media (prefers-reduced-motion: reduce) {
-    animation: fade-in var(--dur-reduced) linear both;
-  }
-}
-
-@utility animate-rise-in {
-  animation: rise-in var(--dur-panel) var(--ease-latch) both;
+@utility animate-panel-drop {
+  animation: panel-drop var(--dur-ui) var(--ease-sign) both;
   @media (prefers-reduced-motion: reduce) {
     animation: fade-in var(--dur-reduced) linear both;
   }
@@ -146,54 +134,45 @@
   animation: fade-in var(--dur-micro) var(--ease-std) both;
 }
 
-@utility animate-tumbler-roll {
-  animation: tumbler-roll var(--dur-tumbler) var(--ease-latch) both;
+@utility animate-flap-fall {
+  animation: flap-fall var(--dur-flap) var(--ease-flap) both;
   @media (prefers-reduced-motion: reduce) {
     animation: none;
+    opacity: 0;
   }
 }
 
-@utility animate-lamp-lit {
-  animation: lamp-lit var(--dur-micro) var(--ease-std) both;
-}
-
-@utility animate-bolt-shoot {
-  animation: bolt-shoot var(--dur-ui) var(--ease-latch) both;
+@utility animate-flap-tick {
+  animation: flap-tick 280ms linear infinite;
   @media (prefers-reduced-motion: reduce) {
     animation: none;
-  }
-}
-
-@utility animate-dial-step {
-  animation: dial-step 1080ms steps(12, end) infinite;
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
+    opacity: 0;
   }
 }
 
 @utility animate-sheet-in-right {
-  animation: sheet-in-right var(--dur-panel) var(--ease-latch) both;
+  animation: sheet-in-right var(--dur-panel) var(--ease-sign) both;
   @media (prefers-reduced-motion: reduce) {
     animation: fade-in var(--dur-reduced) linear both;
   }
 }
 
 @utility animate-sheet-out-right {
-  animation: sheet-out-right var(--dur-panel-close) var(--ease-latch) both;
+  animation: sheet-out-right var(--dur-panel-close) var(--ease-sign) both;
   @media (prefers-reduced-motion: reduce) {
     animation: fade-in var(--dur-reduced) linear reverse both;
   }
 }
 
 @utility animate-sheet-in-bottom {
-  animation: sheet-in-bottom var(--dur-panel) var(--ease-latch) both;
+  animation: sheet-in-bottom var(--dur-panel) var(--ease-sign) both;
   @media (prefers-reduced-motion: reduce) {
     animation: fade-in var(--dur-reduced) linear both;
   }
 }
 
 @utility animate-sheet-out-bottom {
-  animation: sheet-out-bottom var(--dur-panel-close) var(--ease-latch) both;
+  animation: sheet-out-bottom var(--dur-panel-close) var(--ease-sign) both;
   @media (prefers-reduced-motion: reduce) {
     animation: fade-in var(--dur-reduced) linear reverse both;
   }

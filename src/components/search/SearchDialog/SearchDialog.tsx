@@ -3,16 +3,17 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowBigRight, Search } from "lucide-react";
 import { Sheet } from "@/components/ui/Dialog";
 import { ProductRow, type CatalogProduct } from "@/components/product/ProductCard";
 import { PriceDisplay } from "@/components/shared/PriceDisplay/PriceDisplay";
-import { DialLoader } from "@/components/ui/Dial";
+import { FlapLoader } from "@/components/ui/Flap";
+import { PlatformTile } from "@/components/ui/PlatformTile";
 import { searchCountLabel } from "@/lib/hooks/useStoreIndex";
 import type { StoreIndex } from "@/lib/catalog/store-index";
 import { cn } from "@/lib/utils/cn";
 
-const RECENT_KEY = "keyrook-recent-searches";
+const RECENT_KEY = "keyterminus-recent-searches";
 
 function readRecent(): string[] {
   try {
@@ -33,7 +34,7 @@ function rememberSearch(q: string) {
 
 type Option =
   | { kind: "product"; id: string; href: string; product: CatalogProduct }
-  | { kind: "link"; id: string; href: string; label: string; count: number; tone?: string; group: "platforms" | "genres" }
+  | { kind: "link"; id: string; href: string; label: string; count: number; platform?: string; group: "platforms" | "genres" }
   | { kind: "all"; id: string; href: string; total: number };
 
 export function SearchDialog({ open, onClose, index }: { open: boolean; onClose: () => void; index: StoreIndex | null }) {
@@ -82,7 +83,7 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
     const list: Option[] = results.products.slice(0, 6).map((p) => ({ kind: "product", id: `${baseId}-p-${p.id}`, href: `/product/${p.slug}`, product: p }));
     (index?.platforms ?? [])
       .filter((p) => p.short.toLowerCase().includes(q) || p.key.includes(q))
-      .forEach((p) => list.push({ kind: "link", id: `${baseId}-pl-${p.key}`, href: `/platform/${p.slug}`, label: p.short, count: p.count, tone: p.tone, group: "platforms" }));
+      .forEach((p) => list.push({ kind: "link", id: `${baseId}-pl-${p.key}`, href: `/platform/${p.slug}`, label: p.short, count: p.count, platform: p.key, group: "platforms" }));
     (index?.genres ?? [])
       .filter((g) => g.label.toLowerCase().includes(q))
       .slice(0, 5)
@@ -129,16 +130,25 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
   const isActive = (id: string) => options[activeIndex]?.id === id;
   const optionCls = (id: string) => cn("block w-full cursor-pointer", isActive(id) && "bg-brand-soft");
 
+  const o0 = (list: Extract<Option, { kind: "link" }>[]) => list.some((o) => o.platform);
   const linkGroup = (title: string, list: Extract<Option, { kind: "link" }>[]) =>
     list.length ? (
       <div role="group" aria-label={title} className="min-w-0">
         <p className="eyebrow m-0 pb-2">{title}</p>
-        <div className="flex flex-wrap gap-x-5 gap-y-1">
+        <div className={cn("flex", o0(list) ? "flex-col border-t border-line" : "flex-wrap gap-x-5 gap-y-1")}>
           {list.map((o) => (
-            <div key={o.id} id={o.id} role="option" aria-selected={isActive(o.id)} data-platform={o.tone} onClick={() => go(o.href)} onPointerEnter={() => setActiveIndex(options.indexOf(o))} className={cn(optionCls(o.id), "inline-flex w-auto min-h-10 items-center gap-2 px-1.5 text-ui-md text-ink")}>
-              {o.tone ? <span aria-hidden="true" className="size-1.5 bg-platform" /> : null}
-              {o.label}
-              <span className="font-mono text-[0.75rem] text-ink-muted">· {o.count.toLocaleString("en-GB")}</span>
+            <div
+              key={o.id}
+              id={o.id}
+              role="option"
+              aria-selected={isActive(o.id)}
+              onClick={() => go(o.href)}
+              onPointerEnter={() => setActiveIndex(options.indexOf(o))}
+              className={cn(optionCls(o.id), o.platform ? "flex min-h-11 items-center gap-2.5 border-b border-line px-2 text-ui-md text-ink" : "inline-flex w-auto min-h-10 items-center gap-2 rounded-sign px-1.5 text-ui-md text-ink underline decoration-link decoration-2 underline-offset-[3px]")}
+            >
+              {o.platform ? <PlatformTile platform={o.platform} size="xs" /> : null}
+              <span className="pt-0.5 font-semibold">{o.label}</span>
+              <span className="pt-0.5 font-mono text-[0.75rem] text-ink-muted">{o.count.toLocaleString("en-GB")}</span>
             </div>
           ))}
         </div>
@@ -165,10 +175,10 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
             onKeyDown={onKeyDown}
             className="h-14 min-w-0 flex-1 bg-transparent text-step-2 text-ink placeholder:text-ink-subtle focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
           />
-          {loading ? <DialLoader size={16} label="Searching" /> : null}
-          <button type="button" onClick={close} className="btn-text inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 text-ui-md font-[560] text-ink">
+          {loading ? <FlapLoader size={16} label="Searching" /> : null}
+          <button type="button" onClick={close} className="btn-text inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 text-ui-md font-semibold text-ink">
             <span data-label="">Close</span>
-            <kbd className="tumbler-slot text-[0.6875rem] font-normal text-ink-muted max-sm:hidden">Esc</kbd>
+            <kbd className="rounded-flap border border-line-hover px-1.5 font-mono text-[0.6875rem] font-normal text-ink-muted max-sm:hidden">Esc</kbd>
           </button>
         </div>
 
@@ -177,7 +187,7 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
             {products.length > 0 ? (
               <div role="group" aria-labelledby={`${baseId}-products`} className="pt-5">
                 <p id={`${baseId}-products`} className="eyebrow m-0 pb-2">
-                  Keys
+                  Departures
                 </p>
                 <div className="grid gap-x-8 border-t border-line sm:grid-cols-2">
                   {products.map((o) => (
@@ -196,9 +206,11 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
             ) : null}
             {all ? (
               <div className="pt-5">
-                <div id={all.id} role="option" aria-selected={isActive(all.id)} onClick={() => go(all.href)} onPointerEnter={() => setActiveIndex(options.indexOf(all))} className={cn(optionCls(all.id), "inline-flex w-auto min-h-11 items-center gap-1.5 px-1.5 text-ui-md font-[560] text-ink underline decoration-1 underline-offset-4")}>
-                  See all <span className="font-mono">{all.total.toLocaleString("en-GB")}</span> results
-                  <ArrowRight size={16} aria-hidden="true" />
+                <div id={all.id} role="option" aria-selected={isActive(all.id)} onClick={() => go(all.href)} onPointerEnter={() => setActiveIndex(options.indexOf(all))} className={cn(optionCls(all.id), "inline-flex w-auto min-h-11 items-center gap-1.5 rounded-sign px-1.5 text-ui-md font-semibold text-ink")}>
+                  <span className="underline decoration-link decoration-2 underline-offset-[3px]">
+                    See all <span className="font-mono">{all.total.toLocaleString("en-GB")}</span> results
+                  </span>
+                  <ArrowBigRight size={16} aria-hidden="true" />
                 </div>
               </div>
             ) : null}
@@ -206,8 +218,8 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
 
           {empty ? (
             <div className="pt-6" role="status">
-              <p className="m-0 text-step-1 text-ink">Nothing matches “{results?.q}”.</p>
-              <p className="m-0 mt-2 text-ui-md text-ink-muted">Try the title without the edition name, or start from a platform:</p>
+              <p className="m-0 text-step-1 font-semibold text-ink">Nothing on the board matches “{results?.q}”.</p>
+              <p className="m-0 mt-2 text-ui-md text-ink-muted">Try the title without the edition name, or start from a platform.</p>
             </div>
           ) : null}
 
@@ -219,7 +231,7 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
                   <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-1 p-0">
                     {recent.map((r) => (
                       <li key={r}>
-                        <button type="button" onClick={() => setQuery(r)} className="min-h-10 cursor-pointer text-ui-md text-ink underline-offset-4 hover-device:hover:underline">
+                        <button type="button" onClick={() => setQuery(r)} className="min-h-10 cursor-pointer text-ui-md text-ink underline decoration-link decoration-2 underline-offset-[3px]">
                           {r}
                         </button>
                       </li>
@@ -230,13 +242,13 @@ export function SearchDialog({ open, onClose, index }: { open: boolean; onClose:
               {index?.platforms.length ? (
                 <>
                   <p className="eyebrow m-0 pb-2">Platforms</p>
-                  <ul className="m-0 grid list-none grid-cols-2 gap-2 p-0 sm:grid-cols-4 lg:grid-cols-5">
+                  <ul className="m-0 grid list-none grid-cols-1 gap-x-8 border-t border-line p-0 min-[480px]:grid-cols-2 lg:grid-cols-3">
                     {index.platforms.map((p) => (
-                      <li key={p.key} data-platform={p.tone}>
-                        <Link href={`/platform/${p.slug}`} onClick={close} className="plate flex h-14 items-center justify-between gap-2 px-3">
-                          <span className="flex min-w-0 items-center gap-2">
-                            <span aria-hidden="true" className="size-1.5 shrink-0 bg-platform" />
-                            <span className="eyebrow truncate text-ink">{p.short}</span>
+                      <li key={p.key} className="border-b border-line">
+                        <Link href={`/platform/${p.slug}`} onClick={close} className="group/pl flex min-h-12 items-center justify-between gap-3 px-1">
+                          <span className="flex min-w-0 items-center gap-2.5">
+                            <PlatformTile number={p.number} size="sm" />
+                            <span className="truncate pt-0.5 text-ui-md font-bold text-ink decoration-link decoration-2 underline-offset-[3px] group-hover/pl:underline">{p.short}</span>
                           </span>
                           <span className="font-mono text-[0.75rem] text-ink-muted">{p.count.toLocaleString("en-GB")}</span>
                         </Link>

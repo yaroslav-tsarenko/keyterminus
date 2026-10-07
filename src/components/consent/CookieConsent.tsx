@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { SquareChevronDown } from "lucide-react";
 import { Modal } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 import { Switch } from "@/components/ui/Choice";
@@ -11,8 +11,8 @@ import { COOKIE_CATEGORIES, COOKIE_TABLE, type CookieCategory } from "@/config/c
 import { onOpenCookieSettings, useConsent, writeConsent } from "@/lib/consent";
 
 const bannerButton = cn(
-  "label-caps inline-flex h-9 min-w-0 flex-1 cursor-pointer items-center justify-center whitespace-nowrap border border-control bg-plate px-2 text-[0.75rem] text-ink shadow-machined transition-colors duration-[120ms] touch-device:h-11",
-  "hover-device:hover:border-ink hover-device:hover:bg-raised active:translate-y-px active:shadow-machined-pressed",
+  "inline-flex h-9 min-w-0 flex-1 cursor-pointer items-center justify-center whitespace-nowrap rounded-control border-[1.5px] border-ink px-2 pt-0.5 font-display text-ui-sm font-bold text-ink transition-colors duration-[120ms] touch-device:h-11",
+  "hover-device:hover:bg-surface-1 active:translate-y-px",
 );
 
 function CookieList({ category }: { category: CookieCategory }) {
@@ -26,12 +26,12 @@ function CookieList({ category }: { category: CookieCategory }) {
         aria-expanded={open}
         aria-controls={`${id}-list`}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-ui-sm font-[560] text-ink decoration-1 underline-offset-4 hover-device:hover:underline"
+        className="btn-text inline-flex min-h-11 cursor-pointer items-center gap-1.5 text-ui-sm font-semibold text-ink"
       >
-        {open ? "Hide cookies" : "Show cookies"}
-        <ChevronDown size={16} aria-hidden="true" className={cn("transition-transform duration-[180ms]", open && "rotate-180")} />
+        <span data-label="">{open ? "Hide cookies" : "Show cookies"}</span>
+        <SquareChevronDown size={16} aria-hidden="true" className={cn("transition-transform duration-[180ms]", open && "rotate-180")} />
       </button>
-      <div id={`${id}-list`} inert={!open} className={cn("grid transition-[grid-template-rows] duration-[200ms] ease-[var(--ease-latch)]", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
+      <div id={`${id}-list`} inert={!open} className={cn("grid transition-[grid-template-rows] duration-[200ms] ease-[var(--ease-sign)]", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
         <div className="relative min-h-0 overflow-hidden">
           {rows.length === 0 ? (
             <p className="meta pt-2 text-ink-muted">None in use. We will list them here before any are added.</p>
@@ -103,12 +103,12 @@ export function CookieConsent() {
           aria-label="Cookie consent"
           data-print-hide=""
           data-cookie-banner=""
-          className="fixed bottom-[calc(var(--sticky-bar-offset,0px)+16px)] left-4 right-4 z-90 animate-rise-in border border-line bg-raised p-5 text-ink shadow-lg sm:right-auto sm:w-[420px]"
+          className="fixed bottom-[calc(var(--sticky-bar-offset,0px)+16px)] left-4 right-4 z-90 animate-sign-in rounded-card bg-raised p-5 text-ink shadow-overlay sm:right-auto sm:w-[420px]"
         >
           <div className="flex flex-col gap-4">
             <p className="m-0 text-ui-md leading-[1.5]">
               We use necessary cookies to run the store. Analytics and marketing cookies load only if you allow them.{" "}
-              <Link href="/policies/cookies" className="font-[560] text-ink underline decoration-1 underline-offset-4">
+              <Link href="/policies/cookies" className="font-semibold text-ink underline decoration-link decoration-2 underline-offset-[3px]">
                 Cookie policy
               </Link>
             </p>
@@ -120,7 +120,7 @@ export function CookieConsent() {
                 Reject all
               </button>
               <button type="button" className={bannerButton} onClick={openSettings}>
-                Customise
+                Choose cookies
               </button>
             </div>
           </div>
@@ -131,7 +131,7 @@ export function CookieConsent() {
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
         title="Cookie settings"
-        description="Choose which optional cookies we may use. You can change this at any time from the footer."
+        description="Choose which optional cookies we may use. You can change this at any time with Cookie settings in the footer."
         footer={
           <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
             <Button variant="outline" onPress={() => decide({ analytics: false, marketing: false })}>

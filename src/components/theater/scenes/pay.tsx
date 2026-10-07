@@ -4,8 +4,9 @@ import { Check, CreditCard, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Choice";
 import { Input } from "@/components/ui/Field";
-import { DialLoader, DialRuler } from "@/components/ui/Dial";
-import { Plate } from "@/components/ui/Plate";
+import { FlapLoader } from "@/components/ui/Flap";
+import { RouteLine } from "@/components/ui/RouteLine";
+import { Tag } from "@/components/ui/Tag";
 import { Lamp } from "@/components/ui/Lamp";
 import { Cover } from "@/components/product/Cover";
 import { LabelRow, productFace } from "@/components/product/ProductCard";
@@ -33,7 +34,7 @@ const face = productFace(SAMPLE_ORDER.title, SAMPLE_ORDER.key);
 function CheckoutHeader({ phone }: { phone: boolean }) {
   return (
     <div className={cn("flex shrink-0 items-center justify-between border-b border-line bg-rig", phone ? "h-14 px-4" : "h-16 px-6")}>
-      <Wordmark className="h-[26px] w-auto text-ink" detail={phone ? "small" : "full"} />
+      <Wordmark className="h-[26px] w-auto text-ink" />
       <span className="inline-flex items-center gap-2 text-ui-sm font-[560] text-ink">
         <ShieldCheck size={18} aria-hidden="true" />
         Secure checkout
@@ -49,14 +50,14 @@ function Review({ s, phone }: { s: S; phone: boolean }) {
   return (
     <div className={cn("h-full", phone ? "flex flex-col gap-4 overflow-hidden p-4" : "grid grid-cols-[minmax(0,1fr)_340px] gap-10 px-10 py-7")}>
       <div className="min-w-0">
-        <DialRuler
-          active={2}
+        <RouteLine
+          demo
           compactLabels={phone}
-          doneIcon={<Check size={14} aria-hidden="true" className="text-ink" />}
-          detents={[
-            { key: "account", label: "Account" },
-            { key: "details", label: "Details" },
-            { key: "review", label: "Review & pay" },
+          terminus={{ tone: "ink" }}
+          stops={[
+            { key: "account", label: "Account", state: "done", check: true },
+            { key: "details", label: "Details", state: "done", check: true },
+            { key: "review", label: "Review & pay", state: "current" },
           ]}
         />
         <p className="m-0 mt-6 font-display text-step-3 font-[600] text-ink [font-stretch:112.5%]">{copy.review}</p>
@@ -128,9 +129,9 @@ function Hosted({ s, focus, phone }: { s: S; focus: string | null; phone: boolea
             <CreditCard size={18} aria-hidden="true" />
             {copy.hostedTitle}
           </span>
-          <Plate variant="info" size="sm">
+          <Tag variant="info" size="sm">
             Illustration
-          </Plate>
+          </Tag>
         </div>
         <p className="m-0 mt-3 flex items-baseline justify-between border-y border-line py-3 text-ui-sm text-ink-muted">
           {copy.merchant}
@@ -164,7 +165,7 @@ function Hosted({ s, focus, phone }: { s: S; focus: string | null; phone: boolea
                 </>
               ) : (
                 <>
-                  <DialLoader label={copy.bankWaiting} />
+                  <FlapLoader label={copy.bankWaiting} />
                   {copy.bankWaiting}
                 </>
               )}
@@ -182,9 +183,9 @@ function Confirmed({ phone }: { phone: boolean }) {
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3">
           <p className="m-0 font-display text-step-5 font-[700] leading-none text-ink [font-stretch:112.5%]">{copy.confirmed}</p>
-          <Plate variant="success" size="sm">
+          <Tag variant="success" size="sm">
             Paid
-          </Plate>
+          </Tag>
         </div>
         <p className="m-0 mt-3 font-mono text-data text-ink-muted">{copy.orderTitle}</p>
         <OrderTimeline status="paid" createdAt={SAMPLE_ORDER.createdAt} paidAt={SAMPLE_ORDER.paidAt} demo size="large" className="mt-8" />

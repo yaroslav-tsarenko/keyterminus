@@ -22,26 +22,23 @@ interface EmptyStateProps {
 }
 
 export function EmptyBox({ className }: { className?: string }) {
+  const cells = Array.from({ length: 12 }, (_, i) => i);
+  const rows = [0, 1, 2];
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 160 104"
-      width="160"
-      height="104"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
-      className={cn("text-ink-muted", className)}
-    >
-      <path d="M20 8h120v60H20z" />
-      <path d="M28 16h104v44H28z" opacity="0.45" />
-      <path d="M8 52h144v44H8z" />
-      <path d="M8 52l12-16M152 52l-12-16" />
-      <path d="M20 36h120" opacity="0.45" />
-      <path d="M64 72h32v8H64z" />
-      <path d="M20 68v28M140 68v28" opacity="0.45" />
+    <svg aria-hidden="true" viewBox="0 0 168 96" width="168" height="96" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" className={cn("text-ink-muted", className)}>
+      <rect x="0.75" y="0.75" width="166.5" height="94.5" rx="10" />
+      {rows.map((r) =>
+        cells.map((c) => {
+          const x = 12 + c * 12;
+          const y = 14 + r * 24;
+          return (
+            <g key={`${r}-${c}`}>
+              <rect x={x} y={y} width="10" height="18" rx="2" />
+              <path d={`M${x} ${y + 9}h10`} opacity="0.6" />
+            </g>
+          );
+        }),
+      )}
     </svg>
   );
 }
@@ -65,7 +62,7 @@ export function EmptyState({
   return (
     <div data-empty="" className={cn("flex flex-col gap-3 px-4 py-16", centered ? "items-center text-center" : "items-start", className)}>
       <EmptyBox />
-      <Heading className="m-0 mt-4 text-step-2 font-semibold leading-[1.15] text-ink">{title}</Heading>
+      <Heading className="m-0 mt-4 text-step-2 font-bold leading-[1.15] text-ink">{title}</Heading>
       {subtitle ? <p className={cn("m-0 max-w-[48ch] text-ink-muted", centered && "mx-auto")}>{subtitle}</p> : null}
       {children}
       {(actionLabel && (actionHref || onAction)) || (secondaryLabel && secondaryHref) ? (

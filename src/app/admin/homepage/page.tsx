@@ -249,7 +249,7 @@ export default function HomepageAdminPage() {
 
   const openCreate = (tab: Tab) => {
     const defaults: Record<Tab, Record<string, unknown>> = {
-      banners: { type: "HERO", title: "", bgColor: "#1E2420", textColor: "#ffffff", isActive: true, sortOrder: 0 },
+      banners: { type: "HERO", title: "", bgColor: "#222426", textColor: "#ffffff", isActive: true, sortOrder: 0 },
       brands: { name: "", isActive: true, sortOrder: 0 },
       sections: { title: "", slug: "", filterType: "featured", maxProducts: 5, viewAllLabel: "View all", bgStyle: "white", columns: 5, isActive: true, sortOrder: 0 },
       tabs: { label: "", linkUrl: "", color: "#333333", isActive: true, sortOrder: 0 },
@@ -270,7 +270,7 @@ export default function HomepageAdminPage() {
           onClick={handleSeed}
           disabled={seeding}
           style={{
-            padding: "0.5rem 1rem", background: "#1E2420", color: "#fff",
+            padding: "0.5rem 1rem", background: "#222426", color: "#fff",
             border: "none", borderRadius: "6px", fontSize: "0.8125rem",
             fontWeight: 600, cursor: "pointer", opacity: seeding ? 0.6 : 1,
           }}
@@ -287,9 +287,9 @@ export default function HomepageAdminPage() {
             style={{
               display: "flex", alignItems: "center", gap: "0.375rem",
               padding: "0.5rem 1rem", borderRadius: "6px",
-              border: activeTab === t.key ? "2px solid #2E5E4E" : "1px solid #e0e0e0",
-              background: activeTab === t.key ? "#E4EEE9" : "#fff",
-              color: activeTab === t.key ? "#2E5E4E" : "#555",
+              border: activeTab === t.key ? "2px solid #8A6512" : "1px solid #e0e0e0",
+              background: activeTab === t.key ? "#F3E9CF" : "#fff",
+              color: activeTab === t.key ? "#8A6512" : "#555",
               fontSize: "0.8125rem", fontWeight: 600, cursor: "pointer",
             }}
           >
@@ -307,7 +307,7 @@ export default function HomepageAdminPage() {
           onClick={() => openCreate(activeTab)}
           style={{
             display: "flex", alignItems: "center", gap: "0.25rem",
-            padding: "0.4rem 0.75rem", background: "#2E5E4E", color: "#fff",
+            padding: "0.4rem 0.75rem", background: "#8A6512", color: "#fff",
             border: "none", borderRadius: "6px", fontSize: "0.8125rem",
             fontWeight: 600, cursor: "pointer",
           }}
@@ -370,7 +370,7 @@ function ItemRow({ title, subtitle, active, onEdit, onDelete, onToggle, badges }
       <button onClick={onEdit} style={{ background: "none", border: "none", cursor: "pointer", color: "#555", padding: "4px" }}>
         <Save size={16} />
       </button>
-      <button onClick={onDelete} style={{ background: "none", border: "none", cursor: "pointer", color: "#2E5E4E", padding: "4px" }}>
+      <button onClick={onDelete} style={{ background: "none", border: "none", cursor: "pointer", color: "#8A6512", padding: "4px" }}>
         <Trash2 size={16} />
       </button>
     </div>
@@ -428,7 +428,7 @@ function renderPromoStripList(items: PromoStripItemData[], onEdit: (i: PromoStri
   return items.map((i) => (
     <ItemRow key={i.id} title={i.title} subtitle={i.subtitle || ""} active={i.isActive}
       onEdit={() => onEdit(i)} onDelete={() => onDelete(i.id)} onToggle={() => onToggle(i.id, i.isActive)}
-      badges={[{ label: i.icon, color: "#2E5E4E" }]}
+      badges={[{ label: i.icon, color: "#8A6512" }]}
     />
   ));
 }
@@ -578,7 +578,7 @@ function EditModal({ type, item, onClose, onSave }: {
           <button onClick={onClose} style={{ padding: "0.5rem 1rem", background: "#f5f5f5", border: "1px solid #e0e0e0", borderRadius: "6px", cursor: "pointer", fontSize: "0.8125rem" }}>
             Cancel
           </button>
-          <button onClick={() => onSave(form)} style={{ padding: "0.5rem 1rem", background: "#2E5E4E", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
+          <button onClick={() => onSave(form)} style={{ padding: "0.5rem 1rem", background: "#8A6512", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "0.8125rem", fontWeight: 600 }}>
             {form.id ? "Save Changes" : "Create"}
           </button>
         </div>

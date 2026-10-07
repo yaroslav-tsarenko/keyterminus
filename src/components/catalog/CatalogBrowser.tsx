@@ -4,7 +4,7 @@ import { useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ListFilter as ListFilterIcon } from "lucide-react";
+import { SlidersVertical } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
 import { Pagination } from "@/components/ui/Pagination";
@@ -13,7 +13,6 @@ import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { ProductGrid } from "@/components/product/ProductGrid/ProductGrid";
 import { ProductSort, CATALOG_SORTS } from "@/components/product/ProductSort/ProductSort";
 import { FilterSummary, ProductFilters, ProductFiltersSheet, useDisplayPrice, type FilterSelection, type SummaryChip } from "@/components/product/ProductFilters/ProductFilters";
-import { platformInfo } from "@/lib/catalog/platforms";
 import type { CatalogProduct } from "@/components/product/product-face";
 import { CATALOG_PAGE_SIZE, LIST_FILTERS, buildCatalogHref, clearedParams, hasActiveFilters, type CatalogFacets, type CatalogParams, type ListFilter, type SortKey } from "./catalog-url";
 
@@ -42,7 +41,7 @@ export interface CatalogBrowserProps {
 export function CatalogBrowser({
   basePath,
   fixed,
-  defaultSort = "newest",
+  defaultSort = "board",
   sortOptions = CATALOG_SORTS,
   params,
   products,
@@ -93,7 +92,7 @@ export function CatalogBrowser({
       chips.push({
         key: `${filter}:${key}`,
         label: option?.label ?? key,
-        platform: filter === "platforms" ? platformInfo(key).tone : null,
+        platform: filter === "platforms" ? key : null,
         onRemove: () => apply({ [filter]: params[filter].filter((v) => v !== key) }),
       });
     }
@@ -137,7 +136,7 @@ export function CatalogBrowser({
   const filters = <ProductFilters facets={facets} selection={selection} hide={hide} lockOnSale={lockOnSale} onChange={(next) => apply(next)} />;
 
   return (
-    <div data-catalog="" className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-10">
+    <div data-catalog="" className="lg:grid lg:grid-cols-[272px_minmax(0,1fr)] lg:items-start lg:gap-10">
       <aside
         aria-label="Filters"
         className="no-scrollbar hidden lg:sticky lg:top-[calc(var(--header-height-compact)+16px)] lg:block lg:max-h-[calc(100dvh-var(--header-height-compact)-32px)] lg:overflow-y-auto lg:pb-6 lg:pr-1"
@@ -153,9 +152,9 @@ export function CatalogBrowser({
           data-catalog-toolbar=""
           className="sticky top-[var(--header-height-mobile)] z-30 -mx-gutter flex items-center justify-between gap-3 border-b border-line bg-rig px-gutter py-2 lg:hidden"
         >
-          <Button variant="outline" size="sm" onPress={() => setSheetOpen(true)} startContent={<ListFilterIcon size={16} aria-hidden="true" />}>
-            Filter
-            {filterCount > 0 ? <span className="font-mono text-[0.75rem] font-medium normal-case tracking-normal [font-stretch:100%]">{filterCount}</span> : null}
+          <Button variant="outline" size="sm" onPress={() => setSheetOpen(true)} startContent={<SlidersVertical size={16} aria-hidden="true" />}>
+            {t("filter")}
+            {filterCount > 0 ? <span className="font-mono text-[0.8125rem] font-semibold">{filterCount}</span> : null}
           </Button>
           <ProductSort value={params.sort} options={sortOptions} onChange={(sort) => apply({ sort })} />
         </div>
@@ -181,9 +180,11 @@ export function CatalogBrowser({
                         <button
                           type="button"
                           onClick={() => apply({ [s.filter]: [] } as Partial<CatalogParams>)}
-                          className="min-h-10 cursor-pointer text-ui-md font-[560] text-ink decoration-1 underline-offset-4 hover-device:hover:underline"
+                          className="btn-text min-h-10 cursor-pointer text-ui-md font-semibold text-ink"
                         >
-                          Remove {s.label} to see <span className="font-mono text-data">{s.gain.toLocaleString("en-GB")}</span> more
+                          <span data-label="">
+                            Remove {s.label} to see <span className="font-mono">{s.gain.toLocaleString("en-GB")}</span> more
+                          </span>
                         </button>
                       </li>
                     ))}
@@ -203,7 +204,7 @@ export function CatalogBrowser({
                   <ul className="m-0 flex list-none flex-wrap justify-center gap-x-6 gap-y-2 p-0">
                     {related.map((r) => (
                       <li key={r.href}>
-                        <Link href={r.href} className="text-ui-md font-[560] text-ink decoration-1 underline-offset-4 hover-device:hover:underline">
+                        <Link href={r.href} className="text-ui-md font-semibold text-ink underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
                           {r.name}
                         </Link>
                       </li>

@@ -212,7 +212,7 @@ export function RegisterView() {
           id="rg-terms"
           label={t.rich("terms", {
             link: (chunks) => (
-              <Link href="/policies/terms" target="_blank" className="font-[560] underline underline-offset-4">
+              <Link href="/policies/terms" target="_blank" className="font-semibold underline underline-offset-4">
                 {chunks}
               </Link>
             ),
@@ -244,7 +244,7 @@ export function RegisterView() {
   return (
     <div className="mx-auto max-w-[560px] px-gutter pb-24 pt-10 lg:pt-16">
       <div className="mb-8 flex flex-col gap-3">
-        <h1 className="m-0 text-step-5 leading-[1.04] text-ink">{t("title")}</h1>
+        <h1 className="m-0 pt-1 text-step-4 leading-[1.04] text-ink">{t("title")}</h1>
         <p className="m-0 text-ink-muted">{t("lead")}</p>
       </div>
       <form noValidate onSubmit={onSubmit}>
@@ -273,7 +273,7 @@ export function RegisterView() {
       </form>
       <p className="m-0 mt-10 border-t border-line pt-6 text-ui-md text-ink-muted">
         {t("haveAccount")}{" "}
-        <Link href="/auth/login" className="font-[560] text-ink underline underline-offset-4">
+        <Link href="/auth/login" className="font-semibold text-ink underline underline-offset-4">
           Sign in
         </Link>
       </p>

@@ -23,45 +23,9 @@
   }
 }
 
-@keyframes locker-rise {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-}
-
 [data-scene="reveal"][data-reveal="armed"] [data-reveal-item],
-[data-scene="lockers"][data-reveal="armed"] [data-locker],
 [data-anim="plate"][data-plate="armed"] {
   opacity: 0;
-}
-
-[data-tumbler-strip] {
-  position: absolute;
-  inset: 0 0 auto;
-  white-space: pre;
-  text-align: center;
-  line-height: 1.45em;
-  pointer-events: none;
-}
-
-[data-key-slots] [data-glyph] {
-  position: relative;
-  color: transparent;
-}
-
-[data-key-slots] [data-glyph]::after {
-  content: attr(data-glyph);
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-tertiary);
-}
-
-[data-key-slots] [data-glyph][data-phase="settled"]::after {
-  color: var(--color-accent-ink);
 }
 
 [data-door-gl] {
@@ -177,23 +141,15 @@
 @media (prefers-reduced-motion: no-preference) {
   [data-anim="words"] [data-word] {
     display: inline-block;
-    animation: word-settle var(--dur-panel) var(--ease-latch) calc(var(--i, 0) * 40ms) backwards;
+    animation: word-settle var(--dur-panel) var(--ease-sign) calc(var(--i, 0) * 40ms) backwards;
   }
 
   [data-scene="reveal"][data-reveal="in"] [data-reveal-item] {
-    animation: plate-in var(--dur-reveal) var(--ease-latch) calc(var(--i, 0) * 70ms) backwards;
-  }
-
-  [data-scene="lockers"][data-reveal="in"] [data-locker] {
-    animation: locker-rise var(--dur-reveal) var(--ease-latch) calc(var(--i, 0) * 60ms) backwards;
+    animation: sign-in var(--dur-reveal) var(--ease-sign) calc(var(--i, 0) * 70ms) backwards;
   }
 
   [data-anim="plate"][data-plate="in"] {
-    animation: plate-in var(--dur-reveal) var(--ease-latch) backwards;
-  }
-
-  [data-cart-target][data-arriving] [data-tumbler] [data-glyph] {
-    animation-delay: calc(var(--arrive-delay, 400ms) + var(--tumbler-delay, 0ms));
+    animation: sign-in var(--dur-reveal) var(--ease-sign) backwards;
   }
 
   dialog[data-phase="open"]::backdrop {
@@ -205,20 +161,16 @@
     transition: opacity var(--dur-panel-close) var(--ease-std);
   }
 
-  [data-lamp="on"] [data-lamp-fill] {
-    animation: lamp-lit var(--dur-micro) var(--ease-std) both;
-  }
-
   [data-stepper] [data-step][data-direction="forward"] {
-    animation: step-in-forward var(--dur-panel) var(--ease-latch) both;
+    animation: step-in-forward var(--dur-panel) var(--ease-sign) both;
   }
 
   [data-stepper] [data-step][data-direction="back"] {
-    animation: step-in-back var(--dur-panel) var(--ease-latch) both;
+    animation: step-in-back var(--dur-panel) var(--ease-sign) both;
   }
 
   [data-stepper] [data-step-summary] {
-    animation: panel-in var(--dur-ui) var(--ease-latch) backwards;
+    animation: panel-drop var(--dur-ui) var(--ease-sign) backwards;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -227,7 +179,7 @@
       transform: translateX(16px);
       transition:
         opacity var(--dur-ui) var(--ease-std),
-        transform var(--dur-ui) var(--ease-latch);
+        transform var(--dur-ui) var(--ease-sign);
     }
 
     [data-peek-row]:is(:hover, :focus-within) [data-peek] {
@@ -254,22 +206,3 @@
 
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  [data-key-plate][data-issued] > [data-bolt] {
-    animation: bolt-shoot var(--dur-ui) var(--ease-latch) both;
-  }
-
-  [data-key-plate][data-issued] > [data-bolt="tr"] {
-    --bolt-from: 4px;
-    animation-delay: 30ms;
-  }
-
-  [data-key-plate][data-issued] > [data-bolt="br"] {
-    --bolt-from: 4px;
-    animation-delay: 60ms;
-  }
-
-  [data-key-plate][data-issued] > [data-bolt="bl"] {
-    animation-delay: 90ms;
-  }
-}

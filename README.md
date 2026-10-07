@@ -1,6 +1,6 @@
-# Keyrook
+# Keyterminus
 
-Storefront and admin for Keyrook (keyrook.com), a store for game keys, DLC, subscriptions, gift cards, top-ups and software, built with Next.js 16. Products come from the Kinguin ESA API (Kinguin for Business). After a card payment is confirmed, the store orders the key from Kinguin, stores it encrypted and shows it to the buyer on their order page.
+Storefront and admin for Keyterminus (keyterminus.com), a store for game keys, DLC, subscriptions, gift cards, top-ups and software, built with Next.js 16. Products come from the Kinguin ESA API (Kinguin for Business). After a card payment is confirmed, the store orders the key from Kinguin, stores it encrypted and shows it to the buyer on their order page.
 
 ## Tech stack
 
@@ -87,7 +87,7 @@ To connect a real provider: add `src/lib/payments/<name>.ts` exporting a `Paymen
 brew install postgresql@16 && brew services start postgresql@16
 npm install
 cp .env.example .env         # set JWT_SECRET and KINGUIN_API_KEY
-npm run local:setup          # creates the keyrook database, pushes the schema, seeds, generates KEY_ENCRYPTION_SECRET, syncs the catalogue
+npm run local:setup          # creates the keyterminus database, pushes the schema, seeds, generates KEY_ENCRYPTION_SECRET, syncs the catalogue
 npm run dev                  # http://localhost:3000
 ```
 

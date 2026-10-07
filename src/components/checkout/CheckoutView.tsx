@@ -6,14 +6,13 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ShieldCheck } from "lucide-react";
 import { Stepper, type StepperErrorSummary } from "@/components/ui/Stepper";
 import { Input } from "@/components/ui/Field";
 import { Checkbox } from "@/components/ui/Choice";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { AccordionItem } from "@/components/ui/Accordion";
-import { ReadoutLoader } from "@/components/ui/ReadoutLoader";
+import { PageLoader } from "@/components/ui/Flap";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { PaymentLogos } from "@/components/shared/PaymentLogos/PaymentLogos";
 import { ProductRow } from "@/components/product/ProductCard";
@@ -27,6 +26,7 @@ import { checkoutFormSchema, type CheckoutFormData } from "@/lib/validators/chec
 import { countryName, DEFAULT_COUNTRY_CODE } from "@/lib/countries";
 import { formatPrice } from "@/lib/utils/format-price";
 import { STORE_POLICY } from "@/config/store-policy";
+import { TicketSummary } from "@/components/cart/TicketSummary";
 import { COMPANY } from "@/lib/company";
 import { BRAND } from "@/lib/brand";
 import { regionLabel, regionSentence } from "@/lib/catalog/platforms";
@@ -34,7 +34,7 @@ import { CheckoutCounter } from "./CheckoutCounter";
 import { TotalsList } from "./TotalsList";
 import { quotePayloadItems, useCheckoutQuote, type QuoteProblem } from "./useCheckoutQuote";
 
-const DRAFT_KEY = "keyrook-checkout-draft";
+const DRAFT_KEY = "keyterminus-checkout-draft";
 const CHECKOUT_PATH = "/checkout";
 
 type FieldName = FieldPath<CheckoutFormData>;
@@ -296,13 +296,13 @@ export function CheckoutView() {
   const imageFor = useMemo(() => new Map(cart.items.map((item) => [item.productId, item.imageUrl])), [cart.items]);
 
   if (!isHydrated || authLoading) {
-    return <ReadoutLoader block />;
+    return <PageLoader block />;
   }
 
   if (cart.items.length === 0 && !submitting) {
     return (
       <div className="mx-auto max-w-narrow px-gutter py-12">
-        <h1 className="m-0 text-step-5 leading-none text-ink">{t("title")}</h1>
+        <h1 className="m-0 pt-1 text-step-4 leading-none text-ink">{t("title")}</h1>
         <EmptyState title={t("empty.title")} subtitle={t("empty.subtitle")} actionLabel="Browse the catalogue" actionHref="/catalog" align="start" className="px-0" />
       </div>
     );
@@ -326,10 +326,10 @@ export function CheckoutView() {
   ) : (
     <div className="flex flex-col gap-2">
       <p className="m-0 text-step-0 text-ink">
-        Signed in as <span className="font-[560]">{user.email}</span>
+        Signed in as <span className="font-semibold">{user.email}</span>
       </p>
       <p className="m-0 max-w-[60ch] text-ui-sm text-ink-muted">{BRAND.name} keeps your keys in this account. They appear on the order page once your payment is confirmed, and we email you when they’re ready.</p>
-      <Link href={`/auth/login?next=${encodeURIComponent(CHECKOUT_PATH)}`} className="mt-1 w-fit text-ui-sm font-[560] text-ink underline underline-offset-4">
+      <Link href={`/auth/login?next=${encodeURIComponent(CHECKOUT_PATH)}`} className="mt-1 w-fit text-ui-sm font-semibold text-ink underline underline-offset-4">
         Not you? Switch account
       </Link>
     </div>
@@ -486,7 +486,7 @@ export function CheckoutView() {
           label={
             <>
               {STORE_POLICY.waiver.text}{" "}
-              <Link href="/policies/returns#withdrawal" target="_blank" className="font-[560] underline underline-offset-4">
+              <Link href="/policies/returns#withdrawal" target="_blank" className="font-semibold underline underline-offset-4">
                 Refund policy
               </Link>
             </>
@@ -517,7 +517,7 @@ export function CheckoutView() {
             size="lg"
             isDisabled={!accepted || !quoteReady || !user || priceIssueOpen}
             isLoading={submitting}
-            startContent={<ShieldCheck size={18} aria-hidden="true" />}
+            arrow
             className="max-sm:w-full"
           >
             {payLabel}
@@ -539,7 +539,7 @@ export function CheckoutView() {
 
   return (
     <div className="mx-auto max-w-narrow px-gutter pb-20 pt-8 lg:pt-12">
-      <h1 className="m-0 mb-6 text-step-5 leading-[1.04] text-ink lg:mb-10">{t("title")}</h1>
+      <h1 className="m-0 mb-6 pt-1 text-step-4 leading-[1.04] text-ink lg:mb-10">{t("title")}</h1>
 
       <div className="mb-6 border-y border-line lg:hidden">
         <AccordionItem title={`Show summary · ${formatPrice(totals.total, currency)}`} open={summaryOpen} onOpenChange={setSummaryOpen} headingLevel={2} flush className="border-b-0">
@@ -589,9 +589,9 @@ export function CheckoutView() {
           />
         </form>
         <aside aria-label={t("counter.title")} className="hidden lg:col-span-5 lg:block">
-          <div className="plate sticky top-6 p-6">
+          <TicketSummary count={cart.itemCount} className="sticky top-6">
             <CheckoutCounter {...counterProps} />
-          </div>
+          </TicketSummary>
         </aside>
       </div>
     </div>

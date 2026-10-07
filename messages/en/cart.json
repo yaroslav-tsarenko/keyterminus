@@ -1,22 +1,22 @@
 {
   "meta": {
-    "title": "Your cart",
-    "description": "Check the game keys, codes and gift cards in your cart before you check out."
+    "title": "Cart",
+    "description": "The keys in your cart, with platform and region, before you go to checkout."
   },
-  "title": "Your cart",
-  "itemCount": "{count, plural, one {# item} other {# items}}",
-  "itemsLabel": "Items in your cart",
-  "summary": "Order summary",
+  "title": "Cart",
+  "itemCount": "{count, plural, one {# key} other {# keys}}",
+  "itemsLabel": "Keys in your cart",
+  "summary": "Your ticket",
   "checkout": "Checkout",
   "checkoutWithTotal": "Checkout · {total}",
-  "continueShopping": "Continue browsing",
+  "continueShopping": "Continue shopping",
   "saveForLater": "Save for later",
   "removed": "Removed from your cart",
-  "limitPerOrder": "One order can hold up to {max} keys.",
-  "limits": "One order can hold up to {perOrder} keys. Gift cards and top-ups have a lower limit per order.",
+  "limitPerOrder": "An order can hold up to {max} keys.",
+  "limits": "An order can hold up to {perOrder} keys. Gift cards and top-ups have a lower limit per order.",
   "empty": {
     "title": "Your cart is empty",
-    "subtitle": "Products you add will wait here until you check out. Prices are checked again before payment.",
+    "subtitle": "Keys you add stay here until you check out. Prices are checked again before you pay.",
     "action": "Browse the catalogue",
     "links": {
       "games": "Games",
@@ -24,5 +24,5 @@
       "subscriptions": "Subscriptions"
     }
   },
-  "deliveryNote": "No delivery charge. Keys are issued to your account after your payment is confirmed."
+  "deliveryNote": "Nothing is shipped. Keys are issued to your account after your payment is confirmed."
 }

@@ -1,5 +1,5 @@
 import { productTypeDef, regionDef, type KeySummary } from "@/lib/keys/taxonomy";
-import { platformInfo, regionSentence, regionTag, typeSentence, typeTag, typeTone, type PlatformTone, type TypeTone } from "@/lib/catalog/platforms";
+import { isGiftCardKind, platformInfo, regionSentence, regionTag, typeSentence, typeTag } from "@/lib/catalog/platforms";
 
 export interface CatalogProduct {
   id: string;
@@ -23,13 +23,15 @@ export interface ProductFace {
   kind: string;
   typeLabel: string | null;
   typeTag: string | null;
-  typeTone: TypeTone;
+  isGiftCard: boolean;
   typeSentence: string;
   platform: string | null;
   platformShort: string | null;
   platformKey: string | null;
   platformSlug: string | null;
-  tone: PlatformTone;
+  platformNumber: number | null;
+  platformBoard: string;
+  platformBoardShort: string;
   region: string | null;
   regionShort: string | null;
   regionTag: string | null;
@@ -109,13 +111,15 @@ export function productFace(name: string, key: KeySummary | null | undefined): P
       kind: "game",
       typeLabel: null,
       typeTag: null,
-      typeTone: "game",
+      isGiftCard: false,
       typeSentence: "Product",
       platform: null,
       platformShort: null,
       platformKey: null,
       platformSlug: null,
-      tone: "other",
+      platformNumber: null,
+      platformBoard: "OTHER",
+      platformBoardShort: "OTHER",
       region: null,
       regionShort: null,
       regionTag: null,
@@ -140,20 +144,22 @@ export function productFace(name: string, key: KeySummary | null | undefined): P
       : kind === "subscription"
         ? key.validity
         : kind === "game" || kind === "dlc"
-          ? [languageFacts(key.languages), kind === "dlc" ? "Needs the base game" : null].filter(Boolean).join(" · ") || null
+          ? [languageFacts(key.languages, 3), kind === "dlc" ? "Needs the base game" : null].filter(Boolean).join(" · ") || null
           : key.validity ?? languageFacts(key.languages);
   return {
     title: key.title || name,
     kind,
     typeLabel: productTypeDef(kind)?.singular ?? null,
     typeTag: typeTag(kind),
-    typeTone: typeTone(kind),
+    isGiftCard: isGiftCardKind(kind),
     typeSentence: typeSentence(kind),
     platform: platform.label,
     platformShort: platform.short,
     platformKey: platform.key,
     platformSlug: platform.slug,
-    tone: platform.tone,
+    platformNumber: platform.number,
+    platformBoard: platform.boardLabel,
+    platformBoardShort: platform.shortLabel,
     region: region?.label ?? null,
     regionShort: region?.short ?? null,
     regionTag: regionTag(key.region),
@@ -168,5 +174,5 @@ export function productFace(name: string, key: KeySummary | null | undefined): P
 }
 
 export function shelfAspect(products: CatalogProduct[]): "card" | undefined {
-  return products.length > 0 && products.every((p) => productFace(p.name, p.key).typeTone === "giftcard") ? "card" : undefined;
+  return products.length > 0 && products.every((p) => productFace(p.name, p.key).isGiftCard) ? "card" : undefined;
 }

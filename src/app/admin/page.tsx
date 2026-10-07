@@ -147,7 +147,7 @@ export default function AdminDashboard() {
 
   const kpis = [
     { label: "Today's Revenue", value: formatPrice(data.todayRevenue), icon: <DollarSign size={18} />, bg: "rgba(63,122,84,0.12)", fg: "#3F7A54", change: revChange, sub: `vs ${formatPrice(data.yesterdayRevenue)} yesterday` },
-    { label: "Today's Orders", value: String(data.todayOrders), icon: <Handbag size={18} />, bg: "rgba(46,94,78,0.12)", fg: "#2E5E4E", change: pct(data.todayOrders, data.yesterdayOrders), sub: `vs ${data.yesterdayOrders} yesterday` },
+    { label: "Today's Orders", value: String(data.todayOrders), icon: <Handbag size={18} />, bg: "rgba(46,94,78,0.12)", fg: "#8A6512", change: pct(data.todayOrders, data.yesterdayOrders), sub: `vs ${data.yesterdayOrders} yesterday` },
     { label: "Total Products", value: String(data.totalProducts), icon: <Package size={18} />, bg: "rgba(165,86,31,0.12)", fg: "#A5561F", sub: `${data.stockDistribution.lowStock} low stock` },
     { label: "Total Customers", value: String(data.totalCustomers), icon: <Users size={18} />, bg: "rgba(154,107,21,0.12)", fg: "#9A6B15", sub: `${data.totalOrders} total orders` },
   ];

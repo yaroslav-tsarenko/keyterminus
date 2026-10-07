@@ -4,77 +4,72 @@ import { POLICY_FACTS as F } from "@/lib/policy-facts";
 
 export const generateMetadata = policyMetadata(
   "terms",
-  `The terms ${F.company} trades on as ${F.brand}: who can order, product information, prices, payment, delivery of activation keys, the right to cancel, refunds and complaints.`,
+  `The contract between you and ${F.company}, trading as ${F.brand}: who can order, product information, prices, payment, key delivery, the right to cancel, refunds and complaints.`,
 );
 
 const sections: PolicySection[] = [
   {
     id: "about",
-    title: "About these terms",
+    title: "Who we are and what these terms cover",
     body: (
       <>
         <p>
-          These terms apply to every order placed on {F.domain}. {F.brand} is a trading name of {F.company}. When these terms say
-          “we”, “us” or “our”, they mean {F.company}. “You” means the person placing the order.
+          These terms govern every order placed on {F.domain}. {F.brand} is a trading name of {F.company}; “we”, “us” and “our” mean{" "}
+          {F.company}, and “you” means the person who places the order.
         </p>
         <SellerBlock />
         <p>
-          {F.company} is the seller of every product on {F.domain}. Product information and keys are obtained from distribution partners, but your
-          contract is with {F.company}.
+          {F.company} sells every product on {F.domain}. We source keys and product information from distribution partners, but your contract
+          is with {F.company} alone.
         </p>
         <p>
-          These terms work together with our <Link href="/policies/shipping">Delivery policy</Link>,{" "}
-          <Link href="/policies/returns">Refund policy</Link>, <Link href="/policies/warranty">Key guarantee</Link>,{" "}
-          <Link href="/policies/payment">Payment policy</Link>, <Link href="/policies/privacy">Privacy policy</Link> and{" "}
-          <Link href="/policies/cookies">Cookie policy</Link>. Nothing in them reduces the rights you have by law as a consumer.
+          The <Link href="/policies/shipping">Delivery policy</Link>, <Link href="/policies/returns">Refund policy</Link>,{" "}
+          <Link href="/policies/warranty">Key not working?</Link>, <Link href="/policies/payment">Payment policy</Link>,{" "}
+          <Link href="/policies/privacy">Privacy policy</Link> and <Link href="/policies/cookies">Cookie policy</Link> form part of these
+          terms. Nothing in them takes away rights you have by law as a consumer.
         </p>
       </>
     ),
   },
   {
     id: "definitions",
-    title: "Words we use",
+    title: "Definitions",
     body: (
       <ul>
-        <li><strong>Product:</strong> a game or DLC key, subscription code, gift card or top-up code, or software licence key sold on {F.domain}.</li>
-        <li><strong>Key:</strong> the activation key, code or serial number issued to you for a product.</li>
-        <li><strong>Platform:</strong> the service where a key is redeemed, such as Steam, the EA app, Xbox or PlayStation.</li>
-        <li><strong>Publisher:</strong> the company responsible for the game, service, card or software behind a key.</li>
+        <li><strong>Product:</strong> a key for a game or DLC, a subscription code, a gift card or top-up code, or a software licence key offered on {F.domain}.</li>
+        <li><strong>Key:</strong> the activation key, code or serial number we issue to you for a product.</li>
+        <li><strong>Platform:</strong> the service on which a key is redeemed, for example Steam, Xbox, PlayStation or the EA app.</li>
+        <li><strong>Publisher:</strong> the company behind the game, service, card or software a key unlocks.</li>
       </ul>
     ),
   },
   {
     id: "who-can-order",
-    title: "Who can order",
+    title: "Who may order",
     body: (
       <>
+        <p>You must be {F.minAge} or over to open an account or order. We ask for your date of birth at registration and refuse orders from anyone younger.</p>
         <p>
-          You must be at least {F.minAge} years old to create an account or place an order. We ask for your date of birth when you register
-          and do not take orders from anyone under {F.minAge}.
-        </p>
-        <p>
-          We supply consumers buying products for their own use. You may not buy products to resell them. The details you give us (name,
-          email, phone, date of birth and billing address) must be accurate and your own, and the card you pay with must be yours or used with
-          its holder’s permission.
+          We sell to consumers buying for their own use, not for resale. The name, email, phone number, date of birth and billing address you
+          give must be accurate and yours, and the card you pay with must be yours or used with its holder’s consent.
         </p>
       </>
     ),
   },
   {
     id: "where-we-sell",
-    title: "Where we deliver",
+    title: "Countries we serve",
     body: (
       <>
-        <p>We serve customers in the {F.marketCountries}. Checkout only accepts billing addresses in these countries.</p>
+        <p>We serve customers in the {F.marketCountries}, and checkout accepts billing addresses in these countries only.</p>
         <p>
-          We do not deliver to or accept orders or accounts from {F.restrictedCountries}, or from {F.restrictedTerritories}. These
-          countries and territories are excluded from registration and checkout. We do not list keys whose activation region is limited to
-          any of them. If we find that an order is connected to one of them, for example through the billing address or payment card, we
-          cancel it and refund the full amount paid.
+          We don’t open accounts in, deliver to or accept orders from {F.restrictedCountries} or {F.restrictedTerritories}; these are excluded
+          at registration and checkout, and keys whose activation region is limited to them are not listed. If an order turns out to be
+          connected to one of them, for example through the billing address or the card, we cancel it and refund the full amount.
         </p>
         <p>
-          You must not use a VPN, proxy, false address or someone else’s card to hide where you are or to get around a restriction. We
-          do not offer keys that need a VPN to activate.
+          Don’t use a VPN, proxy, false address or another person’s card to hide your location or get around a restriction. We don’t offer
+          keys that need a VPN to activate.
         </p>
       </>
     ),
@@ -85,19 +80,16 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Before you order, check the product page: the platform the key is redeemed on, the activation region, the supported languages,
-          the edition, the duration of a subscription or the value and currency of a gift card, the account you need, and for PC games
-          and DLC the system requirements.
+          Before you order, read the product page: the platform, the activation region, the languages, the edition, a subscription’s length
+          or a gift card’s value and currency, the account you need and, for PC games, DLC and software, the system requirements.
         </p>
         <p>
-          A purchase gives you a key only, with no disc, box or printed card. Cover art and screenshots come from the publisher and show
-          the product, not the key. Descriptions, release dates and requirements are supplied by publishers and distributors; we take care to
-          keep them accurate. If we find a material error in a price, description, region or platform, we correct it and, where needed, cancel
-          the affected order and refund it.
+          You buy a key only; there is no disc, box or printed card. Cover art and screenshots come from the publisher and show the product,
+          not the key. Descriptions, release dates and requirements come from publishers and distributors and we take care to keep them
+          right. If we find a material error in a price, description, region or platform, we correct it and, where necessary, cancel and
+          refund the affected order.
         </p>
-        <p>
-          We do not offer pre-orders. Every product listed can be delivered straight after payment.
-        </p>
+        <p>We don’t take pre-orders. Every listed product can be issued as soon as your payment is confirmed.</p>
       </>
     ),
   },
@@ -107,68 +99,64 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Redeeming a key needs an account with the platform and acceptance of the platform’s and publisher’s own terms and licence.
-          A game or software key gives you a licence to use the content under those terms; it does not transfer ownership of the content.
+          To redeem a key you need an account with the platform and must accept the platform’s and the publisher’s terms and licence. A key
+          for a game or software gives you a licence to use the content on those terms; it doesn’t transfer ownership of the content.
         </p>
         <p>
-          A subscription code gives access for the duration and region shown. We do not renew it or charge you again; any renewal is set up by you
-          with the platform. Gift card and top-up codes add the value shown to an account set to the region shown, and the balance is held and
-          governed by the platform that issues it.
+          A subscription code gives access for the length and region shown. We never renew it or charge you again; any renewal is between you
+          and the platform. A gift card or top-up code adds the value shown to an account set to the region shown, and the issuing platform
+          holds and governs that balance.
         </p>
         <p>
-          {F.brand} is not affiliated with or endorsed by the platforms and publishers whose products it offers. We are not responsible for
-          platform outages, a platform’s decision about your account for reasons unrelated to the key, or changes a publisher makes to a
-          game or service after you redeem it. This does not limit our duty to deliver a key that matches its description.
+          {F.brand} isn’t affiliated with or endorsed by the platforms and publishers whose products it offers. We aren’t responsible for
+          platform outages, for a platform’s decisions about your account that have nothing to do with the key, or for changes a publisher
+          makes after you redeem a key. This doesn’t limit our duty to supply a key that matches its description.
         </p>
       </>
     ),
   },
   {
     id: "orders",
-    title: "How an order becomes a contract",
+    title: "Placing an order",
     body: (
       <>
         <ol>
-          <li>You sign in to your {F.brand} account and add products to your cart.</li>
-          <li>At checkout you enter your contact details and billing address.</li>
-          <li>We re-check the price and availability of each product. If a price has gone up, we show you the new total before you can pay.</li>
-          <li>You tick the box to agree to these terms and our Refund policy and, separately, the box asking us to start delivery straight away, and select Pay.</li>
-          <li>You are taken to our payment provider’s hosted page to pay by card.</li>
-          <li>Once the payment provider confirms the payment to us, we email you an order confirmation with your invoice. The contract between you and {F.company} is formed when we send that email.</li>
+          <li>You sign in to your {F.brand} account and put products in your cart.</li>
+          <li>At checkout you give your contact details and billing address.</li>
+          <li>We check each product’s price and stock again. If a price has risen, you see the new total before you can pay.</li>
+          <li>You tick the box accepting these terms and the Refund policy, tick the separate box asking for delivery straight after payment, and choose Pay.</li>
+          <li>You pay by card on the payment provider’s hosted page.</li>
+          <li>When the provider confirms the payment, we email an order confirmation with your invoice. The contract between you and {F.company} is formed when we send that email.</li>
         </ol>
         <p>
-          To protect customers and cards, an order can contain up to {F.maxItemsPerOrder} keys and up to {F.maxOrderValue} in value, and some
-          products have a lower limit per order, shown on the product page. Gift cards and top-ups are limited to {F.cardLimitPerItem} per product
-          per order and {F.cardLimit24h} keys or {F.cardValue24h} per customer in 24 hours.
+          To protect customers and cardholders, an order can hold up to {F.maxItemsPerOrder} keys worth up to {F.maxOrderValue} in total, and
+          some products have a lower limit per order, shown on their page. Gift cards and top-ups are limited to {F.cardLimitPerItem} per
+          product in an order and to {F.cardLimit24h} keys or {F.cardValue24h} per customer in 24 hours.
         </p>
         <p>
-          We may decline an order before the contract is formed, or cancel it afterwards with a full refund, if a product is no longer
-          available, if the price or description shown was clearly wrong, if a purchase limit applies, if we cannot complete a security
-          check, if the order is linked to a restricted country or territory, or if the payment appears fraudulent. We tell you by email
-          if this happens.
+          We may refuse an order before the contract is formed, or cancel it afterwards with a full refund, when a product is no longer
+          available, a price or description was obviously wrong, a purchase limit applies, a security check can’t be completed, the order is
+          linked to a restricted country or territory, or the payment looks fraudulent. We tell you by email if this happens.
         </p>
       </>
     ),
   },
   {
     id: "prices",
-    title: "Prices, currencies and tax",
+    title: "Prices, currencies and VAT",
     body: (
       <>
         <p>
-          Prices are shown in {F.currencies}. Our prices are set in {F.baseCurrency}; prices in other currencies are converted at our current
-          exchange rate. You pay in the currency selected when you place the order, and the total shown before you pay is the amount charged.
-          Your card issuer may add its own foreign exchange fee if your card is in a different currency.
+          Prices can be shown in {F.currencies}. We set them in {F.baseCurrency} and convert them into other currencies at our current
+          exchange rate. You pay in the currency chosen when you order, and the total shown before payment is the amount charged. If your card
+          uses another currency, its issuer may add a foreign exchange fee.
         </p>
         {F.vatRegistered ? (
           <p>Prices include VAT at the rate that applies to your order.</p>
         ) : (
-          <p>
-            {F.company} is not registered for VAT. We do not charge VAT, no VAT is added at checkout and no VAT is shown on your order
-            confirmation or invoice.
-          </p>
+          <p>{F.company} isn’t registered for VAT. No VAT is charged or added at checkout, and none appears on your confirmation or invoice.</p>
         )}
-        <p>There is no delivery charge and no service fee. The total shown at checkout is the full amount you pay.</p>
+        <p>There are no delivery or service charges: the checkout total is everything you pay.</p>
       </>
     ),
   },
@@ -178,13 +166,13 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          We accept {F.cardMethods} cards. Card details are entered on the hosted payment page of {F.paymentProvider}, which is PCI DSS
-          compliant. We never see or store your full card number. Your bank may ask you to confirm the payment with 3-D Secure, for example in
-          your banking app.
+          We accept {F.cardMethods} cards. You enter your card details on the hosted payment page of {F.paymentProvider}, which is PCI DSS
+          compliant; we never see or store your full card number. Your bank may ask you to approve the payment with 3-D Secure, for example in
+          its app.
         </p>
         <p>
-          We only request your keys after the payment provider has confirmed the payment to us. If the payment is declined or cancelled, no
-          order is placed and no key is issued. More detail is in our <Link href="/policies/payment">Payment policy</Link>.
+          We ask for your keys only after the payment provider confirms the payment. A declined or cancelled payment means no order and no
+          key. See the <Link href="/policies/payment">Payment policy</Link> for more.
         </p>
       </>
     ),
@@ -195,13 +183,12 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Keys are delivered {F.deliveryWhere}, {F.deliveryUsual}. {F.deliveryEmailNote} Delivery of a key is complete when it is available
-          on your order page.
+          Keys are delivered {F.deliveryWhere}, {F.deliveryUsual}. {F.deliveryEmailNote} A key counts as delivered when it is available in your
+          account.
         </p>
         <p>
-          We do not guarantee a fixed delivery time: a bank check, a security review or a delay at our distribution partner can make it take
-          longer. If we cannot deliver a key within {F.deliveryDeadlineHours} hours of payment confirmation, we refund it. Full detail is in our{" "}
-          <Link href="/policies/shipping">Delivery policy</Link>.
+          We don’t promise a fixed time: a bank check, a security review or a delay at our distribution partner can add time. A key we can’t
+          issue within {F.deliveryDeadlineHours} hours of payment confirmation is refunded. See the <Link href="/policies/shipping">Delivery policy</Link>.
         </p>
       </>
     ),
@@ -212,47 +199,46 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 in the UK, and the Consumer Rights
-          Directive in the EU, you normally have {F.withdrawalDays} days to cancel a contract for digital content. That right ends once
-          delivery has begun with your express request and your acknowledgement that you lose the right.
+          Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 in the UK and the Consumer Rights
+          Directive in the EU, you can usually cancel a contract for digital content within {F.withdrawalDays} days. The right ends once supply
+          has started at your express request and you have acknowledged that you lose it.
         </p>
         <p>
-          At checkout there is a separate box, which is not ticked in advance and is separate from accepting these terms: “{F.waiverText}
-          ” You cannot place an order without ticking it. We record the time you ticked it and the wording you agreed to, and we repeat it
-          in your order confirmation email and on your invoice. Delivery begins when a key is issued to your account, which normally happens
-          straight after your payment is confirmed.
+          At checkout there is a separate box, unticked by default and apart from accepting these terms: “{F.waiverText}” An order can’t be
+          placed without it. We record the wording and the time you ticked it, and repeat them in your confirmation email and on your invoice.
+          Supply starts when a key is issued to your account, which is normally straight after your payment is confirmed.
         </p>
         <p>
-          You can cancel without charge before {F.cancelBefore}. Email {F.email} or use the <Link href="/contact">contact form</Link> with your
-          order number. Losing the right to cancel does not affect your rights when a key is not delivered, does not work or is not as described.
+          You can cancel at no cost before {F.cancelBefore} by emailing {F.email} or using the <Link href="/contact">contact form</Link> with
+          your order number. Losing the right to cancel doesn’t affect your rights when a key isn’t issued, doesn’t work or isn’t as described.
         </p>
       </>
     ),
   },
   {
     id: "your-key",
-    title: "Looking after your key",
+    title: "Keeping your key safe",
     body: (
       <p>
-        Keep your key private until you redeem it and redeem it only on the platform and in the region stated. Anyone who sees a key can use it.
-        We are not responsible for a key redeemed by someone else because you shared it, or because your email or {F.brand} account was
-        accessed with your sign-in details, unless that happened through a security failure on our side.
+        Keep a key private until you redeem it, and redeem it only on the platform and in the region named; whoever sees a key can use it. We
+        aren’t responsible for a key redeemed by someone else because you shared it, or because your email or {F.brand} account was entered
+        with your sign-in details, unless a security failure on our side caused it.
       </p>
     ),
   },
   {
     id: "refunds",
-    title: "Refunds and keys that do not work",
+    title: "Refunds and faulty keys",
     body: (
       <>
         <p>
-          If a key is not delivered, is invalid, was redeemed before it reached you, is revoked for a reason you did not cause, or does not
-          match its product page, contact us within {F.guaranteeClaimDays} days of delivery. We replace it or refund the price you paid for it,
-          within {F.refundDays} days to {F.refundMethod}. The procedure is in our <Link href="/policies/warranty">Key guarantee</Link>.
+          If a key isn’t issued, is invalid, was redeemed before it reached you, is withdrawn for a reason you didn’t cause or doesn’t match its
+          product page, tell us within {F.guaranteeClaimDays} days of delivery. We replace it, or refund what you paid for it to{" "}
+          {F.refundMethod} within {F.refundDays} days. The steps are on <Link href="/policies/warranty">Key not working?</Link>.
         </p>
         <p>
-          We do not refund a key that works as described because you changed your mind or chose the wrong platform, region or edition when
-          the product page stated them correctly. Full detail is in our <Link href="/policies/returns">Refund policy</Link>.
+          A key that works as described isn’t refunded because you changed your mind or picked the wrong platform, region or edition when the
+          product page named them correctly. See the <Link href="/policies/returns">Refund policy</Link>.
         </p>
       </>
     ),
@@ -262,12 +248,12 @@ const sections: PolicySection[] = [
     title: "Chargebacks",
     body: (
       <>
-        <p>If something is wrong with an order, please contact us first. Most problems are solved faster by us than through a card dispute.</p>
+        <p>If something is wrong with an order, contact us first; we can usually fix it faster than a card dispute can.</p>
         <p>
-          If you open a chargeback, we will respond to your card issuer with the order details, the delivery record, the record of when the
-          key was revealed in your account, your recorded request for immediate delivery and our correspondence with you. If the chargeback is
-          decided in your favour, we do not also refund you directly for the same amount. We may pause further orders on the account while a
-          dispute is open. This does not limit any right you have under card scheme rules or consumer law.
+          If you raise a chargeback, we answer your card issuer with the order details, the delivery record, the record of when the key was
+          revealed in your account, your recorded request for delivery straight after payment and our messages with you. If the chargeback is
+          decided in your favour, we don’t also refund the same amount directly. While a dispute is open we may pause new orders on the
+          account. None of this limits your rights under card scheme rules or consumer law.
         </p>
       </>
     ),
@@ -277,43 +263,40 @@ const sections: PolicySection[] = [
     title: "Your account",
     body: (
       <>
+        <p>Keep your password secure; you are responsible for activity on your account. Tell us at once if you think someone else has used it.</p>
         <p>
-          You are responsible for keeping your password secure and for activity on your account. Tell us straight away if you think someone
-          else has used it.
-        </p>
-        <p>
-          We may suspend or close an account that breaks our <Link href="/policies/acceptable-use">Acceptable use policy</Link>, gives false
-          details or is linked to a restricted country or territory. Suspension does not remove your rights for earlier valid orders. You can
-          ask us to close your account at any time; keys you bought stay valid on the platforms where you redeemed them.
+          We may suspend or close an account that breaks the <Link href="/policies/acceptable-use">Acceptable use policy</Link>, gives false
+          details or is linked to a restricted country or territory. Your rights for earlier valid orders remain. You may ask us to close your
+          account at any time; keys you redeemed stay valid on their platforms.
         </p>
       </>
     ),
   },
   {
     id: "liability",
-    title: "Our responsibility to you",
+    title: "Our liability",
     body: (
       <>
         <p>
-          If we break these terms, we are responsible for loss or damage you suffer that is a foreseeable result of that breach. We are not
-          responsible for loss that was not foreseeable when the contract was formed.
+          If we break these terms, we are liable for loss or damage you suffer that was a foreseeable result of the breach. We aren’t liable for
+          loss that couldn’t be foreseen when the contract was formed.
         </p>
         <p>
-          We do not exclude or limit our liability for death or personal injury caused by our negligence, for fraud, for failing to supply
-          digital content that matches its description, or for anything else that cannot be limited by law.
+          We don’t exclude or limit liability for death or personal injury caused by our negligence, for fraud, for supplying digital content
+          that doesn’t match its description, or for anything else the law doesn’t allow us to limit.
         </p>
-        <p>We supply products for private use. We are not liable to you for loss of profit, loss of business or business interruption.</p>
+        <p>Products are for private use, so we aren’t liable to you for lost profit, lost business or business interruption.</p>
       </>
     ),
   },
   {
     id: "outside-control",
-    title: "Events outside our control",
+    title: "Events beyond our control",
     body: (
       <p>
-        If an event outside our control, such as a platform outage or an interruption at our distribution partner or payment provider, delays
-        your order, we tell you as soon as we can and do what we reasonably can to reduce the delay. If a key cannot be delivered within{" "}
-        {F.deliveryDeadlineHours} hours, we refund it.
+        If something outside our control, such as a platform outage or a disruption at our distribution partner or payment provider, delays
+        your order, we tell you as soon as we can and do what we reasonably can to shorten the delay. A key that can’t be issued within{" "}
+        {F.deliveryDeadlineHours} hours is refunded.
       </p>
     ),
   },
@@ -322,9 +305,8 @@ const sections: PolicySection[] = [
     title: "Trademarks and content",
     body: (
       <p>
-        Game titles, platform names, logos, cover art and screenshots belong to their owners and are shown to identify the products we offer.
-        Their use does not mean the owner sponsors or endorses {F.brand}. The rest of the site’s text, design and software belongs to{" "}
-        {F.company}.
+        Game titles, platform names, logos, cover art and screenshots belong to their owners and appear only to identify the products we offer;
+        this doesn’t mean their owners sponsor or endorse {F.brand}. All other text, design and software on the site belongs to {F.company}.
       </p>
     ),
   },
@@ -333,7 +315,7 @@ const sections: PolicySection[] = [
     title: "Your personal data",
     body: (
       <p>
-        We use your personal data as set out in our <Link href="/policies/privacy">Privacy policy</Link>.
+        How we use your personal data is set out in the <Link href="/policies/privacy">Privacy policy</Link>.
       </p>
     ),
   },
@@ -342,8 +324,8 @@ const sections: PolicySection[] = [
     title: "Complaints",
     body: (
       <p>
-        If you are unhappy with anything about an order, email {F.email}. We acknowledge complaints {F.complaintsAck} and reply in full within{" "}
-        {F.complaintsDays} days. The process and where you can take a complaint next are in our <Link href="/policies/complaints">Complaints policy</Link>.
+        If anything about an order isn’t right, email {F.email}. We confirm receipt {F.complaintsAck} and answer in full within{" "}
+        {F.complaintsDays} days. The process, and where to go next, is in the <Link href="/policies/complaints">Complaints policy</Link>.
       </p>
     ),
   },
@@ -352,10 +334,10 @@ const sections: PolicySection[] = [
     title: "Governing law",
     body: (
       <>
-        <p>These terms are governed by {F.governingLaw}, and disputes may be brought before {F.courts}.</p>
+        <p>These terms are governed by {F.governingLaw}, and disputes may be taken to {F.courts}.</p>
         <p>
-          If you live in the United Kingdom or in an EU member state, you keep the protection of the mandatory consumer laws of the country
-          where you live, and you can bring proceedings in the courts of that country.
+          If you live in the United Kingdom or an EU member state, you keep the protection of the mandatory consumer law of your country and may
+          bring proceedings in its courts.
         </p>
       </>
     ),
@@ -363,12 +345,7 @@ const sections: PolicySection[] = [
   {
     id: "changes",
     title: "Changes to these terms",
-    body: (
-      <p>
-        We may update these terms. The version published when you place an order applies to that order. The date at the top of this page shows
-        when the terms last changed.
-      </p>
-    ),
+    body: <p>We may update these terms. An order is governed by the version published when you placed it; the date at the top shows the latest change.</p>,
   },
 ];
 

@@ -1,8 +1,7 @@
 "use client";
 
 import { useId, useState, type ReactNode } from "react";
-import { ChevronDown } from "lucide-react";
-import { Lamp } from "./Lamp";
+import { SquareChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export interface AccordionItemProps {
@@ -56,14 +55,13 @@ export function AccordionItem({
           aria-controls={`${baseId}-panel`}
           onClick={toggle}
           className={cn(
-            "relative flex min-h-14 w-full cursor-pointer items-center justify-between gap-3 py-3 text-left font-sans text-step-1 font-[560] leading-[1.3] text-ink",
+            "relative flex min-h-14 w-full cursor-pointer items-center justify-between gap-3 py-3 text-left font-display text-step-1 font-bold leading-[1.3] text-ink",
             titleClassName,
           )}
         >
-          {flush ? null : <Lamp on={open} />}
           <span className="min-w-0 flex-1">{title}</span>
           {aside ? <span className="shrink-0">{aside}</span> : null}
-          <ChevronDown size={18} aria-hidden="true" className={cn("shrink-0 text-ink-muted transition-transform duration-[180ms] ease-[var(--ease-latch)]", open && "rotate-180")} />
+          <SquareChevronDown size={20} aria-hidden="true" className={cn("shrink-0 text-ink transition-transform duration-[180ms] ease-[var(--ease-sign)]", open && "rotate-180")} />
         </button>
       </Heading>
       <div
@@ -71,10 +69,10 @@ export function AccordionItem({
         role="region"
         aria-labelledby={`${baseId}-trigger`}
         inert={!open}
-        className={cn("grid transition-[grid-template-rows] duration-[180ms] ease-[var(--ease-latch)]", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}
+        className={cn("grid transition-[grid-template-rows] duration-[180ms] ease-[var(--ease-sign)]", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}
       >
         <div className="relative min-h-0 overflow-hidden">
-          <div className={cn(flush ? "pb-5" : "pb-5 pl-5 pt-1", panelClassName)}>{children}</div>
+          <div className={cn(flush ? "pb-5" : "pb-5 pt-1", panelClassName)}>{children}</div>
         </div>
       </div>
     </div>

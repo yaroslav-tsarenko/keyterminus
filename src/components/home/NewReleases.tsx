@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { DepositBox } from "@/components/product/ProductCard";
-import { TickBand } from "@/components/ui/Dial";
-import { MERCH } from "@/config/merchandising";
+import { HOME_LEGACY as MERCH } from "./legacy";
 import { ArrowLink, HomeHeading } from "./parts";
 import type { HomeData } from "./types";
 
@@ -48,7 +47,6 @@ export async function NewReleases({ releases }: { releases: HomeData["releases"]
           <div data-release-track="" data-pin-track="" className="relative mx-auto" style={{ width, maxWidth: "none" }}>
             <div aria-hidden="true" className="relative h-16">
               <div className="absolute inset-x-0 bottom-0 h-px bg-rule" style={{ left: PAD, right: PAD }} />
-              <TickBand className="absolute bottom-px" major={false} />
               {weekTicks.map((w, i) => (
                 <span key={w} className="absolute bottom-0 flex flex-col items-center" style={{ left: at(w) }}>
                   <span className="mb-2 -translate-x-1/2 whitespace-nowrap font-mono text-data-sm text-ink-muted">{i === weekTicks.length - 1 ? t("today") : dayLabel(w)}</span>

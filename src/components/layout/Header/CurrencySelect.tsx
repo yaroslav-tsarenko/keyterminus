@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { useCurrency, type Currency } from "@/providers/CurrencyProvider";
 import { CURRENCIES } from "@/lib/utils/constants";
 import { cn } from "@/lib/utils/cn";
@@ -22,8 +22,10 @@ export function CurrencySelect({ size = "xs", className, showLabel = false }: { 
           value={currency}
           onChange={(e) => setCurrency(e.target.value as Currency)}
           className={cn(
-            "cursor-pointer appearance-none border font-mono text-ink transition-colors duration-[120ms]",
-            size === "xs" ? "h-8 border-transparent bg-transparent pl-2 pr-6 text-[0.8125rem] text-ink-muted hover-device:hover:border-control hover-device:hover:text-ink" : "h-11 border-control bg-raised pl-3.5 pr-10 text-data shadow-machined-pressed",
+            "cursor-pointer appearance-none border font-mono transition-colors duration-[120ms]",
+            size === "xs"
+              ? "h-8 w-14 rounded-sign border-transparent bg-transparent pl-2 pr-5 text-[0.8125rem] text-on-board hover-device:hover:bg-flap [&>option]:bg-raised [&>option]:text-ink"
+              : "h-11 rounded-control border-control bg-raised pl-3.5 pr-10 text-data text-ink",
           )}
         >
           {CURRENCIES.map((code) => (
@@ -32,7 +34,7 @@ export function CurrencySelect({ size = "xs", className, showLabel = false }: { 
             </option>
           ))}
         </select>
-        <ChevronDown size={14} aria-hidden="true" className={cn("pointer-events-none absolute top-1/2 -translate-y-1/2 text-ink-muted", size === "xs" ? "right-1.5" : "right-3.5")} />
+        <ChevronsUpDown size={14} aria-hidden="true" className={cn("pointer-events-none absolute top-1/2 -translate-y-1/2", size === "xs" ? "right-1 text-on-board-muted" : "right-3.5 text-ink-muted")} />
       </div>
     </div>
   );

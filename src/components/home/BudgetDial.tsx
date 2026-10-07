@@ -5,8 +5,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { DepositBox, type CatalogProduct } from "@/components/product/ProductCard";
-import { Tumbler } from "@/components/ui/Tumbler";
-import { MERCH } from "@/config/merchandising";
+import { FlapCounter } from "@/components/ui/Flap";
+import { HOME_LEGACY as MERCH } from "./legacy";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { cn } from "@/lib/utils/cn";
 import { HomeHeading } from "./parts";
@@ -177,7 +177,7 @@ export function BudgetDial({ bands, products }: { bands: Record<string, HomeBand
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <Tumbler value={band.total} size="lg" label={t("count", { count })} motion />
+            <FlapCounter value={band.total} size="lg" label={t("count", { count })} />
             <span className="eyebrow">{t("count", { count: "" }).trim()}</span>
           </div>
           <Link href={href} className="btn-text mt-3 inline-flex min-h-11 items-center gap-2 text-ui-md font-[560] text-ink">

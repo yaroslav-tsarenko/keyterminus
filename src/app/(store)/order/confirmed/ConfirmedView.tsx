@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
-import { CopyCheck, Copy, FileDown } from "lucide-react";
-import { Tumbler } from "@/components/ui/Tumbler";
-import { StatusPlate } from "@/components/ui/Plate";
+import { ArrowDownToLine, Check, Copy } from "lucide-react";
+import { FlapCounter } from "@/components/ui/Flap";
+import { StatusTag } from "@/components/ui/Tag";
 import { Alert } from "@/components/ui/Alert";
-import { ReadoutLoader } from "@/components/ui/ReadoutLoader";
+import { PageLoader } from "@/components/ui/Flap";
 import { ProductRow } from "@/components/product/ProductCard";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
 import { OrderKeys } from "@/components/account/OrderDetail/OrderDetail";
@@ -33,7 +33,7 @@ function OrderId({ number }: { number: string }) {
   return (
     <p className="m-0 flex flex-wrap items-center gap-3">
       <span className="eyebrow">Order number</span>
-      <Tumbler value={number} size="md" label={`Order number ${number}`} motion />
+      <FlapCounter value={number} size="md" label={`Order number ${number}`} />
       <button
         type="button"
         aria-label={copied ? "Order number copied" : "Copy order number"}
@@ -42,7 +42,7 @@ function OrderId({ number }: { number: string }) {
         }}
         className="flex size-10 cursor-pointer items-center justify-center text-ink-muted hover-device:hover:bg-raised hover-device:hover:text-ink"
       >
-        {copied ? <CopyCheck size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
+        {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
       </button>
     </p>
   );
@@ -78,7 +78,7 @@ function OrderSummary({ order, live = false }: { order: OrderView; live?: boolea
           </h2>
           <p className="m-0 text-ui-md leading-[1.6] text-ink">
             {STORE_POLICY.delivery.headline}
-            <Link href="/account/keys" className="mt-1 block font-[560] underline decoration-1 underline-offset-4">
+            <Link href="/account/keys" className="mt-1 block font-semibold underline decoration-1 underline-offset-4">
               Your keys in Account → Keys
             </Link>
           </p>
@@ -143,7 +143,7 @@ export function ConfirmedView() {
       cleared.current = true;
       clearCart();
       try {
-        sessionStorage.removeItem("keyrook-checkout-draft");
+        sessionStorage.removeItem("keyterminus-checkout-draft");
       } catch {}
     }
     if (state !== "checking") headingRef.current?.focus();
@@ -174,7 +174,7 @@ export function ConfirmedView() {
   if (state === "checking") {
     return frame(
       <div className="flex min-h-[40vh] flex-col items-center justify-center gap-5 text-center" aria-live="polite">
-        <ReadoutLoader label={t("checking.title")} />
+        <PageLoader label={t("checking.title")} />
         <h1 className="m-0 text-step-4 leading-[1.04] text-ink">{t("checking.title")}</h1>
         <p className="measure m-0 text-ink-muted">{t("checking.body")}</p>
       </div>,
@@ -182,7 +182,7 @@ export function ConfirmedView() {
   }
 
   const heading = (text: string) => (
-    <h1 ref={headingRef} tabIndex={-1} className="m-0 text-step-5 leading-[1.04] text-ink outline-none">
+    <h1 ref={headingRef} tabIndex={-1} className="m-0 pt-1 text-step-4 leading-[1.04] text-ink outline-none">
       {text}
     </h1>
   );
@@ -208,7 +208,7 @@ export function ConfirmedView() {
             Continue shopping
           </Button>
           {order.invoiceAvailable ? (
-            <Button as="a" href={`/api/account/orders/${encodeURIComponent(order.id)}/invoice`} download variant="ghost" startContent={<FileDown size={16} aria-hidden="true" />}>
+            <Button as="a" href={`/api/account/orders/${encodeURIComponent(order.id)}/invoice`} download variant="ghost" startContent={<ArrowDownToLine size={16} aria-hidden="true" />}>
               Download invoice (PDF)
             </Button>
           ) : null}
@@ -221,7 +221,7 @@ export function ConfirmedView() {
     return frame(
       <>
         <div className="flex flex-col gap-4">
-          {order ? <StatusPlate status={plateStatusFor("paymentFailed")} label={t("plates.failed")} className="self-start" /> : null}
+          {order ? <StatusTag status={plateStatusFor("paymentFailed")} label={t("plates.failed")} className="self-start" /> : null}
           {heading(t("failed.title"))}
           <p className="measure m-0 text-step-1 text-ink-muted">{t("failed.body")}</p>
         </div>
@@ -244,8 +244,8 @@ export function ConfirmedView() {
       <>
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <StatusPlate status={plateStatusFor("awaitingPayment")} label={t("plates.awaiting")} />
-            <Tumbler value={order.number} size="sm" label={`Order number ${order.number}`} />
+            <StatusTag status={plateStatusFor("awaitingPayment")} label={t("plates.awaiting")} />
+            <FlapCounter value={order.number} size="sm" label={`Order number ${order.number}`} />
           </div>
           {heading(t(`${key}.title`))}
           <p className="measure m-0 text-step-1 text-ink-muted">

@@ -4,7 +4,6 @@ import { useEffect, useId, useRef, type InputHTMLAttributes, type ReactNode, typ
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { FieldError } from "./Field";
-import { Lamp } from "./Lamp";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   label: ReactNode;
@@ -42,7 +41,7 @@ export function Checkbox({ label, description, count, indeterminate, error, dens
           rest.disabled && "cursor-not-allowed text-ink-subtle",
         )}
       >
-        <span className="relative mt-[3px] grid size-[18px] shrink-0 place-items-center">
+        <span className="relative mt-[2px] grid size-5 shrink-0 place-items-center">
           <input
             ref={(node) => {
               local.current = node;
@@ -53,9 +52,9 @@ export function Checkbox({ label, description, count, indeterminate, error, dens
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? `${fieldId}-error` : undefined}
             className={cn(
-              "peer absolute inset-0 m-0 cursor-pointer appearance-none border-[1.5px] border-control bg-raised",
+              "peer absolute inset-0 m-0 cursor-pointer appearance-none rounded-sign border-[1.5px] border-control bg-raised",
               "transition-colors duration-[120ms] hover-device:hover:border-ink-muted",
-              "checked:border-brand checked:bg-brand indeterminate:border-brand indeterminate:bg-brand",
+              "checked:border-accent-edge checked:bg-brand indeterminate:border-accent-edge indeterminate:bg-brand",
               "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
               "disabled:cursor-not-allowed disabled:bg-surface-1 disabled:border-line",
               error && "border-danger",
@@ -63,8 +62,8 @@ export function Checkbox({ label, description, count, indeterminate, error, dens
             )}
             {...rest}
           />
-          <Check size={12} aria-hidden="true" className="pointer-events-none relative text-on-brand opacity-0 [stroke-width:2.5] peer-checked:opacity-100 peer-indeterminate:opacity-0" />
-          <span aria-hidden="true" className="pointer-events-none absolute h-0.5 w-2 bg-on-brand opacity-0 peer-indeterminate:opacity-100" />
+          <Check size={14} aria-hidden="true" className="pointer-events-none relative text-on-brand opacity-0 [stroke-width:3] peer-checked:opacity-100 peer-indeterminate:opacity-0" />
+          <span aria-hidden="true" className="pointer-events-none absolute h-0.5 w-2.5 bg-on-brand opacity-0 peer-indeterminate:opacity-100" />
         </span>
         <span className="flex min-w-0 flex-1 items-baseline justify-between gap-3">
           <span className="min-w-0">
@@ -89,19 +88,19 @@ export interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 
 function RadioDot({ inputProps }: { inputProps: InputHTMLAttributes<HTMLInputElement> & { ref?: Ref<HTMLInputElement> } }) {
   return (
-    <span className="relative mt-[3px] grid size-[18px] shrink-0 place-items-center">
+    <span className="relative mt-[2px] grid size-5 shrink-0 place-items-center">
       <input
         type="radio"
         {...inputProps}
         className={cn(
           "peer absolute inset-0 m-0 cursor-pointer appearance-none rounded-round border-[1.5px] border-control bg-raised",
-          "transition-colors duration-[120ms] hover-device:hover:border-ink-muted checked:border-brand",
+          "transition-colors duration-[120ms] hover-device:hover:border-ink-muted checked:border-[3px] checked:border-ink",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
           "disabled:cursor-not-allowed disabled:bg-surface-1 disabled:border-line",
           inputProps.className,
         )}
       />
-      <span aria-hidden="true" className="pointer-events-none relative size-2 rounded-round bg-lamp-on opacity-0 peer-checked:opacity-100" />
+      <span aria-hidden="true" className="pointer-events-none relative size-2 rounded-round bg-brand opacity-0 peer-checked:opacity-100" />
     </span>
   );
 }
@@ -135,8 +134,8 @@ export function RadioRow({ label, description, meta, aside, wrapperClassName, id
     <label
       htmlFor={fieldId}
       className={cn(
-        "flex cursor-pointer items-start gap-3 border border-control bg-plate px-4 py-4 shadow-machined transition-colors duration-[120ms]",
-        "hover-device:hover:border-ink-muted has-checked:bg-brand-soft",
+        "relative flex cursor-pointer items-start gap-3 rounded-control border border-control bg-raised px-4 py-4 transition-colors duration-[120ms]",
+        "hover-device:hover:border-ink-muted has-checked:bg-brand-soft has-checked:shadow-[inset_3px_0_0_var(--color-accent)]",
         "has-disabled:cursor-not-allowed has-disabled:text-ink-subtle",
         wrapperClassName,
       )}
@@ -144,7 +143,7 @@ export function RadioRow({ label, description, meta, aside, wrapperClassName, id
       <RadioDot inputProps={{ ...rest, id: fieldId, ref }} />
       <span className="flex min-w-0 flex-1 flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <span className="min-w-0">
-          <span className="block font-medium text-ink">{label}</span>
+          <span className="block font-semibold text-ink">{label}</span>
           {description ? <span className="meta mt-0.5 block text-ink-muted">{description}</span> : null}
           {meta ? <span className="meta mt-0.5 block text-ink-muted">{meta}</span> : null}
         </span>
@@ -171,7 +170,7 @@ export function Switch({ checked, onChange, label, description, disabled, locked
   return (
     <div className={cn("flex items-start justify-between gap-6", className)}>
       <div className="min-w-0">
-        <span id={`${fieldId}-label`} className="block text-step-0 font-[560] text-ink">
+        <span id={`${fieldId}-label`} className="block text-step-0 font-semibold text-ink">
           {label}
         </span>
         {description ? (
@@ -192,7 +191,7 @@ export function Switch({ checked, onChange, label, description, disabled, locked
           disabled={disabled}
           onClick={() => onChange?.(!checked)}
           className={cn(
-            "relative h-[22px] w-10 shrink-0 border transition-colors duration-[180ms] ease-[var(--ease-std)]",
+            "relative h-6 w-11 shrink-0 rounded-control border transition-colors duration-[180ms] ease-[var(--ease-std)]",
             checked ? "border-accent-edge bg-brand" : "border-control bg-surface-2 hover-device:hover:border-ink-muted",
             disabled ? "cursor-not-allowed opacity-80" : "cursor-pointer",
           )}
@@ -200,8 +199,8 @@ export function Switch({ checked, onChange, label, description, disabled, locked
           <span
             aria-hidden="true"
             className={cn(
-              "absolute left-[2px] top-[2px] size-4 rounded-round shadow-machined transition-transform duration-[180ms] ease-[var(--ease-latch)]",
-              checked ? "translate-x-[18px] bg-on-brand" : "translate-x-0 bg-ink-muted",
+              "absolute left-[2px] top-[2px] size-[18px] rounded-sign transition-transform duration-[180ms] ease-[var(--ease-sign)]",
+              checked ? "translate-x-5 bg-ink" : "translate-x-0 bg-ink-muted",
             )}
           />
         </button>
@@ -240,7 +239,7 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
     <div
       role="radiogroup"
       aria-label={label}
-      className={cn("inline-flex border border-control bg-surface-2 p-0", fullWidth && "flex w-full", className)}
+      className={cn("inline-flex overflow-hidden rounded-control border border-control bg-raised p-0", fullWidth && "flex w-full", className)}
     >
       {options.map((option, index) => {
         const selected = option.value === value;
@@ -266,15 +265,14 @@ export function Segmented<T extends string>({ options, value, onChange, label, s
               }
             }}
             className={cn(
-              "label-caps relative flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-3 text-[0.75rem] transition-colors duration-[120ms]",
+              "relative flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-3.5 pt-px font-display text-[0.875rem] font-bold transition-colors duration-[120ms]",
               size === "sm" ? "h-8" : "h-9 touch-device:h-11",
               fullWidth && "flex-1",
               index > 0 && "border-l border-line",
-              selected ? "bg-plate text-ink shadow-machined" : "text-ink-muted hover-device:hover:text-ink",
+              selected ? "bg-ink text-surface" : "text-ink-muted hover-device:hover:bg-surface-1 hover-device:hover:text-ink",
               option.disabled && "cursor-not-allowed text-ink-subtle",
             )}
           >
-            {selected ? <Lamp on /> : null}
             {option.label}
           </button>
         );

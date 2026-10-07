@@ -49,7 +49,7 @@ export function AdminButton({
   const resolvedVariant = resolveVariant(variant, color);
 
   const variantStyles: Record<string, React.CSSProperties> = {
-    primary: { background: "var(--color-accent)", color: "#fff", border: "1px solid var(--color-accent)" },
+    primary: { background: "var(--color-accent)", color: "var(--color-on-accent, #fff)", border: "1px solid var(--color-accent)" },
     secondary: { background: "var(--color-bg-secondary)", color: "var(--color-text)", border: "1px solid var(--color-border)" },
     tertiary: { background: "transparent", color: "var(--color-text-secondary)", border: "1px solid transparent" },
     outline: { background: "transparent", color: "var(--color-text)", border: "1px solid var(--color-border)" },

@@ -57,7 +57,7 @@ export function ActivationSelector({ platforms }: { platforms: string[] }) {
                   tabIndex={on ? 0 : -1}
                   onClick={() => setActive(k)}
                   onKeyDown={(e) => onKey(e, i)}
-                  data-platform={p.tone}
+                  data-platform={p.key}
                   className={cn(
                     "flex min-h-11 shrink-0 cursor-pointer items-center gap-3 border-line px-3 text-left transition-colors duration-[120ms] max-lg:border max-lg:-ml-px max-lg:first:ml-0 lg:min-h-12 lg:border-b",
                     on ? "bg-plate text-ink shadow-machined" : "text-ink-muted hover-device:hover:bg-raised hover-device:hover:text-ink",

@@ -1,16 +1,16 @@
 {
   "orderPlaced": "Order placed",
-  "orderShipped": "Your keys are ready",
-  "profileUpdated": "Your details are saved",
+  "orderShipped": "Your key is ready",
+  "profileUpdated": "Details saved",
   "addressAdded": "Address added",
   "addressDeleted": "Address removed",
-  "itemAdded": "Added to your cart",
-  "itemRemoved": "Removed from your cart",
+  "itemAdded": "Added to cart",
+  "itemRemoved": "Removed from cart",
   "cartUpdated": "Cart updated",
   "reviewSubmitted": "Review sent for moderation",
   "addedToWishlist": "Saved",
-  "removedFromWishlist": "Removed from saved items",
+  "removedFromWishlist": "No longer saved",
   "feedGenerated": "Product feed generated",
-  "importComplete": "Import completed: {success} added, {errors} errors",
+  "importComplete": "Import finished: {success} added, {errors} errors",
   "settingsSaved": "Store settings saved"
 }

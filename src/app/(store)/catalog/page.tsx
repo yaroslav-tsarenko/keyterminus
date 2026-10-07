@@ -4,7 +4,9 @@ import { getTranslations } from "next-intl/server";
 import { pageMetadata, pagedDescription } from "@/lib/seo/metadata";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 import { CatalogBrowser } from "@/components/catalog/CatalogBrowser";
-import { CategoryOpener } from "@/components/catalog/CategoryOpener";
+import { CatalogBoardHeader } from "@/components/catalog/CategoryOpener";
+import { TYPE_ORDER, orderIndex } from "@/config/merchandising";
+import { productTypeBySlug } from "@/lib/keys/taxonomy";
 import { categoryCounts, getCategoryTree, queryCatalog } from "@/components/catalog/catalog-query";
 import { buildCatalogHref, hasActiveFilters, parseCatalogParams, type RawSearchParams } from "@/components/catalog/catalog-url";
 
@@ -14,7 +16,7 @@ interface CatalogPageProps {
 
 export async function generateMetadata({ searchParams }: CatalogPageProps): Promise<Metadata> {
   const t = await getTranslations("catalog");
-  const params = parseCatalogParams(await searchParams, "popular");
+  const params = parseCatalogParams(await searchParams, "board");
   const tree = await getCategoryTree();
   const counts = await categoryCounts(tree);
   const total = tree.roots.reduce((sum, c) => sum + (counts.get(c.id) ?? 0), 0);
@@ -33,7 +35,7 @@ export async function generateMetadata({ searchParams }: CatalogPageProps): Prom
 
 export default async function CatalogPage({ searchParams }: CatalogPageProps) {
   const raw = await searchParams;
-  const params = parseCatalogParams(raw, "popular");
+  const params = parseCatalogParams(raw, "board");
   const tree = await getCategoryTree();
 
   if (params.category) {
@@ -43,17 +45,20 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   const t = await getTranslations("catalog");
   const counts = await categoryCounts(tree);
-  const result = await queryCatalog({ kind: "all" }, { ...params, category: null }, { basePath: "/catalog", defaultSort: "popular" });
+  const result = await queryCatalog({ kind: "all" }, { ...params, category: null }, { basePath: "/catalog", defaultSort: "board" });
   const typeIndex = tree.roots
     .filter((c) => (counts.get(c.id) ?? 0) > 0)
-    .map((c) => ({ slug: c.slug, label: c.slug === "dlc" ? "DLC" : c.name, count: counts.get(c.id) ?? 0, href: `/catalog/${c.slug}` }));
+    .map((c) => ({ slug: c.slug, label: c.slug === "dlc" ? "DLC" : c.name, count: counts.get(c.id) ?? 0, href: `/catalog/${c.slug}` }))
+    .sort((a, b) => orderIndex(TYPE_ORDER, productTypeBySlug(a.slug)?.key ?? a.slug) - orderIndex(TYPE_ORDER, productTypeBySlug(b.slug)?.key ?? b.slug));
   const total = tree.roots.reduce((sum, c) => sum + (counts.get(c.id) ?? 0), 0);
 
   return (
-    <div className="mx-auto max-w-container px-gutter pb-24">
-      <Breadcrumbs items={[{ label: t("home"), href: "/" }, { label: "Catalogue" }]} />
-      <CategoryOpener name={t("allCategoriesTitle")} count={total} lead={t("catalogLead")} typeIndex={typeIndex} typeIndexLabel="Keys by type" />
-
+    <div className="pb-24">
+      <div className="mx-auto max-w-container px-gutter">
+        <Breadcrumbs items={[{ label: t("home"), href: "/" }, { label: "Catalogue" }]} />
+      </div>
+      <CatalogBoardHeader eyebrow="All keys" title={t("allCategoriesTitle")} count={total} typeIndex={typeIndex} />
+      <div className="mx-auto max-w-container px-gutter pt-8 lg:pt-10">
       <CatalogBrowser
         basePath="/catalog"
         params={{ ...params, category: null, page: result.page }}
@@ -62,11 +67,12 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         page={result.page}
         totalPages={result.totalPages}
         facets={result.facets}
-        defaultSort="popular"
+        defaultSort="board"
         related={typeIndex.slice(0, 3).map((d) => ({ name: d.label, href: d.href }))}
         headingId="catalog-results"
         heading={t("resultsHeading")}
       />
+      </div>
     </div>
   );
 }

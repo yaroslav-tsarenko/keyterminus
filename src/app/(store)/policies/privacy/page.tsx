@@ -5,54 +5,52 @@ import { POLICY_FACTS as F } from "@/lib/policy-facts";
 
 export const generateMetadata = policyMetadata(
   "privacy",
-  `How ${F.company} (${F.brand}) collects and uses personal data under UK GDPR and EU GDPR, who processes it, how long it is kept and your rights.`,
+  `The personal data ${F.company} (${F.brand}) holds under UK GDPR and EU GDPR: what, why, who processes it, how long it is kept and your rights.`,
 );
 
 const purposes: { purpose: string; data: string; basis: string }[] = [
-  { purpose: "Taking your order and delivering your keys", data: "Name, email, phone (optional), billing address, products ordered, the keys issued to you (stored encrypted)", basis: "Contract" },
-  { purpose: "Showing your keys only to you", data: "When each key was revealed in your account and how many times", basis: "Contract and legitimate interests" },
-  { purpose: "Running your account", data: "Name, email, phone, date of birth, address, password (stored as a hash), order history, saved items", basis: "Contract" },
-  { purpose: "Recording your request for immediate delivery", data: "The time you ticked the checkbox and the wording you agreed to", basis: "Legal obligation" },
-  { purpose: `Checking you are ${F.minAge} or over`, data: "Date of birth", basis: "Contract and legitimate interests" },
-  { purpose: "Answering messages and complaints", data: "Name, email, order number, the content of your message, the IP address it was sent from", basis: "Contract and legitimate interests" },
-  { purpose: "Refunds, chargebacks and fraud prevention", data: "Order details, payment result and transaction reference, IP address", basis: "Legal obligation and legitimate interests" },
-  { purpose: "Not taking orders from restricted countries and territories", data: "Billing country and address", basis: "Legal obligation" },
-  { purpose: "Accounting and tax records", data: "Order and refund records", basis: "Legal obligation" },
-  { purpose: "Newsletter, only if you sign up", data: "Email address", basis: "Consent" },
-  { purpose: "Keeping the website secure and working", data: "IP address, browser and device type, pages requested, error logs", basis: "Legitimate interests" },
+  { purpose: "Taking your order and issuing your keys", data: "Name, email, phone (optional), billing address, products ordered, keys issued to you (stored encrypted)", basis: "Contract" },
+  { purpose: "Showing each key only to its owner", data: "When each key was revealed in your account, and how often", basis: "Contract and legitimate interests" },
+  { purpose: "Running your account", data: "Name, email, phone, date of birth, address, password (stored as a hash), orders, saved keys", basis: "Contract" },
+  { purpose: "Recording your request for delivery straight after payment", data: "The wording you agreed to and when you ticked the box", basis: "Legal obligation" },
+  { purpose: `Confirming you are ${F.minAge} or over`, data: "Date of birth", basis: "Contract and legitimate interests" },
+  { purpose: "Replying to messages and complaints", data: "Name, email, order number, your message and the IP address it came from", basis: "Contract and legitimate interests" },
+  { purpose: "Refunds, chargebacks and fraud prevention", data: "Order details, payment result, transaction reference, IP address", basis: "Legal obligation and legitimate interests" },
+  { purpose: "Refusing orders from restricted countries and territories", data: "Billing country and address", basis: "Legal obligation" },
+  { purpose: "Accounting and tax", data: "Order and refund records", basis: "Legal obligation" },
+  { purpose: "Newsletter, only if you subscribe", data: "Email address", basis: "Consent" },
+  { purpose: "Keeping the site secure and running", data: "IP address, browser and device type, pages requested, error logs", basis: "Legitimate interests" },
 ];
 
 const sections: PolicySection[] = [
   {
     id: "controller",
-    title: "Who is responsible for your data",
+    title: "Who controls your data",
     body: (
       <>
         <p>
-          {F.company}, trading as {F.brand}, is the controller of the personal data described in this policy. This policy applies to
-          customers in the United Kingdom under the UK GDPR and the Data Protection Act 2018, and to customers in the European Union
-          under the EU General Data Protection Regulation.
+          {F.company}, trading as {F.brand}, is the controller of the personal data described here. For customers in the United Kingdom this
+          policy follows the UK GDPR and the Data Protection Act 2018; for customers in the European Union, the EU General Data Protection
+          Regulation.
         </p>
         <SellerBlock />
-        <p>For any question about your data or to use your rights, email {F.email}.</p>
+        <p>Questions about your data, or requests to use your rights, go to {F.email}.</p>
       </>
     ),
   },
   {
     id: "collect",
-    title: "What we collect",
+    title: "What we hold",
     body: (
-      <>
-        <ul>
-          <li><strong>Account details:</strong> first and last name, email, phone number, date of birth, street, city, postcode and country, and your password, which we store only as a one-way hash.</li>
-          <li><strong>Order details:</strong> the products you buy, billing address, contact details, your request for immediate delivery, the delivery status of each key, and the payment result and transaction reference sent to us by our payment provider.</li>
-          <li><strong>Keys:</strong> the activation keys issued to you. We store them encrypted and decrypt a key only when you select Reveal key in your account. We record when a key was first revealed.</li>
-          <li><strong>Messages:</strong> what you send through the contact form or by email, including any order number, and for the contact form the IP address it was sent from.</li>
-          <li><strong>Saved items:</strong> products you save to your account.</li>
-          <li><strong>Newsletter:</strong> your email address, if you sign up.</li>
-          <li><strong>Technical data:</strong> IP address, browser and device type, and the pages requested, recorded in server logs. Browser storage is described in our <Link href="/policies/cookies">Cookie policy</Link>.</li>
-        </ul>
-      </>
+      <ul>
+        <li><strong>Account:</strong> first and last name, email, phone number, date of birth, street, city, postcode and country, and your password, kept only as a one-way hash.</li>
+        <li><strong>Orders:</strong> the products you buy, billing address, contact details, your request for delivery straight after payment, the status of each key, and the payment result and transaction reference the payment provider sends us.</li>
+        <li><strong>Keys:</strong> the keys issued to you, stored encrypted. A key is decrypted only when you choose Reveal key, and we record when it was first revealed.</li>
+        <li><strong>Messages:</strong> what you send by email or through the contact form, including any order number, and for the form the IP address it came from.</li>
+        <li><strong>Saved keys:</strong> the products you save in your account.</li>
+        <li><strong>Newsletter:</strong> your email address, if you subscribe.</li>
+        <li><strong>Technical data:</strong> IP address, browser and device type and the pages requested, in server logs. Browser storage is listed in the <Link href="/policies/cookies">Cookie policy</Link>.</li>
+      </ul>
     ),
   },
   {
@@ -62,21 +60,21 @@ const sections: PolicySection[] = [
       <>
         <p>
           <strong>
-            We do not store or process full payment card data. All card payments are processed by our PCI DSS compliant payment provider
+            We don’t store or process full payment card data. Every card payment is processed by our PCI DSS compliant payment provider
             {F.paymentProviderNamed ? `, ${F.paymentProviderNamed}` : ""}.
           </strong>
         </p>
         <p>
-          You enter your card details on the provider’s hosted payment page, not on our website. Payments are protected by 3-D Secure
-          and Strong Customer Authentication (SCA), so your bank may ask you to confirm a payment, for example in your banking app. We
-          receive only the result of the payment and a transaction reference.
+          You type your card details on the provider’s hosted page, not on our site. Payments are protected by 3-D Secure and Strong Customer
+          Authentication (SCA), so your bank may ask you to approve a payment, for example in its app. We receive only the payment result and
+          a transaction reference.
         </p>
       </>
     ),
   },
   {
     id: "use",
-    title: "Why we use it and our lawful basis",
+    title: "Why we use it, and on what legal basis",
     body: (
       <div className="overflow-x-auto">
         <table className={policyTable}>
@@ -102,13 +100,10 @@ const sections: PolicySection[] = [
   },
   {
     id: "sharing",
-    title: "Who we share it with",
+    title: "Who receives it",
     body: (
       <>
-        <p>
-          We share personal data only with service providers that process it on our behalf and under our instructions, and only the data
-          each one needs:
-        </p>
+        <p>We pass personal data only to service providers that process it for us, on our instructions, and each receives only what it needs:</p>
         <ul>
           {STORE_POLICY.processors.map((p) => (
             <li key={p.role}>
@@ -117,21 +112,20 @@ const sections: PolicySection[] = [
           ))}
         </ul>
         <p>
-          We may also disclose data where the law requires it, for example to tax authorities or the police, or to a card issuer when a
-          payment is disputed. We do not sell personal data and do not share it with advertisers.
+          We also disclose data when the law requires it, for example to tax authorities or the police, or to a card issuer during a payment
+          dispute. We never sell personal data and don’t share it with advertisers.
         </p>
       </>
     ),
   },
   {
     id: "transfers",
-    title: "International transfers",
+    title: "Transfers abroad",
     body: (
       <p>
-        Our key distribution partner receives the product and quantity of each order and our own order reference. It does not receive your
-        name, email, address or card details. Where a service provider
-        processes data outside the UK or the European Economic Area, we use an adequacy decision or standard contractual clauses (with the UK
-        International Data Transfer Addendum for UK data).
+        Our key distribution partner receives the product, the quantity and our own order reference, never your name, email, address or card
+        details. When a service provider processes data outside the UK or the European Economic Area, we rely on an adequacy decision or
+        standard contractual clauses (with the UK International Data Transfer Addendum for UK data).
       </p>
     ),
   },
@@ -140,8 +134,8 @@ const sections: PolicySection[] = [
     title: "How long we keep it",
     body: (
       <ul>
-        <li>Order, payment and refund records: {F.retention.orderRecordsYears} years after the order, for accounting and tax law.</li>
-        <li>Your account: until you ask us to close it, or after {F.retention.inactiveAccountYears} years without a sign-in or order. Order records are then kept as above.</li>
+        <li>Order, payment and refund records: {F.retention.orderRecordsYears} years from the order, as accounting and tax law require.</li>
+        <li>Your account: until you ask us to close it, or after {F.retention.inactiveAccountYears} years with no sign-in or order. Order records then follow the rule above.</li>
         <li>Messages and complaints: {F.retention.supportMessagesMonths} months after the conversation ends.</li>
         <li>Newsletter: until you unsubscribe.</li>
       </ul>
@@ -152,23 +146,20 @@ const sections: PolicySection[] = [
     title: "Your rights",
     body: (
       <>
-        <p>You have the right to:</p>
+        <p>You can ask us to:</p>
         <ul>
-          <li>get a copy of the personal data we hold about you;</li>
-          <li>have inaccurate data corrected;</li>
-          <li>have data deleted where we no longer need it or have no lawful basis to keep it;</li>
-          <li>restrict or object to our use of it, including where we rely on legitimate interests;</li>
-          <li>receive data you gave us in a portable format;</li>
-          <li>withdraw consent at any time, for example by unsubscribing from the newsletter or changing your cookie settings.</li>
+          <li>give you a copy of the personal data we hold about you;</li>
+          <li>correct data that is wrong;</li>
+          <li>delete data we no longer need or have no lawful basis to keep;</li>
+          <li>restrict or stop using it, including where we rely on legitimate interests;</li>
+          <li>hand over the data you gave us in a portable format.</li>
         </ul>
+        <p>You can also withdraw consent at any time, for example by unsubscribing or changing your cookie settings.</p>
+        <p>Email {F.email} to use these rights. We answer within one month, and may ask you to confirm your identity first.</p>
         <p>
-          Email {F.email} to use any of these rights. We reply within one month. We may ask you to confirm your identity before we act on a
-          request.
-        </p>
-        <p>
-          You can complain to a supervisory authority: in the United Kingdom, the Information Commissioner’s Office (ico.org.uk); in
-          the European Union, the data protection authority of the country where you live or work. We would appreciate the chance to deal
-          with your concern first.
+          You may complain to a supervisory authority: the Information Commissioner’s Office (ico.org.uk) in the United Kingdom, or in the
+          European Union the data protection authority of the country where you live or work. We’d welcome the chance to sort it out with you
+          first.
         </p>
       </>
     ),
@@ -178,9 +169,9 @@ const sections: PolicySection[] = [
     title: "Security",
     body: (
       <p>
-        The website is served only over HTTPS. Passwords are stored as one-way hashes. Access to customer data is limited to the people who
-        need it to fulfil orders and answer messages. Keys are encrypted at rest and shown only to the signed-in account that bought them; our
-        staff do not see them in the admin area. Card details never reach our systems.
+        The site is served over HTTPS only and passwords are kept as one-way hashes. Only the people who fulfil orders and answer messages can
+        reach customer data. Keys are encrypted at rest and shown only to the signed-in account that bought them; staff can’t see them in the
+        admin area. Card details never reach our systems.
       </p>
     ),
   },
@@ -189,9 +180,8 @@ const sections: PolicySection[] = [
     title: "Automated decisions",
     body: (
       <p>
-        We do not make decisions with legal or similarly significant effects about you by automated means alone. Your card issuer and our
-        payment provider run their own automated fraud checks and may decline a payment. If that happens, contact us and we will look at the
-        order.
+        We don’t make decisions with legal or similarly significant effects on you by automated means alone. Your card issuer and the payment
+        provider run their own automated fraud checks and may decline a payment; if that happens, contact us and we’ll look at the order.
       </p>
     ),
   },
@@ -200,15 +190,15 @@ const sections: PolicySection[] = [
     title: "Age",
     body: (
       <p>
-        Our store is for adults. We do not knowingly collect data from anyone under {F.minAge}. If you believe a person under {F.minAge} has
-        created an account, email {F.email} and we will delete it.
+        The store is for adults, and we don’t knowingly collect data from anyone under {F.minAge}. If you think someone under {F.minAge} has
+        an account, email {F.email} and we’ll delete it.
       </p>
     ),
   },
   {
     id: "changes",
     title: "Changes to this policy",
-    body: <p>We update this policy when the way we use personal data changes. The date at the top of the page shows the latest version.</p>,
+    body: <p>We update this policy whenever the way we use personal data changes. The date at the top shows the current version.</p>,
   },
 ];
 

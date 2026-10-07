@@ -4,8 +4,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 import { Accordion, AccordionItem } from "@/components/ui/Accordion";
-import { Plate } from "@/components/ui/Plate";
-import { Lamp } from "@/components/ui/Lamp";
+import { Tag } from "@/components/ui/Tag";
 import { COMPANY } from "@/lib/company";
 import { BRAND } from "@/lib/brand";
 import { POLICY_FACTS } from "@/lib/policy-facts";
@@ -35,7 +34,7 @@ export const policyProse = cn(
   "[&_ul]:mt-4 [&_ul]:flex [&_ul]:list-disc [&_ul]:flex-col [&_ul]:gap-2 [&_ul]:pl-5 [&_ol]:mt-4 [&_ol]:flex [&_ol]:list-decimal [&_ol]:flex-col [&_ol]:gap-2 [&_ol]:pl-5",
   "[&_li]:pl-1 [&_li::marker]:text-ink-subtle",
   "[&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4 hover-device:[&_a:hover]:decoration-2",
-  "[&_strong]:font-[640]",
+  "[&_strong]:font-bold",
   "[&_h3]:mt-8 [&_h3]:font-display [&_h3]:text-step-1 [&_h3]:leading-[1.25] [&_h3]:text-ink",
 );
 
@@ -83,10 +82,9 @@ export async function PolicyLayout({ slug, title: titleProp, lastUpdated = POLIC
                       <Link
                         href={entry.href}
                         aria-current={active ? "page" : undefined}
-                        className={cn(sideLinkCls, active && "font-[560] text-ink")}
+                        className={cn(sideLinkCls, "relative pl-4 before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:bg-brand before:opacity-0", active && "font-bold text-ink before:opacity-100")}
                       >
-                        <Lamp on={active} />
-                        {entry.title}
+                        <span className="pt-0.5">{entry.title}</span>
                       </Link>
                     </li>
                   );
@@ -124,12 +122,12 @@ export async function PolicyLayout({ slug, title: titleProp, lastUpdated = POLIC
           ) : null}
 
           <header className="measure">
-            <h1 className="m-0 text-step-5 leading-[1.04] text-ink">{title}</h1>
+            <h1 className="m-0 pt-1 text-step-4 leading-[1.04] text-ink">{title}</h1>
             {lastUpdated ? (
               <div className="mt-5">
-                <Plate variant="neutral">
+                <Tag variant="neutral">
                   <time dateTime={lastUpdated === POLICY_FACTS.lastUpdated ? POLICY_FACTS.lastUpdatedIso : undefined}>{t("lastUpdated", { date: lastUpdated })}</time>
-                </Plate>
+                </Tag>
               </div>
             ) : null}
             {intro ? <div className={cn(policyProse, "mt-8 text-step-1 leading-[1.55] text-ink-muted")}>{intro}</div> : null}
@@ -159,7 +157,7 @@ export async function PolicyLayout({ slug, title: titleProp, lastUpdated = POLIC
               {sections.map((section, index) => (
                 <section key={section.id} id={section.id} aria-labelledby={`${section.id}-title`} className="mt-12 scroll-mt-32 border-t border-line pt-8 first:mt-12">
                   <h2 id={`${section.id}-title`} className="m-0 flex items-baseline gap-3 text-step-3 leading-[1.15] text-ink">
-                    <span className="shrink-0 font-mono text-step-0 font-medium text-ink-subtle [font-stretch:100%]">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="shrink-0 font-mono text-step-0 font-medium text-ink-subtle">{String(index + 1).padStart(2, "0")}</span>
                     <span>{section.title}</span>
                   </h2>
                   <div className={cn(policyProse, "mt-5")}>{section.body}</div>

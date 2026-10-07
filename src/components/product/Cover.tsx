@@ -2,7 +2,8 @@
 
 import { useState, type ReactNode } from "react";
 import Image from "next/image";
-import { ImageOff } from "lucide-react";
+import { SquareDashed } from "lucide-react";
+import { PlatformTile } from "@/components/ui/PlatformTile";
 import { cn } from "@/lib/utils/cn";
 
 export type CoverAspect = "3/4" | "4/3" | "16/9" | "1/1" | "card";
@@ -38,13 +39,14 @@ export interface CoverProps {
   width?: number | null;
   height?: number | null;
   platformLabel?: string | null;
+  platformNumber?: number | null;
   className?: string;
   imageClassName?: string;
   art?: ReactNode;
   children?: ReactNode;
 }
 
-export function Cover({ src, alt, aspect = "3/4", sizes, priority, compact = false, fit = "auto", width, height, platformLabel, className, imageClassName, art, children }: CoverProps) {
+export function Cover({ src, alt, aspect = "3/4", sizes, priority, compact = false, fit = "auto", width, height, platformLabel, platformNumber, className, imageClassName, art, children }: CoverProps) {
   const [failed, setFailed] = useState(false);
   const known = portraitFit(width, height);
   const [measured, setMeasured] = useState<"cover" | "contain" | null>(null);
@@ -72,9 +74,14 @@ export function Cover({ src, alt, aspect = "3/4", sizes, priority, compact = fal
           onError={() => setFailed(true)}
         />
       ) : (
-        <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center gap-2 px-2 text-center text-ink-muted">
-          <ImageOff size={compact ? 16 : 24} aria-hidden="true" />
-          {!compact && platformLabel ? <span className="eyebrow">{platformLabel}</span> : null}
+        <div className="absolute inset-0 z-[1] flex flex-col items-center justify-center gap-2.5 px-2 text-center text-ink-muted">
+          <SquareDashed size={compact ? 16 : 24} aria-hidden="true" />
+          {!compact && platformLabel ? (
+            <span className="inline-flex items-center gap-1.5">
+              {platformNumber !== undefined ? <PlatformTile number={platformNumber} size="xs" /> : null}
+              <span className="font-display text-[0.75rem] font-bold uppercase tracking-[0.1em] text-ink">{platformLabel}</span>
+            </span>
+          ) : null}
         </div>
       )}
       {children}

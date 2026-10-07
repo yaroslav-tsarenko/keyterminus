@@ -4,30 +4,30 @@ import { POLICY_FACTS as F } from "@/lib/policy-facts";
 
 export const generateMetadata = policyMetadata(
   "warranty",
-  `${F.brand} key guarantee: if a key does not activate, contact us within ${F.guaranteeClaimDays} days of delivery and we replace it or refund the price you paid for it.`,
+  `Key not working? Report it to ${F.brand} within ${F.guaranteeClaimDays} days of delivery and we send a replacement key, or refund what you paid if no replacement is available.`,
 );
 
 const sections: PolicySection[] = [
   {
     id: "guarantee",
-    title: "What the guarantee covers",
+    title: "What is covered",
     body: (
       <>
         <p>{F.guarantee}</p>
-        <p>It covers a key that:</p>
+        <p>We treat a key as faulty when:</p>
         <ul>
-          <li>is reported as invalid by the platform when you enter it;</li>
-          <li>was already redeemed before it was delivered to you;</li>
-          <li>is for a different product, platform, region or edition than the product page stated;</li>
-          <li>is revoked by the publisher for a reason that existed when we delivered it and that you did not cause.</li>
+          <li>the platform rejects it as invalid when you enter it;</li>
+          <li>it had already been redeemed before it reached your account;</li>
+          <li>it is for another product, platform, region or edition than the one named on the product page;</li>
+          <li>the publisher withdraws it for a reason that already existed when we issued it and that you didn’t cause.</li>
         </ul>
-        <p>It also covers a key we fail to deliver within {F.deliveryDeadlineHours} hours of payment confirmation, which we refund without you needing to ask.</p>
+        <p>A key we don’t manage to issue within {F.deliveryDeadlineHours} hours of payment confirmation is refunded without you having to ask.</p>
       </>
     ),
   },
   {
     id: "claim",
-    title: "How to make a claim",
+    title: "How to report a key",
     body: (
       <ol>
         {F.guaranteeSteps.map((step) => (
@@ -38,16 +38,16 @@ const sections: PolicySection[] = [
   },
   {
     id: "evidence",
-    title: "What to send us",
+    title: "What helps us check it",
     body: (
       <>
         <ul>
-          <li>your order number and the product concerned;</li>
-          <li>a screenshot of the error message the platform shows when you enter the key;</li>
-          <li>the platform and the country your account is set to.</li>
+          <li>the order number and the product concerned;</li>
+          <li>a screenshot of the message the platform shows when you enter the key;</li>
+          <li>the platform, and the country your platform account is set to.</li>
         </ul>
         <p>
-          Please do not post the full key anywhere public. Send it to us only if we ask for it, by replying to our email or through the{" "}
+          Don’t post the full key anywhere public. Send it only if we ask for it, by replying to our email or through the{" "}
           <Link href="/contact">contact form</Link>.
         </p>
       </>
@@ -58,25 +58,25 @@ const sections: PolicySection[] = [
     title: "Replacement or refund",
     body: (
       <p>
-        If the claim is covered, we send a replacement key for the same product to your order page. If no replacement is available, or you
-        prefer a refund, we refund the price you paid for that key within {F.refundDays} days to {F.refundMethod}.
+        When a key is faulty, we issue a replacement key for the same product to your account. If no replacement is available, or you would
+        rather have your money back, we refund what you paid for that key to {F.refundMethod} within {F.refundDays} days.
       </p>
     ),
   },
   {
     id: "what-it-is-not",
-    title: "What the guarantee does not cover",
+    title: "What isn’t covered",
     body: (
       <>
         <ul>
           {F.guaranteeExclusions.map((item) => (
             <li key={item}>{item};</li>
           ))}
-          <li>keys you shared with someone else, or that were taken from your email or account because its sign-in details were exposed.</li>
+          <li>keys you passed on to someone else, or that were taken from your email or account after its sign-in details were exposed.</li>
         </ul>
         <p>
-          Your statutory rights as a consumer in the UK and EU are not affected. Digital content must be as described and fit for purpose, and
-          this guarantee adds to those rights.
+          None of this limits your statutory rights as a consumer in the UK or the EU. Digital content must match its description and be fit
+          for purpose; this page adds to those rights.
         </p>
       </>
     ),

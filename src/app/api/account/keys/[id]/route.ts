@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/auth";
 import { consumeRateLimit, rateLimitResponse } from "@/lib/rate-limit";
-import { decryptKey } from "@/lib/keys/vault";
+import { decryptKey } from "@/lib/keys/cipher";
 import { logKeyEvent } from "@/lib/esa/events";
 
 export const runtime = "nodejs";

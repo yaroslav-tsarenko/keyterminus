@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { Pause, Play, RotateCcw } from "lucide-react";
-import { Plate } from "@/components/ui/Plate";
+import { Tag } from "@/components/ui/Tag";
 import { cn } from "@/lib/utils/cn";
 import { frozenTime } from "@/lib/motion/env";
 import { resolveEnd } from "./define";
@@ -244,9 +244,9 @@ export function TheaterStage({
             {reduced ? title : (captions[Math.max(0, shown)] ?? title)}
           </span>
         </p>
-        <Plate variant="neutral" size="sm" className="max-[839px]:hidden">
+        <Tag variant="neutral" size="sm" className="max-[839px]:hidden">
           {labels.sample}
-        </Plate>
+        </Tag>
         {!reduced ? (
           <button type="button" onClick={toggle} aria-label={label} title={label} className="th-knob">
             <KnobIcon size={18} aria-hidden="true" />

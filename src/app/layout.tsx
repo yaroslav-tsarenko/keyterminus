@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { preload } from "react-dom";
-import "@fontsource-variable/mona-sans/wght.css";
-import "@fontsource-variable/red-hat-mono/wght.css";
+import "@fontsource-variable/sometype-mono/wght.css";
 import "./fonts.css";
 import "@/styles/globals.css";
 import { BRAND, SITE_URL } from "@/lib/brand";
@@ -47,8 +46,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F5F7F5" },
-    { media: "(prefers-color-scheme: dark)", color: "#0C110F" },
+    { media: "(prefers-color-scheme: light)", color: "#F4F1EA" },
+    { media: "(prefers-color-scheme: dark)", color: "#121314" },
   ],
 };
 
@@ -58,7 +57,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocale();
-  preload("/fonts/hubot-sans-latin-wdth-normal.woff2", { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
+  preload("/fonts/overpass-latin-wght-normal.woff2", { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
 
   return (
     <html

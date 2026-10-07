@@ -5,13 +5,13 @@ import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { ListPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Field";
 import { Checkbox } from "@/components/ui/Choice";
-import { Plate } from "@/components/ui/Plate";
+import { Tag } from "@/components/ui/Tag";
 import { Alert } from "@/components/ui/Alert";
-import { SkeletonBar } from "@/components/ui/ReadoutLoader";
+import { SkeletonBar } from "@/components/ui/Flap";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog/ConfirmDialog";
 import { AddressFields } from "@/components/account/fields/AddressFields";
@@ -172,7 +172,7 @@ export function AddressBook() {
         title={t("title")}
         aside={
           !editing && addresses.length > 0 ? (
-            <Button variant="outline" size="sm" startContent={<Plus size={16} aria-hidden="true" />} onPress={() => setEditing({ mode: "new" })} className="sm:ml-auto">
+            <Button variant="outline" size="sm" startContent={<ListPlus size={16} aria-hidden="true" />} onPress={() => setEditing({ mode: "new" })} className="sm:ml-auto">
               {t("add")}
             </Button>
           ) : null
@@ -212,7 +212,7 @@ export function AddressBook() {
               <li key={address.id} className={cn("flex flex-col gap-4 border bg-raised p-5", address.isDefault ? "border-control" : "border-line")}>
                 <div className="flex items-start justify-between gap-3">
                   <p className="m-0 text-step-0 font-medium text-ink">{`${address.firstName} ${address.lastName}`}</p>
-                  {address.isDefault ? <Plate variant="neutral">{t("default")}</Plate> : null}
+                  {address.isDefault ? <Tag variant="neutral">{t("default")}</Tag> : null}
                 </div>
                 <address className="text-ui-sm not-italic leading-[1.6] text-ink-muted">
                   {addressLines({ ...address, firstName: "", lastName: "" }).map((line) => (

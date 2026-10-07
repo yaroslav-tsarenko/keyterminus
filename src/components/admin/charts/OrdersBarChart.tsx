@@ -47,7 +47,7 @@ export function OrdersBarChart({ data }: OrdersBarChartProps) {
           labelStyle={{ color: "#a1a1aa" }}
         />
         <Legend wrapperStyle={{ color: "#a1a1aa" }} />
-        <Bar yAxisId="left" dataKey="orders" fill="#2E5E4E" radius={[6, 6, 0, 0]} name="Orders" />
+        <Bar yAxisId="left" dataKey="orders" fill="#8A6512" radius={[6, 6, 0, 0]} name="Orders" />
         <Bar yAxisId="right" dataKey="revenue" fill="rgba(10,132,255,0.4)" radius={[6, 6, 0, 0]} name="Revenue (£)" />
       </BarChart>
     </ResponsiveContainer>

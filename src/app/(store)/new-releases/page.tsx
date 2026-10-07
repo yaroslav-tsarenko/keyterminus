@@ -5,7 +5,6 @@ import { pageMetadata, pagedDescription } from "@/lib/seo/metadata";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 import { CatalogBrowser } from "@/components/catalog/CatalogBrowser";
 import { CategoryOpener } from "@/components/catalog/CategoryOpener";
-import { ReleaseRuler, type ReleaseWeek } from "@/components/catalog/ReleaseRuler";
 import { queryCatalog } from "@/components/catalog/catalog-query";
 import { hasActiveFilters, parseCatalogParams, type RawSearchParams } from "@/components/catalog/catalog-url";
 
@@ -15,6 +14,15 @@ interface ReleasesPageProps {
 
 const WEEKS = 8;
 const DAY = 86_400_000;
+
+interface ReleaseWeek {
+  start: string;
+  count: number;
+}
+
+function weekLabel(iso: string) {
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(iso));
+}
 
 async function releaseWeeks(): Promise<ReleaseWeek[]> {
   const now = Date.now();
@@ -35,7 +43,7 @@ async function releaseWeeks(): Promise<ReleaseWeek[]> {
 export async function generateMetadata({ searchParams }: ReleasesPageProps): Promise<Metadata> {
   const t = await getTranslations("catalog");
   const query = parseCatalogParams(await searchParams, "release-desc");
-  const title = query.page > 1 ? t("titleWithPage", { title: "New releases", page: query.page }) : "New releases";
+  const title = query.page > 1 ? t("titleWithPage", { title: "New arrivals", page: query.page }) : "New arrivals";
   const description = pagedDescription("Recently released games and DLC in stock now, newest first, with platform, region and languages on every key.", query.page, (text, page) => t("descriptionWithPage", { description: text, page }));
   const filtered = hasActiveFilters(query);
   return pageMetadata({ title, description, path: query.page > 1 ? `/new-releases?page=${query.page}` : "/new-releases", canonical: !filtered, index: !filtered });
@@ -48,9 +56,33 @@ export default async function NewReleasesPage({ searchParams }: ReleasesPageProp
   const recent = weeks.reduce((a, w) => a + w.count, 0);
   return (
     <div className="mx-auto max-w-container px-gutter pb-24">
-      <Breadcrumbs items={[{ label: t("home"), href: "/" }, { label: "Catalogue", href: "/catalog" }, { label: "New releases" }]} />
-      <CategoryOpener name="New releases" count={recent} lead="Released in the last eight weeks and in stock now. Keys for titles that aren't out yet are not listed." />
-      {recent > 0 ? <ReleaseRuler weeks={weeks} className="mb-12 max-w-[960px]" /> : null}
+      <Breadcrumbs items={[{ label: t("home"), href: "/" }, { label: "Catalogue", href: "/catalog" }, { label: "New arrivals" }]} />
+      <CategoryOpener name="New arrivals" count={recent} lead="Games and DLC released in the last eight weeks and in stock now. Titles that aren’t out yet are not listed." />
+      {recent > 0 ? (
+        <table className="mb-12 w-full max-w-[560px] border-collapse text-left">
+          <caption className="sr-only">Releases per week, last eight weeks</caption>
+          <thead>
+            <tr className="border-b border-rule">
+              <th scope="col" className="label-caps py-2.5 pr-4 text-ink-muted">
+                Week of
+              </th>
+              <th scope="col" className="label-caps py-2.5 text-right text-ink-muted">
+                Releases
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {[...weeks].reverse().map((w) => (
+              <tr key={w.start} className="border-b border-line">
+                <th scope="row" className="py-2 pr-4 text-left text-ui-md font-semibold text-ink">
+                  {weekLabel(w.start)}
+                </th>
+                <td className="py-2 text-right font-mono text-data text-ink">{w.count.toLocaleString("en-GB")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : null}
       <CatalogBrowser
         basePath="/new-releases"
         params={{ ...query, category: null, page: result.page }}
@@ -62,7 +94,7 @@ export default async function NewReleasesPage({ searchParams }: ReleasesPageProp
         defaultSort="release-desc"
         related={[{ name: "All keys", href: "/catalog" }]}
         headingId="releases-results"
-        heading="New releases"
+        heading="New arrivals"
       />
     </div>
   );

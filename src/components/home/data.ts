@@ -6,7 +6,7 @@ import { GENRES, PLATFORMS, PRODUCT_TYPES } from "@/lib/keys/taxonomy";
 import { platformInfo } from "@/lib/catalog/platforms";
 import { giftCardGroups, subscriptionTimetable, type GiftCardGroup, type Timetable, type TimetableRow } from "@/lib/catalog/prepaid";
 import { loadKeyProducts } from "@/components/catalog/catalog-query";
-import { MERCH, PRICE_BAND_EDGES } from "@/config/merchandising";
+import { HOME_LEGACY as MERCH, PRICE_BAND_EDGES } from "./legacy";
 import { STORE_POLICY } from "@/config/store-policy";
 import { getExchangeRates } from "@/lib/exchange-rates";
 import type { CatalogProduct } from "@/components/product/product-face";
@@ -249,7 +249,7 @@ async function computeHomeData(): Promise<HomeData> {
       slug: p.slug,
       name: p.label,
       short: info.short,
-      tone: info.tone,
+      tone: info.key,
       href: `/platform/${p.slug}`,
       count: stats.get(p.key)?.count ?? 0,
       minPrice: stats.get(p.key)?.min ?? null,

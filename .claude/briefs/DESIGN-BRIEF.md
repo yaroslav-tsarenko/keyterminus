@@ -1,385 +1,351 @@
-# Keyrook — Design Brief: "Vault Run"
+# Keyterminus — Design Brief: "Departure Board"
 
-This is the implementation prompt for the engineer and the source of truth for the motion engineer. Read it top to bottom before touching code. The rules in `.claude/knowledge/DESIGN-MASTER.md`, `.claude/knowledge/WEBGL-3D-KNOWLEDGE.md`, `.claude/knowledge/CHECKLIST-QC.md` (sections 0–17, 19–20 and vertical 18.4) and `/home/claude/devtools/keyrook-common.md` still apply. Where this brief is more specific, follow this brief.
+This is the implementation prompt for the store-pages engineer and the source of truth for the motion engineer. Read it top to bottom before touching code. `.claude/knowledge/DESIGN-MASTER.md`, `.claude/knowledge/WEBGL-3D-KNOWLEDGE.md`, `.claude/knowledge/CHECKLIST-QC.md` (sections 0–17, 19–20 and vertical 18.4) and `/home/claude/devtools/keyterminus-common.md` (including the KEYTERMINUS OVERRIDES and ENVIRONMENT paragraphs) still apply. Where this brief is more specific, follow this brief.
 
-The Patinaskins brief ("Inspection Bay") is retired. Nothing from its visual language survives: no lamp line or light pool, no rarity spine, no float ruler or jaw, no trays, no Sofia Sans Condensed, Source Sans 3 or Martian Mono, no amber, no `ShoppingCart`/`Bookmark` glyphs, no ruler-band footer. Everything CS2-, Steam-trade- and SIH-specific leaves the storefront.
+The codebase was cloned from Keyrook. Keyrook's brief ("Vault Run") is retired and so is everything visual it introduced. Keep its *method* (token plumbing, measured contrast, component states, theater contract, motion hooks); throw away its *look*:
+- no dial, dial ruler, index line, detents, rotary dial, budget dial;
+- no tumbler windows or rolling digits, no decrypt scramble in recessed slots;
+- no bolted plates, bolts, steel grain, machined edges, engraving text-shadow;
+- no lamps or LEDs, no signal green or banker's green;
+- no lockers, vault map, vault door, door poster, wire packets, release ruler;
+- no Hubot Sans, Mona Sans, Red Hat Mono;
+- no `Archive`, `Pin`, `UserKey`, `SquarePlus` glyphs; no square-cap 1.75 icon style;
+- no 0px-everywhere geometry, no two steel tiers, no gunmetal dark-first theme.
 
-**Scope:** the storefront only:
+Fablekeys ("Paper Theatre", a sibling built on the same base) is equally off-limits: no paper sheets with laid shadows, chapters, Roman numerals, running heads, dotted leaders, ribbons, wax seals, cream + vermilion + teal, Fraunces, Alegreya, Atkinson Hyperlegible Mono, `Backpack`, storybook frames or page turns.
+
+**Scope:**
 - `src/app/(store)/**` and `src/components/**` except `admin`;
-- `src/styles/variables.css`, `src/styles/globals.css`, `src/styles/animations.css`, `src/styles/motion.css`;
+- `src/styles/variables.css`, `globals.css`, `animations.css`, `motion.css`, `theater.css`, `home.css`;
 - `src/app/layout.tsx`, `src/app/fonts.css`, `src/components/layout/ThemeScript`;
-- `public/` brand assets, `scripts/gen-favicons.mjs`;
-- fonts and colours in `src/lib/invoice.ts`;
+- `public/` brand assets, `public/manifest.json`, `scripts/gen-favicons.mjs`;
+- fonts and colours in `src/lib/invoice.ts`; the email look in `src/lib/email.ts`;
 - the motion engine in `src/lib/motion/**`;
-- the new theater in `src/components/theater/**`.
+- the theater in `src/components/theater/**`;
+- merchandising in `src/config/catalog.ts`, `src/config/merchandising.ts`, `src/config/navigation.ts`, `src/components/catalog/catalog-*.ts`, `src/components/home/data.ts` (§18);
+- `src/lib/brand.ts` (`BRAND`), `messages/en/*.json`.
 
-Admin (`src/app/admin/**`, `src/components/admin/**`, `src/styles/admin.css`) runs on its own `--admin-*` variables and keeps its look. After the token swap, open every admin page once in both themes and fix only what became illegible.
+Admin (`src/app/admin/**`, `src/components/admin/**`, `src/styles/admin.css`) keeps its `--admin-*` look. After the token swap open every admin page once in both themes and fix only what became illegible.
+
+**Already done by the design director (do not redo):**
+- `src/app/icon.svg` — the new favicon tile (§9).
+- `public/brand/keyterminus-mark.svg` — the mark, light-background colours.
+- `public/brand/keyterminus-lockup.svg` — mark + wordmark lockup, light-background colours (outlined Overpass 800, harfbuzz-shaped with kerning).
 
 **House rules for the code:**
-- No comments anywhere, including in the snippets you copy from this brief.
-- Reuse what exists and restyle it rather than writing parallel versions: `Button`, `Field`, `Select`, `Choice`, `Plate`, `Chip`, `Tabs`, `Accordion`, `Dialog`, `Stepper`, `Pagination`, `Alert`, `ReadoutLoader`, `EmptyState`, `ConfirmDialog`, `PriceDisplay`, `QuantitySelector`, `Breadcrumbs`, `PaymentLogos`, `CartProvider`, `CurrencyProvider`, `ThemeProvider`, the motion engine and ticker in `src/lib/motion`, `pageMetadata`, `JsonLd`, `POLICY_FACTS`, `STORE_POLICY` and `COMPANY`.
-- Reuse the proven game-key logic from `/home/claude/ref/keys/keyarcade` first: `lib/kinguin.ts` normalisation, `lib/catalog.ts`, checkout, the account key display and the legal content.
-- Port the theater engine from `/home/claude/ref/keys/allship-ai/src/components/theater` (§12) instead of inventing a new one.
-- Tokens only. No hex or rgba values in components.
-- Copy lives in `messages/en/*.json` by namespace. Numbers, timings and policy facts come from `STORE_POLICY` / `POLICY_FACTS`.
+- No comments anywhere, including snippets copied from this brief.
+- Restyle what exists rather than writing parallel versions: `Button`, `Field`, `Select`, `Choice`, `Plate` (becomes `Tag`), `Chip`, `Tabs`, `Accordion`, `Dialog`, `Stepper`, `Pagination`, `Alert`, `EmptyState`, `ConfirmDialog`, `PriceDisplay`, `QuantitySelector`, `Breadcrumbs`, `PaymentLogos`, `CartProvider`, `CurrencyProvider`, `ThemeProvider`, the motion engine and ticker in `src/lib/motion`, `pageMetadata`, `JsonLd`, `POLICY_FACTS`, `STORE_POLICY`, `COMPANY`, `BRAND`, the theater engine.
+- `Dial.tsx`, `Tumbler.tsx`, `Lamp.tsx`, `ReadoutLoader.tsx` are deleted once their consumers use the new primitives (§8): `Flap`, `FlapRow`, `FlapLoader`, `PlatformTile`, `RouteLine`, `Remark`.
+- Tokens only. No hex or rgba in components, theater scenes, sample covers or SVG motifs (use `currentColor` and CSS variables). The two exceptions are `src/lib/email.ts` and `src/lib/invoice.ts`, which cannot read CSS.
+- Copy lives in `messages/en/*.json` by namespace. Numbers, timings and policy facts come from `STORE_POLICY` / `POLICY_FACTS`. Merchandising numbers come from `src/config/merchandising.ts` and `src/config/catalog.ts`.
 
 ---
 
 ## 1. Direction
 
 ### 1.1 Concept statement
-Keyrook is a vault. Every key in the catalogue is held in a numbered safe-deposit box behind a machined steel door, and buying one is a short, legible run through that vault:
-1. you choose a box;
-2. the door's combination dial turns while your bank confirms the payment on a hosted card page with 3-D Secure;
-3. the tumblers drop;
-4. your key decrypts character by character in your account.
+Keyterminus is a departures hall. The catalogue is a split-flap board: every key is a departure with a price, a destination (the game), a platform (Steam, Xbox, PlayStation…) and a remark. Buying one is boarding: you check in a key, you pay, and your key **departs** for your account — on the board in your account its characters flip into place, one flap at a time. Redeeming it on the platform is the arrival.
 
-The interface is the hardware around that story:
-- steel plates with machined edges;
-- engraved labels in a wide grotesk;
-- tumbler windows for every number that matters;
-- a graduated dial with a green index line, the same signal green as the vault's indicator lamps and its primary actions.
+The interface is the hall around the board: a warm white concourse, clear wayfinding signage set in a highway-signage grotesk, numbered platform signs, timetable rows, a route diagram for genres, and one graphite object that never changes colour between day and night — the board. Mustard is the colour of the board's remarks and of the one thing you should do next. Cover art is the colour of the store everywhere else.
 
-Cover art is the colour of the store; the vault is quiet, cool and exact. The visitor should feel that their purchase is handled by something solid and accountable, and should be able to find a key, check its platform and region at a glance, pay, and redeem it without guessing.
+The visitor should feel they are reading a well-run station: every key has a clear platform and region before they pay, the next step is always signed, and nothing is announced that the board can't back up.
 
-The name carries it: a **rook** is the castle piece, a stronghold that holds its ground. **Key + rook** means the place where keys are kept.
+The name carries it: a **terminus** is where every line ends and every journey starts. **Key + terminus** is the station all keys leave from. The mark (§9) is a key drawn as a route-map line that ends at a terminus bar.
 
 ### 1.2 What carries colour, what stays quiet
-- **Cover art carries the colour.** Game covers are loud and varied; the vault never competes with them. Covers are never tinted, washed, blurred or overlaid with UI.
-- **Signal green** is the vault's indicator lamp. It belongs to:
-  - primary actions and focus rings;
-  - the dial's index line;
-  - lit lamps (8px circles: "in stock", "key ready", the active step);
-  - the character that has just settled during a decrypt.
+- **Cover art carries the colour.** Covers are never tinted, washed, blurred, duotoned, overlaid or cropped into shapes.
+- **Graphite is the board.** The board family (`--color-board`, `--color-flap`, `--color-hinge`) is identical in both themes. It belongs to: the hero board, flap tiles (platform numbers, counts, the deal tile, key characters), the gate strip on departure cards, the key board in the account, the theater housing, the information strip above the header, and the mini-boards in set-pieces. It is an *object*, never a page background except the hero hall and the information strip.
+- **Mustard has two jobs and only two:**
+  1. **Action fill** — the primary button (one per viewport region), checked checkboxes/radios/switches, the current station on route lines (checkout, order timeline), the active 3px bar under tabs/nav, text selection.
+  2. **Remark ink on the board** — the REMARKS column of any board, deal tiles (`NOW −18%`), the terminus bar in the logo and on route lines.
 
-  It never fills a section, never sets a heading and never glows.
-- **Platform colours** appear only as a 6px square pip beside the platform's name (§3.3), like a coloured enamel inlay in a brass-free steel plate. **Type colours** appear only as the text of a type tag.
-- **Deals** carry no colour. A discount is an inverted plate (ink fill, page-colour text), the way a struck price is cut into a steel tag.
-- Everything else is steel: blued gunmetal in the dark theme, satin nickel in the light theme, plus hairlines.
+  On page surfaces mustard is never used as text colour except `--color-accent-ink` (a deep ochre in Day) for small active labels. It never fills a section, never sets a heading, never marks an error.
+- **Platforms carry no colour.** A platform is a number on a flap tile plus its name in words (`[1] Steam`). No brand colours, no pips.
+- **Types carry no colour.** "DLC", "Gift card", "Subscription" are words in a quiet tag.
+- **Deals carry no red and no green.** A deal is the graphite deal tile with mustard remark text and the struck "was" price in faint text.
+- **Semantic colours** (success, warning, danger, info) appear only in status contexts, always with an icon and a word.
 
 ### 1.3 Signature motifs (repeat with discipline, §10)
-1. **The dial.** A graduated combination ring (100 minor ticks, numerals every 10, a green index line at 12 o'clock) and its straightened form, the **dial ruler** (a horizontal tick scale with detents). It appears on:
-   - the hero door (WebGL);
-   - the price-band explorer (a real rotary control);
-   - the checkout and registration progress (the dial ruler with detents);
-   - the order timeline track and the price and year sliders;
-   - the loader;
-   - the 404.
+1. **The split flap.** A graphite tile with a 2px radius and a horizontal hinge gap across its middle; one character per tile; it changes by flipping its top half down. Used for: the hero board (WebGL), platform numbers, the cart count, the order number, the key in the account, the deal tile, the 404, the theater tabs board, and mini-boards. A row of flaps is a **board row**.
+2. **The route line.** A 3px ink line with circular stops and a mustard **terminus bar** at its end. Used for: genre routes on home, checkout and registration progress, the order timeline, the "through the gate" payment diagram, and the footer's platform line. It is the logo's own geometry, so the brand repeats itself every time a line ends.
+3. **Wayfinding signage.** Numbered platform signs (`[3] PlayStation`), uppercase tracked sign labels, and big block arrows (`ArrowBigRight`) on directional links ("All 4,212 →"). This is the label system rather than a separate motif, but it must be consistent: one sign label style, one arrow, one platform tile.
 
-   The logo is not a dial: it is the key rook (§9).
-2. **Tumbler windows.** Mono characters sitting in recessed slots, like the number wheels of a combination lock. Numbers that matter roll into place in them: live catalogue counts, the cart count, order numbers and, most importantly, the key itself, which decrypts in tumbler windows left to right.
-3. **Bolted plates.** Engraved steel plates with a round bolt head in each corner. They appear only where the store holds or proves something:
-   - the hero door;
-   - the key plate in the account;
-   - the security ledger on the home page;
-   - the company-credentials plate in the footer.
-
-   Nowhere else.
-
-Engraved labels (wide grotesk caps cut into the steel) are the label system, not a fourth motif.
+Nothing else is decoration. No clocks that tell invented times, no fake departure times, no ticker, no airport/plane clip-art, no barcodes or QR codes as ornament.
 
 ### 1.4 Moods per theme
-- **Strongroom (dark, primary, default).** The room inside the vault, after hours.
-  - Blued gunmetal walls with a faint green-grey cast, deeper recesses for covers, short hard-edged ambient shadows.
-  - Plates catch a 1px machined highlight on their top edge and a 1px dark lip at the bottom.
-  - The signal green is the lit lamp on the door.
-- **Counter Hall (light, designed counterpart).** The banking hall at midday.
-  - Satin-nickel grey ground (never paper white), near-white counters (raised panels), recessed stages slightly darker than the page so covers sit in a well.
-  - The green becomes a deep **banker's green** enamel (#0F7A50) used as a fill with white text, never as a light mint. This keeps it far from Chipwave's porcelain + lime.
-  - Engravings flip: a light 1px highlight below the letters instead of a dark one.
+- **Day concourse (light, default).** A station hall in daylight: warm white floor (`#F4F1EA`), slightly darker bands for alternating sections, near-white panels for inputs and cards, a graphite board hanging in it. Ink is a warm graphite black. Mustard is a fill with ink text; mustard as text becomes deep ochre `#7A5800`.
+- **Night concourse (dark).** The same hall after dark: near-black floor `#121314` (neutral-warm, never blue, never navy), panels one step lighter, ink becomes warm paper white `#EEE9DE`. The board stays exactly the same graphite, so at night it reads as the brightest object in the room; its 1px `--color-board-edge` keeps it separated from the floor. Mustard lifts to `#E6B84A` and becomes usable as text.
+
+`:root` holds **Day**. `[data-theme="dark"]` overrides with **Night**. `ThemeScript`: stored value wins; otherwise `prefers-color-scheme`; otherwise light. Keyrook defaulted to dark and used `[data-theme="light"]` overrides — flip that structure.
 
 ### 1.5 Divergence audit (must hold on every page)
-| Axis | Keyrook "Vault Run" | Inspection Bay (Patinaskins) | Console Deck / current keyarcade shop-wall | Midnight Arcade | Cartridge Club | Portfolio directions |
-|---|---|---|---|---|---|---|
-| Base | blued gunmetal #0F1513 dark-first; satin nickel #E3E7E4 light | neutral graphite #121315; grey studio | ice white glass; warm saturated shop wall | violet night #0E0B1E | cream #FFFCF5 | Dresser chalk + chocolate; Drop District concrete; Blueprint drafting paper; Chipwave porcelain; Aurora polar night |
-| Accent | signal green #46D39A / banker's green #0F7A50, lamps only | amber indicator | signal blue + coral; saturated multi-colour | cyan + amber | orange + yellow | brass; orange-red/cobalt/yellow; blueprint blue; lime; emerald→violet gradient |
-| Type | Hubot Sans (expanded) + Mona Sans + Red Hat Mono | Sofia Sans Condensed + Source Sans 3 + Martian Mono | Manrope + Inter; Anton | Space Grotesk + Inter + Silkscreen | Anton + Archivo + Archivo Black | Gloock + Commissioner; Anton; Space Grotesk; Archivo |
-| Geometry | square steel (0px) + round hardware (dial, bolts, lamps, knobs) | 2px controls, 4px trays, jaw pentagon | glass tiles, soft radii; rotated stickers | rounded cards | rounded, outlined | 45° bevels; offset shadows; tight rects; glass |
-| Signature | dial, tumbler windows, bolted plates | lamp, rarity spine, float ruler | focus ring, tinted rails; stickers | pixel accents | bargain-bin stickers | shelf/brass; tape/ticker; title blocks/stamps; pad grid; starfield |
-| Cart | `Archive` (a deposit box) + word "Cart" | `ShoppingCart` | — | — | — | `Handbag` |
-| Header | two steel tiers: search-first tier + nav/status tier | one dark rig | glass bar | top strip + nav row | — | utility line + cornice |
-| Footer | vault floor: platform index, four columns, bolted credentials plate, light logo strip | ruler band + mono sheet | — | — | — | chocolate plinth |
-| Product card | deposit box: 3:4 recessed cover, engraved label row, tumbler price | tray with spine and lamp | glass tile | 8:7 bordered card | 3:4 outlined | — |
+| Axis | Keyterminus "Departure Board" | Keyrook "Vault Run" | Fablekeys "Paper Theatre" | Inspection Bay (Patinaskins) | Others |
+|---|---|---|---|---|---|
+| Base | warm white `#F4F1EA` light-first; neutral-warm night `#121314`; graphite board object in both | blued gunmetal dark-first; satin nickel | laid cream; umber | neutral graphite `#121315` page, dark-first | Console Deck ice glass; Midnight Arcade violet; Cartridge Club cream `#FFFCF5`; Chipwave porcelain+lime; Aurora polar night |
+| Accent | mustard `#E2AE2F` / `#E6B84A` (hue ≈43°), action fill + board remarks | signal green | vermilion + teal | amber `#F39A2E` (hue ≈33°, orange) on graphite pages | signal blue; cyan+amber; orange+yellow; lime |
+| Type | Overpass (Highway Gothic lineage) for signage and text + Sometype Mono for flaps, prices, keys | Hubot + Mona + Red Hat Mono | Fraunces + Alegreya Sans + Atkinson Mono | Sofia Sans Condensed + Source Sans 3 + Martian Mono | Manrope/Inter; Anton/Archivo; Space Grotesk/Silkscreen; Gloock/Commissioner |
+| Geometry | mixed: 0px bands; 2px flap tiles with hinge gap; 4px sign plates; 6px controls; 8px cards; 10px board housings; circles only for route stops, radios, play | 0px + round hardware | 0px sheets, 3px controls, 2px tags | 2px controls, 4px trays | glass, rounded cards, pills |
+| Depth | flat; depth only from the board (hinge shading) and overlays | machined inset edges | paper shadows | lamp pool | glass, offset shadows |
+| Signature | split flap, route line + terminus bar, numbered platform signs | dial, tumblers, bolts | paper layers, chapters, ribbon, seal | lamp, rarity spine, float ruler | stickers, tapes, title blocks, pad grid, starfield |
+| Cart glyph | `Ticket` + "Cart" | `Archive` | `Backpack` | `ShoppingCart` | `Handbag` |
+| Header | 32px graphite information strip + one 64px concourse bar | two steel tiers | one running-head bar + double rule | one dark rig | glass bar |
+| Footer | light (theme-following) concourse band; the platform line with stops ends at a terminus bar; "Company notice" sign | gunmetal vault floor, bolted plate | dark book-cloth colophon | ruler band | chocolate plinth |
+| Product card | departure card: graphite gate strip on top (platform tile + platform + region), 3:4 cover, Overpass title, mono price | steel deposit box, drawer pull | paper sheet with tipped-in mount, ribbon | tray with spine | glass tile, 8:7 card |
+| Home opener | full-bleed graphite hall: H1 over a WebGL split-flap board of real keys that also flips to your search results | pinned WebGL vault door | paper theatre stage | inspection bay | shop wall |
+| Default sort | "Board order": departure score interleaved across platforms (§18) | most ordered | story picks | — | — |
 
-**Banned here because a sibling owns them, or because they would make the store read as a generic gaming template:**
-- sticker badges and rotated tags; tape rules, tickers, index numerals as section openers;
-- title blocks, stamps, registration/crop marks, millimetre grids;
-- glass panels, backdrop blur, blurred cover backdrops (keyarcade's fix);
-- gradients as decoration, glow of any kind, neon-on-black;
-- hard offset shadows, pills;
-- the lamp line or pool, rarity spines, jaws, the ruler band;
-- pixel fonts, angled sci-fi panels, scanlines;
-- a full-screen "matrix rain" of characters.
-
-The green must never read as a terminal: no green text paragraphs, no green-on-black mono blocks, no blinking cursors.
+**Banned here** (owned by a sibling, or generic):
+- everything listed in the preamble;
+- amber-orange accents, graphite *pages* in the light theme (Inspection Bay is a graphite page; ours is a graphite *object* on warm white);
+- terminal or hacker cues: green or amber text on black paragraphs, blinking cursors, a "|" caret after the wordmark, scanlines, matrix rain, mono sentences;
+- airport clichés: plane icons, boarding-pass barcodes, QR codes, "Gate closing" countdowns, fake departure times, world clocks, globe spinners;
+- tickers and marquees (Drop District), sticker badges, rotated tags, stamps;
+- glass, backdrop blur, blurred cover backdrops, gradients as decoration, glow, mesh, neon;
+- pills (fully rounded rectangles) anywhere.
 
 ---
 
 ## 2. Token plumbing
 
 ### 2.1 Where tokens live
-- `src/styles/variables.css` holds the CSS custom properties. It is the single source of colour, radius, shadow, font stacks and motion timings.
-- `src/styles/globals.css` holds the Tailwind v4 `@theme inline` block that turns those variables into utilities. Tailwind compiles from this block only.
-- `tailwind.config.ts` mirrors the aliases. `globals.css` has no `@config`, so Tailwind does not read it; update it anyway so tools that read it stay in sync.
-- `ThemeScript` sets `data-theme="light|dark"` and the `dark` class on `<html>` before paint. `@custom-variant dark ([data-theme="dark"] &)` stays.
-- `:root` holds the **dark** values (Strongroom) and `[data-theme="light"]` overrides with Counter Hall, as in Patinaskins. When nothing valid is stored, the fallback stays `"dark"`.
+- `src/styles/variables.css`: every CSS custom property (colour, radius, shadow, fonts, motion, layout). `:root` = Day, `[data-theme="dark"]` = Night.
+- `src/styles/globals.css`: the Tailwind v4 `@theme inline` block. Tailwind compiles from this block only.
+- `tailwind.config.ts`: mirror the aliases for tools that read it.
+- `ThemeScript`: sets `data-theme="light|dark"` and the `dark` class before paint (§1.4 order). `@custom-variant dark ([data-theme="dark"] &)` stays.
 
-### 2.2 Keep every existing alias name, change what it points to
-Approximate storefront usage today:
-
-| Alias | Uses |
-|---|---|
-| `text-ink*` | ~330 |
-| `text-ink-muted` | 233 |
-| `border-line` | 143 |
-| `data` | ~200 |
-| `eyebrow` | 55 |
-| `bg-raised` | 34 |
-| `bg-brand` | 30 |
-| `bg-surface` | 29 |
-| `border-control` | 21 |
-| `bg-surface-1` | 20 |
-| `label-caps` | 12 |
-| `border-rule` | 8 |
-| `text-on-brand` | 8 |
-| `bg-rig` | 5 |
-| `bg-floor` | 2 |
-
-The names stay so everything compiles on day one; the values change.
+### 2.2 Keep existing alias names, change what they point to
+The storefront compiles against Keyrook's aliases. Keep names on day one, change values, then retire Vault Run-only names in the sweep (§2.5).
 
 | Existing variable | Utility alias | New meaning |
 |---|---|---|
-| `--color-bg` | `bg-surface` | the vault room (page canvas) |
-| `--color-bg-secondary` | `bg-surface-1` | band (alternating sections, disabled fills) |
-| `--color-bg-tertiary` | `bg-surface-2` | inset (wells, skeletons, dial track, tumbler slots) |
-| `--color-bg-warm` | `bg-surface-warm` | → `--color-accent-light` (green-tinted note box) |
-| `--color-raised` | `bg-raised` | panels, inputs, popovers, the cart drawer |
-| `--color-stage` | `bg-stage` | the cover recess (cover wells in cards, PDP, cart rows) |
+| `--color-bg` | `bg-surface` | concourse floor (page canvas) |
+| `--color-bg-secondary` | `bg-surface-1` | band (alternating sections, disabled fills, footer) |
+| `--color-bg-tertiary` | `bg-surface-2` | inset (skeleton fills, quantity well, table heads) |
+| `--color-bg-warm` | `bg-surface-warm` | → `var(--color-accent-light)` (mustard-tinted note box) |
+| `--color-raised` | `bg-raised` | panel: inputs, cards, popovers, drawers, dialogs |
+| `--color-plate` | `bg-plate` | → `var(--color-raised)`; rename uses to `bg-raised`, then delete |
+| `--color-stage` | `bg-stage` | cover stage (behind every cover) |
 | `--color-on-stage` | `text-on-stage` | = ink |
-| `--color-surface-dark` | — | = inset in dark, ink in light |
-| `--color-rig` | `bg-rig` | header tiers and the vault map |
-| `--color-floor` | `bg-floor` | footer |
+| `--color-surface-dark` | — | → `var(--color-board)` |
+| `--color-rig` | `bg-rig` | header concourse bar (= `--color-bg` in both themes) |
+| `--color-floor` | `bg-floor` | footer (= `--color-bg-secondary`) |
 | `--color-text` | `text-ink` | ink |
 | `--color-text-secondary` | `text-ink-muted` | muted ink |
 | `--color-text-tertiary` | `text-ink-subtle` | faint ink (≥4.5:1 everywhere text may sit) |
-| `--color-accent` | `bg-brand`, `border-brand` | signal green (fill) |
-| `--color-accent-hover` | `bg-brand-hover` | green hover |
-| `--color-accent-light` | `bg-brand-soft` | green tint for hover and selected rows |
-| `--color-on-accent` | `text-on-brand` | text on green |
-| `--color-accent-ink` | `text-accent-ink` | green as text (links on hover, active counts) |
-| `--color-accent-edge` | `border-accent-edge` | 1px edge on green buttons (light theme) |
-| `--color-accent-2` | `bg-brand-2` | → `--color-steel-hi` (machined highlight; dial ticks on posters; non-text) |
-| `--color-accent-3` | `text-sale` | → `--color-text` (deals are an inverted plate, §8.12) |
-| `--color-rule` | `border-rule`, `bg-rule` | strong 1px rule (dial ruler baseline, table heads, active tab) |
+| `--color-accent` | `bg-brand`, `border-brand` | mustard fill |
+| `--color-accent-hover` | `bg-brand-hover` | mustard hover |
+| `--color-accent-light` | `bg-brand-soft` | mustard tint for selected rows and the note box |
+| `--color-on-accent` | `text-on-brand` | text on mustard (ink in both themes) |
+| `--color-accent-ink` | `text-accent-ink` | mustard as text (deep ochre in Day) |
+| `--color-accent-edge` | `border-accent-edge` | 1px edge on mustard fills in Day |
+| `--color-accent-2` | `bg-brand-2` | → `var(--color-board)` |
+| `--color-accent-3` | `text-sale` | → `var(--color-text)` (deals are a flap tile, §8.12) |
+| `--color-rule` | `border-rule`, `bg-rule` | strong 1px rule (table heads, route line rest colour on bands) |
 | `--color-border` | `border-line` | hairline |
 | `--color-border-hover` | `border-line-hover` | stronger hairline |
 | `--color-border-control` | `border-control` | control borders (≥3:1) |
-| `--color-focus` | `outline-focus` | green focus ring (accent-ink in light) |
-| `--radius-*` | `rounded-*` | all `0` (§5.3); `--radius-pill` becomes 0 |
-| `--shadow-card`, `--shadow-card-hover` | `shadow-card*` | machined edge at rest; drawer pulled |
-| `--shadow-lg`, `--shadow-xl`, `--shadow-panel*` | | popovers, dialogs, drawers |
-| `--rarity-*`, `--rarity`, `--mark-*` | `*-rarity-*`, `*-mark-*` | **delete** (no rarity in this store) |
-| `--lamp-*`, `--stage-lamp`, `--color-lamp`, `--lamp-catch` | `bg-lamp`, `shadow-lamp-catch` | **delete**; the lamp idea is replaced by the 8px LED (`--color-lamp-on/off`) |
-| `--spine`, `--lamp-inset` | | **delete** |
-| `--z-tray-item` | | rename to `--z-box-item` (same value) |
+| `--color-focus` | `outline-focus` | focus ring (ink in Day, mustard in Night) |
+| `--color-deal`, `--color-on-deal` | `bg-deal`, `text-on-deal` | → `var(--color-flap)` / `var(--color-remark)` |
+| `--color-logo-strip` | `bg-logo-strip` | white strip behind payment logos, both themes |
+| `--radius-*` | `rounded-*` | new scale (§5.3) |
+| `--shadow-*` | `shadow-*` | new elevation (§5.5) |
+| `--color-plate`, `--color-steel-hi`, `--color-lamp-on/off`, `--steel-grain`, `--edge-machined*`, `--engrave`, `--bolt`, `--platform*`, `--type*` | | **delete** after the sweep |
+| `--z-box-item` | | rename `--z-card-item` (same value) |
 
 ### 2.3 New names (add to `variables.css` and `@theme inline`)
 | Variable | Utility | Job |
 |---|---|---|
-| `--color-plate` | `bg-plate` | machined steel plate: buy box, key plate, theater bezel, lockers, bolted plates, product-card body |
-| `--color-steel-hi` | `bg-steel-hi`, `text-steel-hi` | non-text machined highlight, dial ticks on the door poster |
-| `--color-lamp-on` | `bg-lamp-on` | lit LED (= accent) |
-| `--color-lamp-off` | `bg-lamp-off` | unlit LED body (always drawn with a 1px `--color-border-control` ring) |
-| `--color-deal` / `--color-on-deal` | `bg-deal`, `text-on-deal` | inverted discount plate (= ink / = bg) |
-| `--steel-grain` | `steel-grain` (custom `@utility`, sets `background-image`) | **the only gradient token.** A brushed-steel hairline texture for the three hardware faces: door poster, key plate, credentials plate |
-| `--edge-machined` | `shadow-machined` | 1px top highlight + 1px bottom lip, inset (plates, buttons, cards) |
-| `--edge-machined-pressed` | `shadow-machined-pressed` | the same inverted (pressed key) |
-| `--engrave` | `text-shadow-engrave` (custom utility) | 1px text shadow that makes labels read as cut into steel |
-| `--bolt` | | bolt-head diameter (6px; 8px on the door poster and the key plate) |
-| `--platform-*` and `--platform` | `bg-platform`, `text-platform` | platform pips (§3.3) |
-| `--type-*` and `--type` | `text-type` | type-tag text (§3.3) |
-| `--color-success-tint` … `--color-info-tint`, `--color-on-danger` | `bg-*-tint`, `text-on-danger` | status tags, alerts |
-| `--color-scrim` | `bg-scrim` | modal and drawer backdrop (no blur) |
-| `--color-logo-strip` | `bg-logo-strip` | the light strip behind the coloured payment logos; it does **not** flip with the theme |
-
-The `@theme inline` additions (next to the existing aliases):
+| `--color-board` | `bg-board` | graphite board housing, gate strips, info strip, key board |
+| `--color-flap` | `bg-flap` | flap face (one step lighter than the board) |
+| `--color-flap-top` | `bg-flap-top` | top half of a flap (a hair lighter than the bottom; flat, no gradient) |
+| `--color-hinge` | `bg-hinge`, `border-hinge` | the hinge gap and housing seams |
+| `--color-board-edge` | `border-board-edge` | 1px edge round board objects (matters at Night) |
+| `--color-on-board` | `text-on-board` | flap characters and board text |
+| `--color-on-board-muted` | `text-on-board-muted` | secondary board text, column heads |
+| `--color-on-board-faint` | `text-on-board-faint` | board captions (never on flap faces) |
+| `--color-remark` | `text-remark`, `bg-remark` | mustard remark ink on the board |
+| `--color-board-success` / `-warning` / `-danger` / `-info` | `text-board-*` | statuses on the board (key board) |
+| `--color-focus-on-board` | `outline-focus-board` | focus ring on board surfaces (mustard in both themes) |
+| `--color-link-line` | `decoration-link` | underline colour of text links |
+| `--color-scrim` | `bg-scrim` | modal backdrop (no blur) |
+| `--color-stop` | `bg-stop`, `border-stop` | route line and stop stroke (= ink) |
+| `--color-terminus` | `bg-terminus` | the terminus bar (= remark mustard, both themes) |
+| `--radius-flap`, `--radius-sign`, `--radius-control`, `--radius-card`, `--radius-board`, `--radius-round` | `rounded-flap`, `rounded-sign`, `rounded-control`, `rounded-card`, `rounded-board`, `rounded-round` | §5.3 |
+| `--shadow-overlay`, `--shadow-panel`, `--shadow-panel-left`, `--shadow-flap` | `shadow-overlay`, … | §5.5 |
 
 ```css
 @theme inline {
-  --color-plate: var(--color-plate);
-  --color-steel-hi: var(--color-steel-hi);
-  --color-lamp-on: var(--color-lamp-on);
-  --color-lamp-off: var(--color-lamp-off);
-  --color-deal: var(--color-deal);
-  --color-on-deal: var(--color-on-deal);
+  --color-board: var(--color-board);
+  --color-flap: var(--color-flap);
+  --color-flap-top: var(--color-flap-top);
+  --color-hinge: var(--color-hinge);
+  --color-board-edge: var(--color-board-edge);
+  --color-on-board: var(--color-on-board);
+  --color-on-board-muted: var(--color-on-board-muted);
+  --color-on-board-faint: var(--color-on-board-faint);
+  --color-remark: var(--color-remark);
+  --color-board-success: var(--color-board-success);
+  --color-board-warning: var(--color-board-warning);
+  --color-board-danger: var(--color-board-danger);
+  --color-board-info: var(--color-board-info);
+  --color-focus-board: var(--color-focus-on-board);
+  --color-link: var(--color-link-line);
+  --color-stop: var(--color-stop);
+  --color-terminus: var(--color-terminus);
   --color-logo-strip: var(--color-logo-strip);
-  --color-platform: var(--platform);
-  --color-type: var(--type);
-  --shadow-machined: var(--edge-machined);
-  --shadow-machined-pressed: var(--edge-machined-pressed);
-  --text-shadow-engrave: var(--engrave);
+  --radius-flap: var(--radius-flap);
+  --radius-sign: var(--radius-sign);
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --radius-board: var(--radius-board);
   --radius-round: 50%;
-  --ease-latch: cubic-bezier(0.3, 0, 0.1, 1);
-}
-
-@utility steel-grain {
-  background-image: var(--steel-grain);
+  --shadow-overlay: var(--shadow-overlay);
+  --shadow-flap: var(--shadow-flap);
+  --ease-flap: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-sign: cubic-bezier(0.2, 0, 0, 1);
 }
 ```
 
-### 2.4 Platform and type are wired by attribute, never by per-component colour logic
+### 2.4 Platforms are numbers and words, never colours
+- `src/config/merchandising.ts` gets `PLATFORM_BOARD`: a fixed, ordered list that assigns each platform its **platform number** and its board label:
 
-```css
-[data-platform="steam"] { --platform: var(--platform-steam); }
-[data-platform="epic"] { --platform: var(--platform-epic); }
-[data-platform="ea"] { --platform: var(--platform-ea); }
-[data-platform="ubisoft"] { --platform: var(--platform-ubisoft); }
-[data-platform="gog"] { --platform: var(--platform-gog); }
-[data-platform="battlenet"] { --platform: var(--platform-battlenet); }
-[data-platform="xbox"] { --platform: var(--platform-xbox); }
-[data-platform="playstation"] { --platform: var(--platform-playstation); }
-[data-platform="nintendo"] { --platform: var(--platform-nintendo); }
-[data-platform="rockstar"] { --platform: var(--platform-rockstar); }
-[data-type="game"] { --type: var(--type-game); }
-[data-type="dlc"] { --type: var(--type-dlc); }
-[data-type="giftcard"] { --type: var(--type-giftcard); }
-[data-type="subscription"] { --type: var(--type-subscription); }
-[data-type="software"] { --type: var(--type-software); }
-```
+  | No. | Platform key | Name (UI) | Board label (flaps, ≤11 chars) |
+  |---|---|---|---|
+  | 1 | `steam` | Steam | `STEAM` |
+  | 2 | `xbox` | Xbox | `XBOX` |
+  | 3 | `playstation` | PlayStation | `PLAYSTATION` |
+  | 4 | `nintendo` | Nintendo | `NINTENDO` |
+  | 5 | `epic` | Epic Games | `EPIC GAMES` |
+  | 6 | `gog` | GOG | `GOG` |
+  | 7 | `ea-app` | EA app | `EA APP` |
+  | 8 | `ubisoft-connect` | Ubisoft Connect | `UBISOFT` |
+  | 9 | `battle-net` | Battle.net | `BATTLE.NET` |
+  | 10 | `rockstar` | Rockstar | `ROCKSTAR` |
+  | — | `other` | the raw supplier label | `OTHER` |
 
-- `--platform` defaults to `var(--platform-other)` and `--type` to `var(--type-game)` on `:root`.
-- One helper in `src/lib/catalog/platforms.ts` maps the supplier platform string to `{ slug, label, launcher, redeemUrl }`. It is the same table that drives §14.13.
-- One helper maps the product kind to the type slug.
-- Unknown platforms get `other` and the raw label, never a guessed colour.
+- Numbers are fixed (a platform keeps its number even when it has no stock and is hidden), exactly like real stations. They are wayfinding, not data: never show "Platform 3" without the name beside it.
+- `platformInfo()` in `src/lib/catalog/platforms.ts` gains `number` and `boardLabel`; delete `tone`. Delete `TYPE_TONE`.
+- Remove every `[data-platform]` / `[data-type]` colour rule.
 
 ### 2.5 Mandatory sweeps
-1. **CS2 out.** Delete from the storefront:
-   - `src/components/skin/*`: `FloatRuler`, `SkinStage`, `SkinTray`, `StarMark`, `SteamAccountBlock`, `TradeUrlField`, `face.ts`. `PurchaseTimeline` is rebuilt as `OrderTimeline` (§8.24). `RecentlyViewed` moves to `src/components/product/`.
-   - `src/components/product/*`: `InspectionStage`, `SkinDetailTabs`, `SkinReadout`, `VariantLadder`.
-   - `src/components/home/*`: all of it, rebuilt per §14.1.
-   - `src/components/account/SteamDelivery`; `src/app/(store)/account/steam`.
-   - The motion scenes `hero`, `inspect`, `lamp-gl`, `trays`. `lamp-gl.ts` is the starting point for the WebGL scaffold patterns (context loss, DPR cap, idle boot) used in the door scene.
-2. **Rarity and lamp out.** Remove the `[data-rarity]` rules, rarity/mark/lamp tokens and their `@theme` aliases once nothing references them.
-3. **Radius to zero.** Every `--radius-*` becomes `0`. Circles are drawn with the new `rounded-round` (`50%`) and only on square elements (§5.3).
-4. **Text on green.** Every `text-white` or `#fff` on `bg-brand` becomes `text-on-brand`; on `bg-danger` it becomes `text-on-danger`.
-5. **Hex hunt.** No hex or rgba in storefront components, including `BrandMark.tsx`, home components, theater scenes and sample covers.
-6. **Copy hunt.** Grep for and remove these words: `skin`, `float`, `trade offer`, `trade URL`, `Steam account linked`, `StatTrak`, `rarity`, `exterior`, `inspect`, `bay`, `lamp`, `SIH`, `Patinaskins`, `Brasmora`.
+1. **Vault Run out.** Delete or rebuild: `src/components/home/*` (all, rebuilt per §14.1), `src/components/layout/Header/VaultMap.tsx` (→ `ConcourseMap.tsx`), `Dial`, `Tumbler`, `Lamp`, `ReadoutLoader`, the motion scenes `door/*`, `door-ajar`, `ledger`, `releases`, `tumblers`, `index-slide`, `src/components/catalog/ReleaseRuler.tsx`. Keep `lamp-gl`-era scaffold patterns now living in `src/lib/motion/door/controller.ts` (context loss, DPR cap, idle boot, pause on hidden) as the starting point for the board scene, then delete the door.
+2. **Tokens out.** Remove steel grain, machined edges, engrave, bolt, lamp, platform and type colour tokens and their `@theme` aliases once nothing references them.
+3. **Radius in.** Replace every `rounded-none` / implicit 0px on controls and cards with the role tokens (§5.3).
+4. **Text on mustard.** Every `text-white` or `#fff` on `bg-brand` becomes `text-on-brand` (ink in both themes).
+5. **Hex hunt.** No hex or rgba in storefront components, `BrandMark.tsx`, home components, theater scenes or `SampleCover`.
+6. **Copy hunt.** Grep and remove: `Keyrook`, `keyrook`, `KR-`, `vault`, `Vault`, `dial`, `tumbler`, `lamp`, `bolt`, `steel`, `Strongroom`, `Counter Hall`, `door`, `locker`, `Pinned`, `pin` (as save), `Lantern Coast`, `Ironvale`, `Night Ferry`, `Saltmarsh`, `Orbit Freight`, `Hollowstone`, `Brasmora`, `Patinaskins`. Sample titles shared with siblings are replaced (§12.3).
+7. **Brand.** `BRAND = { name: "Keyterminus", domain: "keyterminus.com", tagline: "Game keys for every platform, delivered to your account" }`. Order prefix and SKU prefix `KT-`. Consent storage key `keyterminus-consent`. Theme storage key and every other `keyrook-*` localStorage key become `keyterminus-*` (update the Cookie Policy table).
 
 ---
 
 ## 3. Colour tokens
 
-### 3.1 `src/styles/variables.css` — replace the colour, shadow, radius, font and motion parts with this
+### 3.1 `src/styles/variables.css` — replace the colour, shadow, radius, font, layout and motion parts with this
 
 ```css
 :root {
-  --color-primary: #e4ebe7;
-  --color-secondary: #19211f;
+  --color-primary: #1b1c1d;
+  --color-secondary: #fcfbf7;
 
-  --color-bg: #0f1513;
-  --color-bg-secondary: #131a18;
-  --color-bg-tertiary: #090d0c;
-  --color-raised: #19211f;
-  --color-plate: #1e2725;
-  --color-stage: #0b100f;
-  --color-on-stage: #e4ebe7;
-  --color-surface-dark: #090d0c;
-  --color-rig: #0c110f;
-  --color-floor: #080b0a;
+  --color-bg: #f4f1ea;
+  --color-bg-secondary: #eae5da;
+  --color-bg-tertiary: #e0dacd;
+  --color-raised: #fcfbf7;
+  --color-plate: var(--color-raised);
+  --color-stage: #dcd6c9;
+  --color-on-stage: #1b1c1d;
+  --color-rig: var(--color-bg);
+  --color-floor: var(--color-bg-secondary);
 
-  --color-text: #e4ebe7;
-  --color-text-secondary: #a2aea9;
-  --color-text-tertiary: #87948f;
+  --color-text: #1b1c1d;
+  --color-text-secondary: #4b4842;
+  --color-text-tertiary: #5d5951;
 
-  --color-accent: #46d39a;
-  --color-accent-hover: #72e0b2;
-  --color-accent-light: #15291f;
-  --color-on-accent: #04120b;
-  --color-accent-ink: #46d39a;
-  --color-accent-edge: #46d39a;
+  --color-accent: #e2ae2f;
+  --color-accent-hover: #d29d1a;
+  --color-accent-light: #f5e6bd;
+  --color-on-accent: #1b1c1d;
+  --color-accent-ink: #7a5800;
+  --color-accent-edge: #9c7612;
   --color-bg-warm: var(--color-accent-light);
-  --color-steel-hi: #c9d3cf;
-  --color-accent-2: var(--color-steel-hi);
+  --color-link-line: #9c7612;
+
+  --color-board: #222426;
+  --color-flap: #2b2e31;
+  --color-flap-top: #2e3134;
+  --color-hinge: #0e0f10;
+  --color-board-edge: #3a3d41;
+  --color-on-board: #f2ede1;
+  --color-on-board-muted: #b0aba0;
+  --color-on-board-faint: #9b978e;
+  --color-remark: #e9bb45;
+  --color-terminus: var(--color-remark);
+  --color-board-success: #8ccb97;
+  --color-board-warning: #f2a766;
+  --color-board-danger: #ff8c7e;
+  --color-board-info: #9cc3dd;
+  --color-focus-on-board: #e6b84a;
+  --color-surface-dark: var(--color-board);
+  --color-accent-2: var(--color-board);
   --color-accent-3: var(--color-text);
-  --color-lamp-on: var(--color-accent);
-  --color-lamp-off: #2b3532;
-  --color-deal: var(--color-text);
-  --color-on-deal: var(--color-bg);
-  --color-logo-strip: #f5f7f5;
+  --color-deal: var(--color-flap);
+  --color-on-deal: var(--color-remark);
+  --color-logo-strip: #ffffff;
+  --color-stop: var(--color-text);
 
-  --color-rule: #3a4743;
-  --color-border: #26302d;
-  --color-border-hover: #3a4743;
-  --color-border-control: #6c7a75;
-  --color-focus: #46d39a;
+  --color-rule: #b5ae9f;
+  --color-border: #d6d0c3;
+  --color-border-hover: #b5ae9f;
+  --color-border-control: #7c766b;
+  --color-focus: #1b1c1d;
 
-  --color-success: #8ed8b6;
-  --color-success-tint: #132520;
-  --color-warning: #e9b96b;
-  --color-warning-tint: #2a2215;
-  --color-danger: #ff8b7d;
-  --color-danger-tint: #2e1a18;
-  --color-on-danger: #140807;
-  --color-info: #a0c1d7;
-  --color-info-tint: #16212a;
+  --color-success: #2c6a3a;
+  --color-success-tint: #dce9da;
+  --color-warning: #9a4a0a;
+  --color-warning-tint: #f6e2cf;
+  --color-danger: #b02a1f;
+  --color-danger-tint: #f6dcd6;
+  --color-on-danger: #ffffff;
+  --color-info: #2c5a78;
+  --color-info-tint: #dce6ec;
 
-  --platform-steam: #9cc3e6;
-  --platform-epic: #d3dad7;
-  --platform-ea: #ff8f6b;
-  --platform-ubisoft: #62b2f5;
-  --platform-gog: #c99bf2;
-  --platform-battlenet: #56cfe8;
-  --platform-xbox: #8fd16b;
-  --platform-playstation: #8ea7ff;
-  --platform-nintendo: #ff7a86;
-  --platform-rockstar: #f0c95a;
-  --platform-other: #a2aea9;
-  --platform: var(--platform-other);
-
-  --type-game: #e4ebe7;
-  --type-dlc: #b3beff;
-  --type-giftcard: #f3a9c6;
-  --type-subscription: #86d7e0;
-  --type-software: #c9c2a8;
-  --type: var(--type-game);
-
-  --steel-grain: repeating-linear-gradient(90deg, rgb(255 255 255 / 0.018) 0 1px, transparent 1px 3px);
-  --edge-machined: inset 0 1px 0 rgb(255 255 255 / 0.06), inset 0 -1px 0 rgb(0 0 0 / 0.45);
-  --edge-machined-pressed: inset 0 1px 0 rgb(0 0 0 / 0.45), inset 0 -1px 0 rgb(255 255 255 / 0.04);
-  --engrave: 0 1px 0 rgb(0 0 0 / 0.55);
-  --bolt: 6px;
-
-  --color-scrim: rgb(4 7 6 / 0.74);
+  --color-scrim: rgb(27 28 29 / 0.5);
 
   --shadow-sm: none;
   --shadow-md: none;
-  --shadow-card: var(--edge-machined);
-  --shadow-card-hover: var(--edge-machined), 0 14px 22px -14px rgb(0 0 0 / 0.9);
-  --shadow-lg: 0 0 0 1px #26302d, 0 18px 32px -18px rgb(0 0 0 / 0.8);
-  --shadow-xl: 0 0 0 1px #26302d, 0 30px 60px -26px rgb(0 0 0 / 0.88);
-  --shadow-accent: 0 0 0 2px #46d39a;
-  --shadow-panel: -1px 0 0 #26302d, -28px 0 56px -28px rgb(0 0 0 / 0.85);
-  --shadow-panel-left: 1px 0 0 #26302d, 28px 0 56px -28px rgb(0 0 0 / 0.85);
+  --shadow-card: none;
+  --shadow-card-hover: 0 0 0 1px var(--color-border-hover);
+  --shadow-flap: inset 0 -1px 0 rgb(0 0 0 / 0.35);
+  --shadow-overlay: 0 0 0 1px var(--color-border), 0 18px 40px -18px rgb(27 28 29 / 0.32);
+  --shadow-lg: var(--shadow-overlay);
+  --shadow-xl: 0 0 0 1px var(--color-border), 0 28px 60px -24px rgb(27 28 29 / 0.38);
+  --shadow-accent: 0 0 0 2px var(--color-focus);
+  --shadow-panel: -1px 0 0 var(--color-border), -24px 0 48px -24px rgb(27 28 29 / 0.3);
+  --shadow-panel-left: 1px 0 0 var(--color-border), 24px 0 48px -24px rgb(27 28 29 / 0.3);
 
-  --radius-control: 0px;
-  --radius-tray: 0px;
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-pill: 0px;
+  --radius-flap: 2px;
+  --radius-sign: 4px;
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-board: 10px;
+  --radius-tray: var(--radius-card);
+  --radius-sm: var(--radius-sign);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-card);
+  --radius-xl: var(--radius-board);
+  --radius-2xl: var(--radius-board);
+  --radius-pill: var(--radius-control);
 
   --max-width: 1360px;
-  --header-tier-1: 64px;
-  --header-tier-2: 40px;
-  --header-height: 104px;
-  --header-height-compact: 56px;
+  --strip-height: 32px;
+  --bar-height: 64px;
+  --header-height: 96px;
+  --header-height-compact: 64px;
   --header-height-mobile: 56px;
   --gutter: 16px;
 
   --z-base: 0;
-  --z-box-item: 1;
+  --z-card-item: 1;
   --z-sticky: 40;
   --z-dropdown: 50;
   --z-drawer: 60;
@@ -387,26 +353,27 @@ The `@theme inline` additions (next to the existing aliases):
   --z-toast: 80;
   --z-cookie: 90;
 
-  --font-sans: var(--font-mona), "Mona Sans Variable", "Mona Fallback", "Segoe UI", sans-serif;
-  --font-display: var(--font-hubot), "Hubot Sans Variable", "Hubot Fallback", Verdana, sans-serif;
-  --font-mono: var(--font-redhat-mono), "Red Hat Mono Variable", "Red Hat Mono Fallback", ui-monospace, Menlo, Consolas, monospace;
+  --font-sans: var(--font-overpass), "Overpass Variable", "Overpass Fallback", Arial, sans-serif;
+  --font-display: var(--font-overpass), "Overpass Variable", "Overpass Display Fallback", Arial, sans-serif;
+  --font-mono: var(--font-sometype), "Sometype Mono Variable", "Sometype Fallback", ui-monospace, Menlo, Consolas, monospace;
 
-  --ease-latch: cubic-bezier(0.3, 0, 0.1, 1);
+  --ease-flap: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-sign: cubic-bezier(0.2, 0, 0, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-std: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
   --dur-micro: 120ms;
   --dur-ui: 180ms;
-  --dur-panel: 260ms;
-  --dur-panel-close: 200ms;
-  --dur-reveal: 640ms;
-  --dur-tumbler: 520ms;
-  --dur-reduced: 120ms;
+  --dur-panel: 240ms;
+  --dur-panel-close: 180ms;
+  --dur-flap: 70ms;
+  --dur-reveal: 560ms;
+  --dur-reduced: 100ms;
 
-  --selection-bg: #46d39a;
-  --selection-fg: #04120b;
+  --selection-bg: #e2ae2f;
+  --selection-fg: #1b1c1d;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 @media (min-width: 640px) {
@@ -421,86 +388,56 @@ The `@theme inline` additions (next to the existing aliases):
   }
 }
 
-[data-theme="light"] {
-  --color-primary: #0f1513;
-  --color-secondary: #f5f7f5;
+[data-theme="dark"] {
+  --color-primary: #eee9de;
+  --color-secondary: #1b1d1f;
 
-  --color-bg: #e3e7e4;
-  --color-bg-secondary: #d9dedb;
-  --color-bg-tertiary: #cdd3d0;
-  --color-raised: #f5f7f5;
-  --color-plate: #ecefed;
-  --color-stage: #d2d8d5;
-  --color-on-stage: #0f1513;
-  --color-surface-dark: #0f1513;
-  --color-rig: #f5f7f5;
-  --color-floor: #d5dad7;
+  --color-bg: #121314;
+  --color-bg-secondary: #17181a;
+  --color-bg-tertiary: #0c0d0e;
+  --color-raised: #1b1d1f;
+  --color-stage: #0e0f10;
+  --color-on-stage: #eee9de;
 
-  --color-text: #0f1513;
-  --color-text-secondary: #3e4945;
-  --color-text-tertiary: #505b57;
+  --color-text: #eee9de;
+  --color-text-secondary: #b4aea3;
+  --color-text-tertiary: #979187;
 
-  --color-accent: #0f7a50;
-  --color-accent-hover: #0a6642;
-  --color-accent-light: #d2e6dc;
-  --color-on-accent: #ffffff;
-  --color-accent-ink: #0a6642;
-  --color-accent-edge: #0a6642;
-  --color-steel-hi: #ffffff;
-  --color-lamp-off: #b7c0bc;
+  --color-accent: #e6b84a;
+  --color-accent-hover: #f0c866;
+  --color-accent-light: #2c2616;
+  --color-on-accent: #17150f;
+  --color-accent-ink: #e6b84a;
+  --color-accent-edge: #e6b84a;
+  --color-link-line: #e6b84a;
 
-  --color-rule: #a3ada9;
-  --color-border: #c3cac7;
-  --color-border-hover: #a3ada9;
-  --color-border-control: #6b7773;
-  --color-focus: #0a6642;
+  --color-rule: #3a3d40;
+  --color-border: #2a2c2f;
+  --color-border-hover: #3a3d40;
+  --color-border-control: #77736b;
+  --color-focus: #e6b84a;
 
-  --color-success: #156a49;
-  --color-success-tint: #d3e6dc;
-  --color-warning: #80500c;
-  --color-warning-tint: #f0e2cc;
-  --color-danger: #a62a20;
-  --color-danger-tint: #f3dcd8;
-  --color-on-danger: #ffffff;
-  --color-info: #2e5672;
-  --color-info-tint: #d6e0e8;
+  --color-success: #8ccb97;
+  --color-success-tint: #16241a;
+  --color-warning: #f2a766;
+  --color-warning-tint: #2b1e12;
+  --color-danger: #ff8c7e;
+  --color-danger-tint: #2e1916;
+  --color-on-danger: #170807;
+  --color-info: #9cc3dd;
+  --color-info-tint: #142029;
 
-  --platform-steam: #24557f;
-  --platform-epic: #2e3533;
-  --platform-ea: #a3361a;
-  --platform-ubisoft: #14589c;
-  --platform-gog: #6e2f9e;
-  --platform-battlenet: #0b6478;
-  --platform-xbox: #2d6b12;
-  --platform-playstation: #2d48b8;
-  --platform-nintendo: #b0202f;
-  --platform-rockstar: #705500;
-  --platform-other: #3e4945;
+  --color-scrim: rgb(5 5 6 / 0.72);
 
-  --type-game: #0f1513;
-  --type-dlc: #3a47a8;
-  --type-giftcard: #962e5b;
-  --type-subscription: #0e6670;
-  --type-software: #5b5236;
+  --shadow-overlay: 0 0 0 1px var(--color-border-hover), 0 22px 48px -20px rgb(0 0 0 / 0.8);
+  --shadow-xl: 0 0 0 1px var(--color-border-hover), 0 32px 64px -24px rgb(0 0 0 / 0.85);
+  --shadow-panel: -1px 0 0 var(--color-border-hover), -24px 0 48px -24px rgb(0 0 0 / 0.8);
+  --shadow-panel-left: 1px 0 0 var(--color-border-hover), 24px 0 48px -24px rgb(0 0 0 / 0.8);
 
-  --steel-grain: repeating-linear-gradient(90deg, rgb(15 21 19 / 0.025) 0 1px, transparent 1px 3px);
-  --edge-machined: inset 0 1px 0 rgb(255 255 255 / 0.9), inset 0 -1px 0 rgb(15 21 19 / 0.12);
-  --edge-machined-pressed: inset 0 1px 0 rgb(15 21 19 / 0.14), inset 0 -1px 0 rgb(255 255 255 / 0.7);
-  --engrave: 0 1px 0 rgb(255 255 255 / 0.8);
+  --selection-bg: #e6b84a;
+  --selection-fg: #17150f;
 
-  --color-scrim: rgb(15 21 19 / 0.48);
-
-  --shadow-card-hover: var(--edge-machined), 0 16px 24px -16px rgb(15 21 19 / 0.35);
-  --shadow-lg: 0 0 0 1px #c3cac7, 0 18px 32px -20px rgb(15 21 19 / 0.3);
-  --shadow-xl: 0 0 0 1px #c3cac7, 0 30px 60px -28px rgb(15 21 19 / 0.38);
-  --shadow-accent: 0 0 0 2px #0a6642;
-  --shadow-panel: -1px 0 0 #c3cac7, -28px 0 56px -28px rgb(15 21 19 / 0.32);
-  --shadow-panel-left: 1px 0 0 #c3cac7, 28px 0 56px -28px rgb(15 21 19 / 0.32);
-
-  --selection-bg: #0f7a50;
-  --selection-fg: #ffffff;
-
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 ::selection {
@@ -509,385 +446,296 @@ The `@theme inline` additions (next to the existing aliases):
 }
 ```
 
-### 3.2 Measured contrast: text, controls and semantics
-These are WCAG 2.x relative-luminance ratios (sRGB linearisation, `(L1 + 0.05) / (L2 + 0.05)`), computed by script for these exact hex pairs. Any change to a token must be re-measured the same way. Text needs 4.5:1. Non-text (control borders, focus rings, lamps, pips) needs 3:1.
+The board family (`--color-board` … `--color-focus-on-board`, `--color-remark`, `--color-terminus`) is deliberately **not** overridden in Night: the board is the same object in both themes.
 
-| Pair | Strongroom (dark) | Counter Hall (light) |
+### 3.2 Measured contrast
+WCAG 2.x relative-luminance ratios (sRGB linearisation, `(L1 + 0.05) / (L2 + 0.05)`), computed by script for these exact hex pairs. Text needs 4.5:1; non-text UI (control borders, focus rings, fills that identify a control) needs 3:1. Re-measure the same way after any token change.
+
+| Kind | Pair | Day (light) | Night (dark) |
+|---|---|---|---|
+| Text | `ink` on `bg` | 15.13 | 15.36 |
+| Text | `ink` on `band` | 13.59 | 14.67 |
+| Text | `ink` on `raised` | 16.48 | 13.96 |
+| Text | `ink` on `inset` | 12.26 | 16.07 |
+| Text | `ink` on `stage` | 11.79 | 15.85 |
+| Text | `ink` on `accent-light` (selected rows) | 13.76 | 12.43 |
+| Text | `muted` on `bg` | 8.08 | 8.44 |
+| Text | `muted` on `band` | 7.25 | 8.06 |
+| Text | `muted` on `raised` | 8.80 | 7.67 |
+| Text | `muted` on `inset` | 6.54 | 8.82 |
+| Text | `muted` on `stage` | 6.29 | 8.70 |
+| Text | `muted` on `accent-light` | 7.35 | 6.82 |
+| Text | `faint` on `bg` | 6.18 | 5.95 |
+| Text | `faint` on `band` | 5.55 | 5.68 |
+| Text | `faint` on `raised` | 6.73 | 5.41 |
+| Text | `faint` on `inset` | 5.00 | 6.22 |
+| Text | `faint` on `stage` | 4.81 | 6.14 |
+| Text | `on-accent` on `accent` (primary button) | 8.39 | 9.84 |
+| Text | `on-accent` on `accent-hover` | 6.97 | 11.44 |
+| Text | `accent-ink` on `bg` (active labels) | 5.78 | 10.03 |
+| Text | `accent-ink` on `band` | 5.19 | 9.58 |
+| Text | `accent-ink` on `raised` | 6.29 | 9.11 |
+| Text | `accent-ink` on `accent-light` | 5.25 | 8.11 |
+| Text | `success` on `bg` | 5.76 | 9.84 |
+| Text | `success` on `success-tint` | 5.17 | 8.53 |
+| Text | `warning` on `bg` | 5.54 | 9.30 |
+| Text | `warning` on `warning-tint` | 4.97 | 8.09 |
+| Text | `danger` on `bg` | 5.82 | 8.24 |
+| Text | `danger` on `raised` | 6.34 | 7.49 |
+| Text | `danger` on `danger-tint` | 5.04 | 7.34 |
+| Text | `on-danger` on `danger` | 6.57 | 8.66 |
+| Text | `info` on `bg` | 6.55 | 9.98 |
+| Text | `info` on `info-tint` | 5.83 | 8.88 |
+| Text | link (`ink` text, underline `link-line`) on `bg` | 15.13 | 15.36 |
+| UI | `accent` fill on `bg` | 1.80 | 10.03 |
+| UI | `accent-edge` (button edge, link underline) on `bg` | 3.71 | 10.03 |
+| UI | `accent-edge` on `raised` | 4.05 | 9.11 |
+| UI | `control` border on `bg` | 3.99 | 3.94 |
+| UI | `control` on `band` | 3.59 | 3.76 |
+| UI | `control` on `raised` | 4.35 | 3.58 |
+| UI | `control` on `inset` | 3.24 | 4.12 |
+| UI | `focus` ring on `bg` | 15.13 | 10.03 |
+| UI | `focus` on `band` | 13.59 | 9.58 |
+| UI | `focus` on `raised` | 16.48 | 9.11 |
+| UI | `focus` on `stage` | 11.79 | 10.34 |
+
+| Kind | Pair on the board (identical in both themes) | Ratio |
 |---|---|---|
-| ink / bg | 15.25 | 14.79 |
-| ink / band | 14.58 | 13.56 |
-| ink / raised | 13.56 | 17.16 |
-| ink / plate | 12.63 | 15.95 |
-| ink / plate under steel grain (worst case) | 11.83 | 15.21 |
-| ink / stage | 15.83 | 12.77 |
-| ink / header (rig) | 15.72 | 17.16 |
-| ink / footer (floor) | 16.32 | 13.05 |
-| ink / accent-light (hover and selected fill) | 12.66 | 14.15 |
-| muted / bg | 8.06 | 7.49 |
-| muted / band | 7.71 | 6.87 |
-| muted / raised | 7.17 | 8.69 |
-| muted / plate | 6.68 | 8.08 |
-| muted / stage | 8.37 | 6.47 |
-| muted / floor | 8.62 | 6.61 |
-| muted / accent-light | 6.69 | 7.17 |
-| faint / bg | 5.86 | 5.65 |
-| faint / band | 5.61 | 5.18 |
-| faint / raised | 5.21 | 6.56 |
-| faint / plate | 4.86 | 6.10 |
-| faint / stage | 6.08 | 4.88 |
-| faint / floor | 6.27 | 4.99 |
-| faint / inset | 6.20 | 4.65 |
-| on-accent / accent (primary button) | 10.07 | 5.36 |
-| on-accent / accent-hover | 11.87 | 7.02 |
-| accent-ink (green text) / bg | 9.71 | 5.62 |
-| accent-ink / band | 9.29 | 5.15 |
-| accent-ink / raised | 8.64 | 6.52 |
-| accent-ink / plate | 8.05 | 6.06 |
-| accent-ink / accent-light | 8.07 | 5.38 |
-| deal plate: bg text on ink fill | 15.25 | 14.79 |
-| accent fill / bg (non-text) | 9.71 | 4.29 |
-| accent fill / plate (non-text) | 8.05 | 4.63 |
-| accent-edge / bg (non-text) | 9.71 | 5.62 |
-| lamp on / plate (non-text) | 8.05 | 4.63 |
-| control border / bg (non-text) | 4.11 | 3.73 |
-| control border / band | 3.94 | 3.42 |
-| control border / raised | 3.66 | 4.32 |
-| control border / plate | 3.41 | 4.02 |
-| focus ring / bg | 9.71 | 5.62 |
-| focus ring / raised | 8.64 | 6.52 |
-| focus ring / plate | 8.05 | 6.06 |
-| focus ring / stage | 10.08 | 4.85 |
-| focus ring / band | 9.29 | 5.15 |
-| success / bg | 11.12 | 5.27 |
-| success / tint | 9.63 | 5.05 |
-| success / plate | 9.22 | 5.69 |
-| warning / bg | 10.22 | 5.48 |
-| warning / tint | 8.68 | 5.36 |
-| danger / bg | 8.13 | 5.66 |
-| danger / raised | 7.23 | 6.56 |
-| danger / tint | 7.24 | 5.39 |
-| info / bg | 9.77 | 6.25 |
-| info / tint | 8.64 | 5.83 |
-| on-danger / danger | 8.66 | 7.06 |
+| Text | `on-board` on `board` | 13.33 |
+| Text | `on-board` on `flap` (flap characters) | 11.69 |
+| Text | `on-board-muted` on `board` | 6.81 |
+| Text | `on-board-muted` on `flap` | 5.97 |
+| Text | `on-board-faint` on `board` (captions only, never on flaps) | 5.35 |
+| Text | `remark` on `board` | 8.65 |
+| Text | `remark` on `flap` (deal tile, remark flaps) | 7.58 |
+| Text | `board-success` on `board` | 8.24 |
+| Text | `board-warning` on `board` | 7.78 |
+| Text | `board-danger` on `board` | 6.90 |
+| Text | `board-info` on `board` | 8.35 |
+| Text | Night `on-accent` on Night `accent` (mustard button placed on the board, both themes) | 9.84 |
+| UI | `focus-on-board` / mustard button fill on `board` | 8.40 |
+| UI | `remark` on `flap` | 7.58 |
 
-Extra checks:
-- **Unlit lamp.** The unlit lamp body (`--color-lamp-off`) is only 1.21 (dark) / 1.61 (light) against the plate. It is therefore always drawn with a 1px `--color-border-control` ring (3.41 / 4.02), and the state it shows is always also written in words ("In stock", "Key ready", "Step 2 of 3").
-- **Decrypt animation.** Transient characters are `--color-text-secondary` (≥6.68 on the plate in both themes). The character that has just settled flashes `--color-accent-ink` (8.05 / 6.06) for 120ms, then turns ink. Every frame passes AA.
+Consequences you must honour:
+- **Mustard fill in Day is 1.80:1 against the floor**, so every mustard-filled control in Day carries a 1px `--color-accent-edge` border (3.71:1). Its label (8.39:1) also identifies it.
+- **Focus ring around a mustard button in Night** would be mustard on mustard; the ring always sits at a 2px offset, so it is measured against the floor (10.03:1).
+- **On board surfaces** (hero, gate strips, key board, info strip, theater housing) the focus ring is `--color-focus-on-board` in both themes, and a mustard button on the board uses the Night accent pair: set `--color-accent: #e6b84a` and `--color-on-accent: #17150f` on `[data-surface="board"]` so buttons there look right in Day too. In Day the board is 13.81:1 against the floor; in Night only 1.19:1, which is why board objects carry the 1px `--color-board-edge` (decorative; the board is not a control).
+- `--color-on-board-faint` fails on flap faces (4.02:1) and is therefore never set on a flap.
 
-### 3.3 Measured contrast: platform pips and type tags
-Pips are non-text (3:1 needed). Every value nevertheless clears 4.5:1 on every surface where a tag can sit, so the same colour may be used for the platform name in the filter list if the lead wants it. Type colours are used as tag text, so 4.5:1 is required.
-
-| Token | Label | Dark hex | on bg | on band | on raised | on plate | on stage | Light hex | on bg | on band | on raised | on plate | on stage |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `--platform-steam` | Steam | `#9CC3E6` | 9.99 | 9.56 | 8.89 | 8.28 | 10.37 | `#24557F` | 6.27 | 5.75 | 7.28 | 6.76 | 5.42 |
-| `--platform-epic` | Epic Games | `#D3DAD7` | 13.00 | 12.43 | 11.56 | 10.77 | 13.49 | `#2E3533` | 10.05 | 9.22 | 11.66 | 10.84 | 8.68 |
-| `--platform-ea` | EA app | `#FF8F6B` | 8.26 | 7.90 | 7.35 | 6.85 | 8.58 | `#A3361A` | 5.42 | 4.97 | 6.29 | 5.85 | 4.69 |
-| `--platform-ubisoft` | Ubisoft Connect | `#62B2F5` | 8.10 | 7.75 | 7.20 | 6.71 | 8.41 | `#14589C` | 5.79 | 5.31 | 6.71 | 6.24 | 5.00 |
-| `--platform-gog` | GOG | `#C99BF2` | 8.32 | 7.95 | 7.39 | 6.89 | 8.63 | `#6E2F9E` | 6.56 | 6.02 | 7.61 | 7.08 | 5.67 |
-| `--platform-battlenet` | Battle.net | `#56CFE8` | 10.10 | 9.66 | 8.98 | 8.37 | 10.49 | `#0B6478` | 5.41 | 4.96 | 6.28 | 5.83 | 4.67 |
-| `--platform-xbox` | Xbox | `#8FD16B` | 10.11 | 9.68 | 8.99 | 8.38 | 10.50 | `#2D6B12` | 5.22 | 4.78 | 6.05 | 5.63 | 4.51 |
-| `--platform-playstation` | PlayStation | `#8EA7FF` | 8.02 | 7.67 | 7.13 | 6.65 | 8.33 | `#2D48B8` | 6.16 | 5.65 | 7.14 | 6.64 | 5.32 |
-| `--platform-nintendo` | Nintendo | `#FF7A86` | 7.37 | 7.05 | 6.55 | 6.11 | 7.65 | `#B0202F` | 5.44 | 4.98 | 6.30 | 5.86 | 4.69 |
-| `--platform-rockstar` | Rockstar | `#F0C95A` | 11.62 | 11.11 | 10.33 | 9.63 | 12.06 | `#705500` | 5.63 | 5.16 | 6.53 | 6.07 | 4.86 |
-| `--platform-other` | Other / unknown | `#A2AEA9` | 8.06 | 7.71 | 7.17 | 6.68 | 8.37 | `#3E4945` | 7.49 | 6.87 | 8.69 | 8.08 | 6.47 |
-| `--type-game` | Base game | `#E4EBE7` | 15.25 | 14.58 | 13.56 | 12.63 | 15.83 | `#0F1513` | 14.79 | 13.56 | 17.16 | 15.95 | 12.77 |
-| `--type-dlc` | DLC | `#B3BEFF` | 10.31 | 9.87 | 9.17 | 8.55 | 10.71 | `#3A47A8` | 6.35 | 5.83 | 7.37 | 6.85 | 5.49 |
-| `--type-giftcard` | Gift card | `#F3A9C6` | 9.94 | 9.51 | 8.84 | 8.24 | 10.32 | `#962E5B` | 5.92 | 5.43 | 6.87 | 6.39 | 5.12 |
-| `--type-subscription` | Subscription | `#86D7E0` | 11.27 | 10.78 | 10.02 | 9.34 | 11.70 | `#0E6670` | 5.33 | 4.89 | 6.19 | 5.75 | 4.61 |
-| `--type-software` | Software | `#C9C2A8` | 10.35 | 9.90 | 9.20 | 8.57 | 10.74 | `#5B5236` | 6.22 | 5.70 | 7.21 | 6.70 | 5.37 |
-
-**Why these are not the brands' own colours.** Brand hexes fail on one theme or the other: Xbox `#107C10` measures 3.2 on the Strongroom bg, Steam's `#1B2838` and Epic's black are invisible on it, and Steam's light `#C7D5E0` disappears on Counter Hall. Each token keeps the brand's hue family, lifted for dark and deepened for light.
-
-Where the brand hues collide (Steam, Ubisoft, Battle.net and PlayStation are all blues), the set spreads them apart:
-- Steam takes a desaturated steel blue;
-- Battle.net takes cyan;
-- Ubisoft takes azure;
-- PlayStation takes periwinkle.
-
-The platform's **name is always printed next to the pip**, so colour is never the only cue.
-
-**Xbox green and signal green** have the same lightness (ratio 1.04 between them). They are kept apart by shape and role:
-- a platform pip is a **6px square** and appears only beside a platform name;
-- a lamp is an **8px circle** and appears only as a state indicator;
-- green fills appear only on actions.
-
-### 3.4 Colour rules
-- **Signal green appears only on:**
-  - primary buttons;
-  - focus rings;
-  - lit lamps;
-  - the dial index line and the active detent;
-  - the 2px active bar on tabs, nav and filters;
-  - the just-settled decrypt character;
-  - selection.
-
-  Count the green elements in any viewport: if more than four non-button greens show, remove some.
-- **Platform colour appears only as:**
-  - the 6px square pip in a platform plate;
-  - the pip on a locker door;
-  - the pip on a filter row.
-
-  It never appears as a border round a card, a background wash, a tinted cover or a text colour for anything but the platform's own name.
-- **Type colour appears only as** the text of a type tag ("DLC", "Gift card", "Subscription", "Software"). Base games carry no type tag on cards; the PDP prints "Base game" in ink.
-- **Semantic colours** (success, warning, danger, info) appear only in status contexts, always with an icon and a word: form errors, alerts, the order timeline, key status, toasts. They never sit on product cards, so Nintendo red and danger red never meet.
-- **Deals:** the inverted plate (`--color-deal` fill, `--color-on-deal` text) with the percentage in mono. The struck "was" price is `--color-text-tertiary` with `line-through`. Never red, never green.
-- **Hairlines:** `--color-border` hairlines are decorative and never the only boundary of a control. Controls use `--color-border-control`.
-- **Green on light:** in Counter Hall, green is a fill. Green text uses `--color-accent-ink`, and primary buttons get a 1px `--color-accent-edge` border.
-- **Steel grain:** `--steel-grain` is used only on the hero door poster, the key plate and the footer credentials plate. Text on it measured ≥11.8:1. It is the only gradient in the system.
+### 3.3 Colour rules
+- **Mustard appears only as:** the primary button fill; checked controls; the current stop on a route line; the 3px active bar under nav, tabs and filter headers; the terminus bar; board remarks and the deal tile text; selection; the Night focus ring. Count non-button mustard elements in any viewport: more than four outside the board means remove some.
+- **Graphite board surfaces appear only as listed in §1.2.** A section background may be graphite only for the hero hall.
+- **Semantic colours** never appear on product cards, so danger and the deal tile never meet. On the board use `--color-board-*`.
+- **Deals:** deal tile (§8.12) + struck "was" in `--color-text-tertiary`. Never red, never green, never mustard text on the floor.
+- **Hairlines** are decorative and never the only boundary of a control; controls use `--color-border-control`.
+- **Links in prose:** ink text, 2px underline in `--color-link-line` at 3px offset; hover: text `--color-accent-ink`, underline 3px. Links are identified by the underline, never by colour alone.
+- **No gradients at all.** Flap halves are two flat colours; there is no gradient token in this system.
 
 ---
 
 ## 4. Typography
 
 ### 4.1 Packages and loading
-Verified with `npm view` (all 5.3.0) and inspected with fontTools in the latin subsets:
+Verified with `npm view` on 2026-10-07 (all 5.3.0) and inspected with fontTools/harfbuzz in the latin subsets:
 
-- **`@fontsource-variable/hubot-sans`: display and engraved labels.** Axes: `wdth` 75–125, `wght` 200–900.
-  - At `wdth` 112.5–125 it is a wide, squared-round grotesk: the lettering cut into vault doors, safe-deposit plates and dial rings. Its O is a rounded rectangle, like a machined slot.
-  - It is used only expanded (≥112.5) and heavy (≥600), for headlines, buttons, nav, the wordmark and engraved micro-labels.
-- **`@fontsource-variable/mona-sans`: body and UI.** Axes: `wdth` 75–125, `wght` 200–900; only `wdth` 100 is used.
-  - A calm industrial grotesk with good 16px legibility.
-  - Hubot and Mona were drawn as a pair: same 1000 upm, ascender 1090, descender 320, cap height 729, x-height 515/517. An engraved label and a body line therefore sit on one baseline grid, and swapping faces inside a row costs no vertical shift.
-  - Treat Hubot + Mona as **one grotesk superfamily**. Contrast between them comes from width and geometry: expanded and squared for Hubot, normal and humanist for Mona.
-- **`@fontsource-variable/red-hat-mono`: the data voice.** Axis: `wght` 300–700.
-  - Its default **zero is slashed** and 1/I/l are fully distinct (rendered and checked). That matters more here than anywhere: a customer must never misread `0O` or `1Il` in a key.
-  - It is used for prices, keys, counts, order numbers, dates, durations and tumbler windows. It never sets sentences.
+- **`@fontsource-variable/overpass`: signage, headings and body.** Axis `wght` 100–900 (+ italic file). 2000 upm, cap height 0.70, x-height 0.511, `USE_TYPO_METRICS` on (ascender 0.883, descender 0.383, no line gap). Has `tnum`, `pnum`, `kern`.
+  - Why: Overpass is the open-source descendant of **Highway Gothic / Interstate**, the US road-signage alphabet. Its squared rounds, flat terminals and open apertures read as wayfinding at sign sizes (800–900, tight tracking) and stay calm at 16px body (400).
+  - **One family for signage and text is the point.** Transport systems standardise on one typeface family for every sign, timetable and notice; the hall's hierarchy comes from weight (400 → 900), case (sign labels uppercase, headings sentence case), tracking and placement, not from a second sans. (The master's "pair by contrast" is met by the mono below.)
+- **`@fontsource-variable/sometype-mono`: the flap voice.** Axis `wght` 400–700. 1000 upm, advance 0.58em, cap 0.65, x-height 0.47.
+  - Why: a sturdy, slightly typewriter-humanist mono that holds up as white characters on graphite flaps; its **zero is slashed** and `1 I l` are fully distinct (rendered and checked), which matters for keys. It is less associated with code editors than Inconsolata, JetBrains or Fira, which keeps the board from reading as a terminal (the name "Keyterminus" invites that misreading).
+  - Used for: flap characters, prices, counts, order numbers, keys, dates, durations. Never for sentences.
+- Rejected after rendering: B612 Mono (Airbus cockpit face, but its 0 and O are nearly identical at 700); Overpass Mono (dotted zero, and Red Hat lineage sits too close to Keyrook's Red Hat Mono); DM Mono (no weight above 500); Fragment Mono (single weight); Inconsolata (code-editor association); Big Shoulders Display and Barlow Semi Condensed (condensed poster grotesks read like Anton and Sofia Sans Condensed, owned by siblings); Signika (too soft for the board); Public Sans, Instrument Sans, Schibsted, Hanken (neutral, no signage lineage). Excluded by the owner: Commissioner, Gloock, Martian Mono, Sofia Sans Condensed, Source Sans 3, Hubot Sans, Mona Sans, Red Hat Mono, Atkinson Hyperlegible Mono, Fraunces, Alegreya Sans, Inter, Roboto. Also avoided: Manrope, Space Grotesk, Anton, Archivo, JetBrains Mono, Silkscreen, Karla, Bricolage.
 
-Not used, and why:
-- Martian Mono, Sofia, Source Sans: Patinaskins owns them.
-- JetBrains Mono, Space Grotesk, Inter, Manrope, Archivo, Anton, Silkscreen: siblings own them.
-- Science Gothic (Bank Gothic revival): sci-fi connotation.
-- Azeret, Chivo, Spline, IBM Plex Mono: their zero is not slashed.
-
-**Install:** `@fontsource-variable/hubot-sans`, `@fontsource-variable/mona-sans`, `@fontsource-variable/red-hat-mono`, plus the static `@fontsource/mona-sans` (400, 600) and `@fontsource/red-hat-mono` (500) for the PDF invoice (verify they exist with `npm view`; if not, convert the variable files with fontTools' instancer in a build script).
-
-**Uninstall:** `@fontsource-variable/sofia-sans-condensed`, `@fontsource-variable/source-sans-3`, `@fontsource-variable/martian-mono` and their static packages. Delete `public/fonts/*` from Patinaskins.
+**Install:** `@fontsource-variable/overpass`, `@fontsource-variable/sometype-mono`, plus the static `@fontsource/overpass` (400, 700, 800) and `@fontsource/sometype-mono` (500, 600) for the PDF invoice (both verified 5.3.0).
+**Uninstall:** `@fontsource-variable/hubot-sans`, `@fontsource-variable/mona-sans`, `@fontsource-variable/red-hat-mono`, `@fontsource/mona-sans`, `@fontsource/red-hat-mono`. Delete Keyrook's files in `public/fonts/`.
 
 `src/app/layout.tsx` imports:
-
 ```ts
-import "@fontsource-variable/hubot-sans/wdth.css";
-import "@fontsource-variable/mona-sans/wght.css";
-import "@fontsource-variable/red-hat-mono/wght.css";
+import "@fontsource-variable/overpass/wght.css";
+import "@fontsource-variable/sometype-mono/wght.css";
 import "./fonts.css";
 ```
-
-- `hubot-sans/wdth.css` is needed because the display face runs at `font-stretch: 112.5%–125%`. Its latin file is 93 KB.
-- `mona-sans/wght.css` is used because body text runs only at width 100. Its latin file is 40 KB instead of 98 KB.
-- Red Hat Mono's latin file is 22 KB.
-- Preload the Hubot latin `wdth` woff2 only. It sets the hero H1, which is the LCP element. Copy that one file to `public/fonts/hubot-sans-latin-wdth-normal.woff2` and preload it, as Patinaskins did with its display face.
+- Latin files: Overpass `wght` normal 39 KB, Sometype Mono 17 KB. Do not import the Overpass italic file; nothing is set in italic.
+- Preload only `overpass-latin-wght-normal.woff2` (copy to `public/fonts/overpass-latin-wght-normal.woff2`): it sets the hero H1, the LCP element.
 
 `src/app/fonts.css`:
-
 ```css
 :root {
-  --font-hubot: "Hubot Sans Variable";
-  --font-mona: "Mona Sans Variable";
-  --font-redhat-mono: "Red Hat Mono Variable";
+  --font-overpass: "Overpass Variable";
+  --font-sometype: "Sometype Mono Variable";
 }
 
 @font-face {
-  font-family: "Hubot Fallback";
-  src: local("Verdana Bold"), local("DejaVu Sans Bold"), local("Verdana"), local("DejaVu Sans");
-  size-adjust: 106%;
-  ascent-override: 103%;
-  descent-override: 30%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: "Mona Fallback";
+  font-family: "Overpass Fallback";
   src: local("Arial"), local("Liberation Sans"), local("Helvetica");
-  size-adjust: 102.6%;
-  ascent-override: 106%;
-  descent-override: 31%;
+  size-adjust: 99.2%;
+  ascent-override: 89%;
+  descent-override: 38.6%;
   line-gap-override: 0%;
 }
 
 @font-face {
-  font-family: "Red Hat Mono Fallback";
-  src: local("Menlo"), local("DejaVu Sans Mono"), local("Consolas");
-  size-adjust: 100%;
-  ascent-override: 102%;
-  descent-override: 30.5%;
+  font-family: "Overpass Display Fallback";
+  src: local("Arial Bold"), local("Liberation Sans Bold"), local("Arial"), local("Liberation Sans");
+  size-adjust: 99.1%;
+  ascent-override: 89.1%;
+  descent-override: 38.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Sometype Fallback";
+  src: local("Menlo"), local("Liberation Mono"), local("DejaVu Sans Mono"), local("Consolas");
+  size-adjust: 96.7%;
+  ascent-override: 95.7%;
+  descent-override: 28.4%;
   line-gap-override: 0%;
 }
 ```
-
-The override values are starting points derived from measured metrics:
-
-| Face | Avg advance (em) | Compared with |
-|---|---|---|
-| Mona at wdth 100 / wght 400 | 0.497 | Liberation Sans 0.484 |
-| Hubot at 112.5 / 700 | 0.575 | DejaVu Sans 0.542 |
-| Red Hat Mono | 0.600 | DejaVu Sans Mono 0.602 |
-
-Ascender and descender are 1090/320 for Hubot and Mona, 1018/305 for Red Hat Mono. Tune in Playwright until swapping shifts the hero H1, a body paragraph and a price by less than 2px.
+The overrides come from measured averages on a mixed sentence: Overpass 400 0.4486em vs Liberation Sans 0.4521; Overpass 800 0.4783 vs Liberation Sans Bold 0.4824; Sometype 0.580 vs Liberation Mono 0.600. Tune in Playwright until swapping shifts the H1, a body paragraph and a price by <2px.
 
 **Weights:**
-- Hubot: 600 (engraved micro-labels, H3), 680 (buttons, nav, H2), 760 (H1, hero, wordmark).
-- Mona: 400 (body), 560 (UI labels, emphasis), 640 (product titles in cards, table heads).
-- Red Hat Mono: 400 (readouts), 500 (keys, tumblers), 600 (prices, totals).
+- Overpass: 400 body; 600 UI labels, form labels, emphasis; 700 buttons, nav, card titles, sign labels, H3; 800 H2, wordmark, platform names on signs; 900 hero H1 and display numerals only.
+- Sometype Mono: 400 readouts (dates, IDs); 500 keys and order numbers; 600 prices and flap characters; 700 hero flaps only.
 
-Set `font-synthesis: none` globally.
+`font-synthesis: none` globally. Numbers in Overpass tables use `font-variant-numeric: tabular-nums`. Keys: `font-feature-settings: "calt" 0; font-variant-ligatures: none` (Sometype has `calt`).
 
-**Widths:**
-- Hubot H1/H2 at `font-stretch: 112.5%`.
-- Hubot buttons, nav, micro-labels and the wordmark at `125%`.
-- Mona always at `100%`.
+**Glyph coverage** (checked): neither family has `→ ↗ ✓ ★ №`. Arrows are Lucide (`ArrowBigRight`, `MoveUpRight`), ticks Lucide `Check`, and "No." replaces `№`. `· – — − × € £ … ` and non-breaking space exist in both.
 
-**Numbers:**
-- Red Hat Mono is monospaced and slashed-zero by default, so prices, keys and counts are tabular.
-- Mona and Hubot have `tnum`: add `font-variant-numeric: tabular-nums` (the existing `tabular` utility) where they show numbers in tables.
-- Red Hat Mono has `calt`. **Turn it off in keys** (`font-feature-settings: "calt" 0`) so no contextual alternate ever changes a character's shape.
+**PDF invoices** (`src/lib/invoice.ts`): body Overpass 400/700; invoice number, keys-delivered line and amounts Sometype Mono 500; the wordmark embedded as the outlined lockup path (§9). Colours: ink `#1B1C1D`, muted `#4B4842`, rule `#B5AE9F`, a 3pt mustard `#E2AE2F` rule under the header, the terminus bar `#D29D1A`. Invoices are always light and never print key codes ("Key delivered to your account on {date}").
 
-**Glyph coverage** (checked in the latin subset files):
-- None of the three has `→`, `↗`, `✓`, `★` or `№`. Arrows are Lucide `ArrowRight` / `SquareArrowOutUpRight`, ticks are Lucide `Check`, and the word "No." replaces `№`.
-- `·`, `–`, `—`, `×`, `€`, `£`, `™`, `°` and `…` exist in all three.
-
-**PDF invoices** (`src/lib/invoice.ts`):
-- Body: Mona 400/600. Invoice number, keys and amounts: Red Hat Mono 500. Wordmark: Hubot 760 at 125%, embedded as an SVG path instead of a font.
-- Colours: ink `#0F1513`, muted `#3E4945`, rule `#A3ADA9`, and the green index line `#0F7A50` in the wordmark.
-- Invoices are always light. They never print key codes, only "Key delivered to your account on {date}".
-
-### 4.2 Modular scale: ratio 1.2 (minor third), base 16px
-Wide display faces look much bigger than their size, so a modest ratio keeps headings from swallowing the page; the hero takes its drama from a separate display step. Mona's x-height (0.517) reads well at 16px.
+### 4.2 Modular scale: ratio 1.333 (perfect fourth), base 16px
+Signage needs decisive jumps between a sign, its sub-line and the small print; 1.333 gives that, and the hero takes its own display step. Overpass's x-height (0.511) reads comfortably at 16px.
 
 ```css
 @theme inline {
   --text-step--2: 0.75rem;
-  --text-step--1: 0.8125rem;
+  --text-step--1: 0.875rem;
   --text-step-0: 1rem;
-  --text-step-1: clamp(1.125rem, 1.08rem + 0.2vw, 1.2rem);
-  --text-step-2: clamp(1.25rem, 1.15rem + 0.45vw, 1.44rem);
-  --text-step-3: clamp(1.4375rem, 1.25rem + 0.85vw, 1.728rem);
-  --text-step-4: clamp(1.625rem, 1.35rem + 1.35vw, 2.074rem);
-  --text-step-5: clamp(1.875rem, 1.45rem + 2.05vw, 2.488rem);
-  --text-step-6: clamp(2.125rem, 1.5rem + 3.05vw, 2.986rem);
-  --text-display-xl: clamp(2.5rem, 0.9rem + 6.4vw, 5.5rem);
+  --text-step-1: clamp(1.125rem, 1.05rem + 0.35vw, 1.333rem);
+  --text-step-2: clamp(1.3125rem, 1.15rem + 0.7vw, 1.777rem);
+  --text-step-3: clamp(1.5rem, 1.25rem + 1.2vw, 2.369rem);
+  --text-step-4: clamp(1.75rem, 1.3rem + 2vw, 3.157rem);
+  --text-step-5: clamp(2rem, 1.3rem + 3.2vw, 4.209rem);
+  --text-display: clamp(2.5rem, 1.2rem + 5.6vw, 5.61rem);
   --text-ui-md: 0.9375rem;
   --text-ui-sm: 0.875rem;
-  --text-ui-xs: 0.8125rem;
   --text-data: 0.875rem;
   --text-data-sm: 0.75rem;
+  --text-sign: 0.75rem;
   --text-key: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  --text-flap-sm: 0.875rem;
+  --text-flap-md: 1.125rem;
+  --text-flap-lg: clamp(1.25rem, 0.9rem + 1.1vw, 1.75rem);
 }
 ```
+Checked at 390px and 1440px: step-5 = 33px / 67px; display = 41px / 90px (capped from ~1260px); step-4 = 29px / 50px.
 
-| Role | Face | Size token | Leading | Tracking | Case / width |
+| Role | Face | Size token | Leading | Tracking | Case |
 |---|---|---|---|---|---|
-| Home hero H1 | Hubot 760 | display-xl | 0.92 | -0.02em | sentence, wdth 112.5 |
-| Landing H1 (how activation works, about) | Hubot 740 | step-6 | 0.98 | -0.015em | sentence, wdth 112.5 |
-| Store H1 (catalogue, product title, account) | Hubot 700 | step-5 | 1.04 | -0.01em | sentence, wdth 112.5 |
-| H2 section | Hubot 680 | step-4 | 1.06 | -0.01em | sentence, wdth 112.5 |
-| H3 / panel title | Hubot 600 | step-2 | 1.15 | 0 | sentence, wdth 112.5 |
-| Engraved micro-label, eyebrow, column head | Hubot 600 | data-sm (12px) | 1.2 | 0.12em | UPPERCASE, wdth 125, `text-shadow: var(--engrave)` |
-| Product title in a card | Mona 640 | step-0 | 1.3 | 0 | as named, 2 lines max |
-| Lead paragraph | Mona 400 | step-1 | 1.5 | 0 | sentence |
-| Body | Mona 400 | step-0 (16px) | 1.6 | 0 | sentence |
-| UI label, form label | Mona 560 | ui-md (15px) | 1.3 | 0 | sentence |
-| Meta, captions, breadcrumbs | Mona 400 | ui-sm (14px) | 1.45 | 0.005em | sentence |
-| Navigation links, buttons | Hubot 680 | ui-sm / 15px / 16px | 1 | 0.06em | UPPERCASE, wdth 125 |
-| Price in a card | Red Hat Mono 600 | step-1 | 1.1 | -0.01em | — |
-| Price in the buy box | Red Hat Mono 600 | step-4 | 1.0 | -0.02em | — |
-| Order total | Red Hat Mono 600 | step-2 | 1.05 | 0 | — |
-| Key code | Red Hat Mono 500 | text-key | 1.2 | 0.08em | UPPERCASE as issued, `calt` off |
-| Readouts (counts, IDs, dates, durations) | Red Hat Mono 400 | data (14px) | 1.4 | 0 | — |
-| Tumbler numerals (hero readout, cart count) | Red Hat Mono 500 | step-3 / 12px | 1 | 0 | — |
+| Hero H1 | Overpass 900 | display | 0.94 | −0.03em | sentence |
+| Landing H1 (activation guide, about) | Overpass 800 | step-5 | 1.0 | −0.02em | sentence |
+| Store H1 (catalogue, product, account) | Overpass 800 | step-4 | 1.04 | −0.015em | sentence |
+| H2 section | Overpass 800 | step-4 (home) / step-3 (store) | 1.06 | −0.015em | sentence |
+| H3 / panel title | Overpass 700 | step-2 | 1.15 | −0.005em | sentence |
+| **Sign label** (eyebrows, column heads, board heads, filter heads) | Overpass 700 | sign (12px) | 1.2 | 0.14em | UPPERCASE |
+| Platform name on signs | Overpass 800 | step-2 / step-3 | 1.05 | −0.01em | as named |
+| Card title | Overpass 700 | step-0 (17px on ≥1280 via `text-[1.0625rem]`) | 1.25 | −0.005em | as named, 2 lines max |
+| Lead | Overpass 400 | step-1 | 1.5 | 0 | sentence |
+| Body | Overpass 400 | step-0 | 1.6 | 0 | sentence |
+| UI label, form label | Overpass 600 | ui-md | 1.3 | 0 | sentence |
+| Meta, captions, breadcrumbs | Overpass 400 | ui-sm | 1.45 | 0.005em | sentence |
+| Nav links | Overpass 700 | ui-md | 1 | 0 | sentence (signs speak in sentence case; only sign labels are caps) |
+| Buttons | Overpass 700 | 15px (md) / 16px (lg) / 14px (sm) | 1 | 0.005em | sentence |
+| Price in a card | Sometype 600 | step-1 | 1.1 | −0.01em | — |
+| Price in the buy box | Sometype 600 | step-4 | 1.0 | −0.02em | — |
+| Order total | Sometype 600 | step-2 | 1.05 | 0 | — |
+| Key characters (flaps) | Sometype 600 | text-key | 1 | 0 | as issued |
+| Readouts (counts, IDs, dates) | Sometype 400 | data | 1.4 | 0 | — |
+| Flap characters (board) | Sometype 600 (700 in hero GL atlas) | flap-sm/md/lg | 1 | 0 | UPPERCASE on boards |
 
 Rules:
-- Mono is for data only, never for sentences.
-- Uppercase is for Hubot labels, buttons and nav only. Headings are sentence case.
-- Reading blocks (policies, FAQ answers, how activation works, product description) are capped at `68ch`.
-- Minimum sizes: body 16px, meta 14px, micro-labels 12px.
+- Mono is for data and flaps only, never for sentences.
+- Uppercase only for sign labels and board flaps. Buttons, nav, headings are sentence case (Keyrook used uppercase wide buttons; we don't).
+- Reading blocks (policies, FAQ answers, activation guide, product description) are capped at `66ch`.
+- Minimum sizes: body 16px, meta 14px, sign labels 12px.
 
 ### 4.3 Global base rules in `globals.css`
-- `body`: `var(--font-sans)`, `1rem`, line-height 1.6, `font-stretch: 100%`, `var(--color-bg)`, `var(--color-text)`.
-- `h1–h6`: `var(--font-display)`, `font-stretch: 112.5%`, weights from §4.2, `font-synthesis: none`, `text-wrap: balance`.
+- `body`: `var(--font-sans)`, 1rem, line-height 1.6, `var(--color-bg)`, `var(--color-text)`.
+- `h1–h6`: `var(--font-display)`, weights per §4.2, `font-synthesis: none`, `text-wrap: balance`.
 - `p`: `text-wrap: pretty`.
-- `@utility eyebrow` becomes the **engraved label**: Hubot 600, 0.75rem, uppercase, 0.12em tracking, `font-stretch: 125%`, `--color-text-secondary`, `text-shadow: var(--engrave)`.
-- `@utility label-caps`: Hubot 680, uppercase, 0.06em, `font-stretch: 125%`.
-- `@utility data`: Red Hat Mono 400, 0.875rem, line-height 1.4.
-- `@utility data-compact` is retired, because Red Hat Mono has no width axis. Replace its uses with `data` plus `tracking-[-0.02em]`.
-- `@utility price`: Red Hat Mono 600, letter-spacing -0.01em.
-- `@utility key-code` (new): Red Hat Mono 500, `--text-key`, 0.08em, `font-feature-settings: "calt" 0`, `font-variant-ligatures: none`, `user-select: all`, `word-break: break-all`.
-- `@utility tumbler` (new): Red Hat Mono 500 inside a recessed slot (see §8.21).
-- Keep `@utility tabular`, `measure` (68ch), `meta`, `no-scrollbar`.
-- `@utility text-shadow-engrave` (new): `text-shadow: var(--engrave)`.
-- Scrollbar: thumb `--color-border-hover`, track `--color-bg-secondary`, square.
-- `svg.lucide` keeps `flex-shrink: 0`; stroke rules per §7.
+- `@utility eyebrow` → the **sign label**: Overpass 700, 0.75rem, uppercase, 0.14em, `--color-text-secondary`. No text-shadow.
+- `@utility label-caps` → same as `eyebrow` but ink.
+- `@utility data`: Sometype 400, 0.875rem, line-height 1.4.
+- `@utility price`: Sometype 600, letter-spacing −0.01em.
+- `@utility key-code`: Sometype 500, `--text-key`, `font-feature-settings: "calt" 0`, `font-variant-ligatures: none`, `user-select: all`.
+- `@utility flap` (new): see §8.21.
+- Delete `@utility steel-grain`, `tumbler`, `display-wide`, `text-shadow-engrave`.
+- Keep `tabular`, `measure` (66ch), `meta`, `no-scrollbar`.
+- `a:not([class])` and `.prose a`: the link style from §3.3.
+- Scrollbar: thumb `--color-border-hover`, track `--color-bg-secondary`, 6px radius thumb.
+- `svg.lucide`: `flex-shrink: 0; stroke-linecap: round; stroke-linejoin: round;` with stroke widths from §7.
 
 ---
 
 ## 5. Space, layout, geometry, borders, elevation
 
 ### 5.1 Spacing
-4px base: `4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80 · 96 · 128 · 160`.
+4px base: `4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80 · 96 · 120 · 160`.
 
-Section rhythm is deliberately uneven, and §14.1 gives every home section its own padding:
-- the catalogue grid is dense (16px gaps on desktop, 10px on mobile) because comparison is the job there;
-- the security strip and the deal rail are dense;
-- the hero, the theater and the security ledger are generous because they are read once.
+Rhythm is uneven on purpose (padding per home section in §14.1):
+- dense where comparison is the job: catalogue grid (16px gaps desktop, 12px mobile), timetable rails, revised fares board, season tickets table;
+- generous where something is read once: hero hall, theater, routes, through the gate.
 
 ### 5.2 Layout
 | Token | Value | Use |
 |---|---|---|
 | `--container-container` | 1360px | default content width |
-| `--container-wide` | 1560px | home set-pieces, footer inner, the locker wall |
+| `--container-wide` | 1520px | home set-pieces, header bar ≥1600px, footer inner |
 | `--container-narrow` | 1120px | checkout, account, orders |
-| `--container-read` | 720px | policies, FAQ answers, activation steps |
+| `--container-read` | 720px | policies, FAQ answers, activation guide |
 | gutters | 16px (<640), 24px (640–1023), 40px (≥1024) | |
-| grid | 12 columns, 24px gap (≥1024); 6 columns, 16px (640–1023); 4 columns, 10px (<640) | |
+| grid | 12 columns, 24px gap (≥1024); 6 columns, 16px (640–1023); 4 columns, 12px (<640) | |
 
-Breakpoints: 390 (mobile design base), 640, 840 (theater switches between phone and desktop layouts), 1024, 1280, 1536.
+Breakpoints: 390 (mobile design base), 640, 840 (theater phone/desktop switch), 1024, 1280, 1440, 1600.
 
-### 5.3 Geometry language: "square steel, round hardware"
-The vault is built from two kinds of shape: plates and doors cut square from steel, and the round hardware mounted on them.
-- **0px for everything rectangular:**
-  - pages, bands, plates, cards, cover stages, buttons, inputs, selects, chips, tags, dialogs, drawers, toasts, the header, the footer;
-  - the theater bezel, lockers, tables and images.
+### 5.3 Geometry: "mixed by role"
+Each radius belongs to a kind of object in a station; never mix within a kind, never apply one radius everywhere.
 
-  A machined edge (§5.4) gives plates their finish, not a radius. There is no radius scale; every `--radius-*` is `0`.
-- **Circles only for hardware, and only on square boxes:**
-  - the dial and the dial loader;
-  - bolt heads (`--bolt`);
-  - lamps (8px LEDs);
-  - radio dots;
-  - the switch knob;
-  - order-timeline nodes;
-  - the theater's play/pause control (a round knob, 44px);
-  - the avatar initials in the account header.
+| Token | Value | Objects |
+|---|---|---|
+| none | 0px | page bands, section edges, tables, the header and strip, the footer, cover images inside cards, the hero hall |
+| `--radius-flap` | 2px | flap tiles, platform number tiles, the deal tile, the cart count, flap loader, tags |
+| `--radius-sign` | 4px | sign plates: large platform signs, "Company notice", the payment logo strip, the "through the gate" plates, chips |
+| `--radius-control` | 6px | buttons, inputs, selects, segmented controls, quantity, toasts, the cookie banner |
+| `--radius-card` | 8px | departure cards, buy box, cart summary, dialogs, drawers' inner panels, search panel |
+| `--radius-board` | 10px | board housings: hero board, key board, theater housing, mini-boards, the gift card blank |
+| `--radius-round` | 50% | route stops, timeline stations, radio dots, the theater play control, the switch knob — only on elements with equal width and height |
 
-  `rounded-round` (`50%`) is the only rounded utility. It is used only on elements with equal width and height.
-- **No pills, no chamfers, no bevels, no rotated elements.**
-- Third-party payment logos keep their own rounded white cards untouched.
+- No pills (a 6px button is not a pill), no chamfers, no rotated elements, no notched ticket edges anywhere except the cart/checkout ticket summary (§8.26), where two 10px semicircle notches mark the tear line.
+- Third-party payment logos keep their own artwork.
 
-### 5.4 Borders, rules and machined edges
-- **Hairline:** 1px `--color-border` (section dividers, table rows, card outlines).
-- **Rule:** 1px `--color-rule` (dial ruler baseline, table head underline, active tab baseline).
-- **Control:** 1px `--color-border-control`. Hover: `--color-text-secondary`. Focus adds the green ring. Error: 2px `--color-danger`.
-- **Machined edge** (`--edge-machined`, applied as `box-shadow` inset):
-  - 1px light line on the top inner edge and 1px dark lip on the bottom inner edge;
-  - used on every plate, button and card;
-  - pressed controls swap to `--edge-machined-pressed`.
+### 5.4 Borders and rules
+- **Hairline:** 1px `--color-border` (card outlines, section dividers, table rows).
+- **Rule:** 1px `--color-rule` (table heads, filter group heads).
+- **Control:** 1px `--color-border-control`; hover `--color-text-secondary`; error 2px `--color-danger`.
+- **Hinge:** 1px (small flaps) or 2px (≥24px flaps) `--color-hinge` across the middle of every flap tile. Never on anything that isn't a flap.
+- **Route line:** 3px `--color-stop` (ink); upcoming segments 3px dashed (6/4) `--color-rule`.
+- **Active bar:** 3px `--color-accent` under the active nav item, tab, filter head and pagination number.
 
-  It is the only "3D" a control gets. No outer glow, no drop shadow at rest.
-- **Bolts:** 6px circles of `--color-border-control` with a 1px inner `--color-steel-hi` highlight at 25% (top-left), 10px in from each corner. Only on the four bolted plates (§1.3).
-- **Engraving:** micro-labels on plates carry `--engrave` (a 1px offset shadow). It never applies to body text or to text on green.
-
-### 5.5 Elevation: light from above, short and hard
+### 5.5 Elevation: flat hall, lifted overlays
 | Level | Token | Use |
 |---|---|---|
-| e0 | none | page, bands, tables, text |
-| e1 | `--shadow-card` (machined edge) | cards, plates, inputs, buttons at rest |
-| e2 | `--shadow-card-hover` | deposit box with its drawer pulled (hover), sticky buy bar when stuck |
-| e3 | `--shadow-lg` | popovers, vault map, search dialog, toasts |
-| e4 | `--shadow-xl`, `--shadow-panel` | dialogs, cart drawer, mobile vault map |
+| e0 | none | page, bands, tables, text, cards at rest (hairline only) |
+| e1 | `--shadow-card-hover` (a stronger hairline) | card hover, sticky buy bar when stuck |
+| e2 | `--shadow-overlay` | popovers, concourse map, search panel, toasts, cookie banner |
+| e3 | `--shadow-xl`, `--shadow-panel*` | dialogs, cart drawer, mobile sheets |
+| flap | `--shadow-flap` | 1px inner dark line at the bottom of every flap tile |
 
-No coloured shadows, no glows, no inner glows on green.
+No coloured shadows, no glows, no inner glows on mustard, no drop shadows on cards at rest.
 
 ### 5.6 Z-index
-Unchanged values: `base 0 · box-item 1 · sticky 40 · dropdown 50 · drawer 60 · modal 70 · toast 80 · cookie 90`. The theater cursor and spotlight live inside the stage's own stacking context (`isolation: isolate`).
+`base 0 · card-item 1 · sticky 40 · dropdown 50 · drawer 60 · modal 70 · toast 80 · cookie 90`. The theater cursor and spotlight live inside the stage's own stacking context (`isolation: isolate`). The hero canvas sits under the DOM board's links (§13 M1).
 
 ---
 
@@ -895,99 +743,89 @@ Unchanged values: `base 0 · box-item 1 · sticky 40 · dropdown 50 · drawer 60
 
 | Token | Value | Use |
 |---|---|---|
-| `--dur-micro` | 120ms | hover, press, focus, tag swaps, lamp on/off |
-| `--dur-ui` | 180ms | accordions, tabs, filter groups, segmented controls, drawer pull on cards |
-| `--dur-panel` | 260ms | cart drawer, vault map, dialogs, mobile sheets |
-| `--dur-panel-close` | 200ms | closing panels |
-| `--dur-tumbler` | 520ms | one tumbler wheel settling (counts, cart count, order number) |
-| `--dur-reveal` | 640ms | landing section entrances only |
-| `--dur-reduced` | 120ms | the only transition under reduced motion (opacity) |
-| `--ease-latch` | cubic-bezier(0.3, 0, 0.1, 1) | anything that moves: it waits, travels, then seats firmly with no overshoot, like a bolt shooting home |
-| `--ease-std` | cubic-bezier(0.4, 0, 0.2, 1) | colour and opacity |
-| `--ease-in-out` | cubic-bezier(0.76, 0, 0.24, 1) | pinned scenes, door swing, camera moves |
+| `--dur-micro` | 120ms | hover, press, focus, tag swaps |
+| `--dur-ui` | 180ms | accordions, tabs, filter groups, segmented controls |
+| `--dur-panel` | 240ms | cart drawer, concourse map, dialogs, sheets |
+| `--dur-panel-close` | 180ms | closing panels |
+| `--dur-flap` | 70ms | one flap falling (one character step) |
+| `--dur-reveal` | 560ms | landing section entrances only |
+| `--dur-reduced` | 100ms | the only transition under reduced motion (opacity) |
+| `--ease-flap` | cubic-bezier(0.55, 0, 1, 0.45) | a flap falls under gravity: it accelerates and lands; a 3° rebound over 40ms follows (JS/GL only) |
+| `--ease-sign` | cubic-bezier(0.2, 0, 0, 1) | UI movement: quick start, soft arrival |
+| `--ease-std` | cubic-bezier(0.4, 0, 0.2, 1) | colour, opacity |
+| `--ease-in-out` | cubic-bezier(0.76, 0, 0.24, 1) | board pitch on scroll, theater scene changes |
 | `--ease-out-expo` | cubic-bezier(0.16, 1, 0.3, 1) | entrances |
-| dial detent (JS) | spring stiffness 420, damping 38, max overshoot 0 | price dial, hero dial rotation snapping to numerals |
-| tumbler settle (JS) | per-character stagger 28ms, 3–6 intermediate glyphs, 22ms each | decrypt, counts |
+
+**Flap physics (JS and GL):** a character change walks the **drum order** `" ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:-–−·/&'!?+%€£$()"` forward from the current to the target character, one flap per step. Each step is `--dur-flap` (70ms). If a cell needs more than 10 steps it skips ahead so it never takes more than 10 visible steps (the step duration may drop to 40ms for the skipped part). Column stagger 18ms left→right, row stagger 60ms top→bottom. A pure function `flapFrame(from, to, cellIndex, t)` in `src/lib/motion/flap.ts` returns `{ top, bottom, falling, angle }` for any time `t`, so every frame can be rendered as a still (theater, `?t=` freeze, reduced motion).
 
 Update `src/lib/motion/tokens.ts`:
-- `MOTION_DURATION`: micro 120, ui 180, panel 260, panelClose 200, tumbler 520, reveal 640, reduced 120, cartFlight 400, decrypt 900, doorOpen 1800.
-- `MOTION_EASE.latch`.
-- `MOTION_SPRING` 420/38.
-- `MOTION_DEPTH` from §13.1.
-- `MOTION_STAGGER`: chars 28, rows 70, lockers 60, words 40, ticks 3.
-- `MOTION_LIMITS`: lockerSwing 24°, doorSwing 108°, cardDrawer 6px, dprCap 1.5, pointerDoor 6px, decryptGlyphs 4.
-- Delete `LAMP_POSE` and the inspect and tilt limits.
+- `MOTION_DURATION`: micro 120, ui 180, panel 240, panelClose 180, flap 70, reveal 560, reduced 100, cartFlight 380, keyFlip 1100, boardPage 7000.
+- `MOTION_EASE`: `flap`, `sign`, `std`, `inOut`, `outExpo`.
+- `MOTION_STAGGER`: chars 18, rows 60, cards 70, stops 90.
+- `MOTION_LIMITS`: flapMaxSteps 10, flapRebound 3, riffleAngle 10, riffleRadius 60, boardPitch 12, dprCap 1.5, pointerTilt 2.
+- Delete `MOTION_SPRING` (no springs), `LAMP_POSE`, door and dial limits.
 
-**Philosophy: vault mechanics.** Things move like hardware:
-- a short wait, a decisive travel, a firm seat;
-- bolts shoot home, tumblers drop, a door swings on a heavy hinge;
-- the dial turns and clicks into detents.
-
-Nothing bounces, floats, pulses, wobbles or glows, and nothing loops ambiently, except the theater, which is a pausable demo. Transform and opacity only.
+**Philosophy: station mechanics.** Things move like a hall's equipment: flaps fall in discrete steps and land; signs and panels slide in quickly and settle; lines draw in the direction of travel. Nothing floats, pulses, bounces (apart from the 3° flap rebound), glows, or loops ambiently — except the hero board's page change, which is real content, has a visible pause control (WCAG 2.2.2) and stops off-screen, and the theater, which is a pausable demo.
 
 With `prefers-reduced-motion: reduce`:
-- every transition becomes an instant state change or a ≤120ms opacity fade;
-- tumblers show their final value;
-- the decrypt shows the key at once;
-- the door poster shows the designed open state, and nothing pins;
-- the theater shows still frames with the full step list;
+- every transition is an instant state change or a ≤100ms opacity fade;
+- flaps show their final character immediately (boards, key reveal, counts);
+- the hero board does not page automatically; a "Next 6" button pages instantly; search updates instantly;
+- no WebGL, no pointer riffle, no scroll pitch, nothing pins;
+- route lines are drawn complete;
+- the theater shows stills with full step lists;
 - `scroll-behavior: smooth` is removed.
 
-`src/styles/animations.css`: delete `tray-in`, `lamp-on`, `count-roll` and every keyframe with no consumer. Add:
-- `plate-in` (translateY 10px→0 + opacity);
-- `panel-in` (translateY −6px→0 + opacity);
-- `tumbler-roll` (translateY 100%→0 for the incoming glyph, translateY 0→−100% for the outgoing);
-- `bolt-shoot` (translateX ±4px→0, used on the key plate's bolts when a key is issued);
-- `lamp-lit` (opacity 0→1 on the LED fill, 120ms).
-
-Durations and easings come from the tokens.
+`src/styles/animations.css`: delete `plate-in`, `panel-in`, `tumbler-roll`, `bolt-shoot`, `lamp-lit` and every keyframe without a consumer. Add: `sign-in` (translateY 8px→0 + opacity), `panel-drop` (translateY −6px→0 + opacity), `flap-fall` (rotateX 0→−90° on the upper falling half, `transform-origin: bottom`, `--ease-flap`), `flap-land` (rotateX 90°→0 on the lower half, `transform-origin: top`), `route-draw` (stroke-dashoffset 1→0 with `pathLength="1"`), `stop-in` (scale 0→1). Durations and easings from tokens.
 
 ---
 
-## 7. Icons — Lucide (distinct glyph map)
+## 7. Icons — Lucide (a glyph map distinct from Keyrook's and Fablekeys')
 
-- `lucide-react` 1.52 (installed). Every glyph below was verified to exist in `node_modules/lucide-react/dist/esm/icons`.
-- One system: `strokeWidth={1.75}`, `strokeLinecap="square"`, `strokeLinejoin="miter"`. Set this once in a small `Icon` wrapper or in the global `svg.lucide` rule: `stroke-linecap: square; stroke-linejoin: miter; stroke-width: 1.75`. The square caps make Lucide look machined rather than friendly. Inspection Bay used round caps at 1.5.
-- Sizes 14, 16, 18, 20 or 24.
-- `aria-hidden` unless the icon is the only content (then the parent has an `aria-label`).
-- No icon in circles or tinted squares; icons sit in text colour.
-- On desktop, header actions pair icon + word.
+- `lucide-react` 1.52 (installed). Every glyph below was verified to exist in `node_modules/lucide-react/dist/esm/icons/*.mjs`.
+- One system: **round caps and joins (Lucide's defaults), stroke 2 at 14–18px and 1.75 at 20–24px** — bold pictograms like station signage. Keyrook used square caps at 1.75; Fablekeys 1.25–1.5 hairlines. Set it once in the global `svg.lucide` rule plus a size-aware `Icon` wrapper.
+- Sizes 16, 18, 20, 24. `aria-hidden` unless the icon is the only content (then the parent has an `aria-label`).
+- Never in circles or tinted squares; icons sit in text colour (on the board, `--color-on-board`).
+- On desktop, header actions pair icon + word (≥1280px, §11.1).
 
 | Job | Glyph | Job | Glyph |
 |---|---|---|---|
-| Cart | `Archive` (a deposit box) + the word "Cart" | Search | `Search` |
-| Save / saved | `Pin` / `PinOff` ("Pinned") | Account | `UserKey` |
-| Menu / vault map (mobile) | `Menu` | Close | `X` |
-| Add to cart | `SquarePlus` | Remove | `Trash` |
-| Quantity | `SquareMinus` / `SquarePlus` | Filters | `ListFilter` |
-| Sort | `ArrowDownWideNarrow` | Disclosure | `ChevronDown` (rotates 180°) |
-| Back | `ArrowLeft` | Inline link arrow | `ArrowRight` |
-| External (redeem pages, platform help) | `SquareArrowOutUpRight` | Breadcrumb separator | none, a mono "/" |
-| Key | `KeyRound` | Reveal / hide key | `Eye` / `EyeOff` |
-| Copy / copied | `Copy` / `CopyCheck` | Replacement key | `RotateCcwKey` |
-| Keys encrypted at rest | `Vault` | Hosted card page | `CreditCard` |
-| 3-D Secure | `ShieldCheck` | PDF invoice | `ReceiptText` (download: `FileDown`) |
-| Delivery time | `Timer` | Pending / issuing | `Hourglass` |
-| Region | `EarthLock` | Languages | `Languages` |
-| System requirements | `Cpu` | Activation steps | `ListOrdered` |
-| Gift card | `WalletCards` | Subscription | `CalendarSync` |
-| DLC | `PackagePlus` | Success | `BadgeCheck` |
-| Error | `OctagonAlert` | Warning | `TriangleAlert` |
-| Info | `Info` | Check | `Check` |
-| Theme | `SunMoon` | Currency | none (mono "EUR") |
-| Sign out | `LogOut` | Email sent | `MailCheck` |
-| No cover | `ImageOff` | Help | `CircleHelp` |
-| Clock / time | `Clock` | Report a problem | `MessageSquareWarning` |
+| Cart | `Ticket` + "Cart" | Search | `Search` |
+| Add to cart (card) | `TicketPlus` | In cart | `TicketCheck` |
+| Remove from cart | `TicketX` + "Remove" | Quantity | `ChevronDown` (decrease) / `ChevronUp` (increase) on a flap counter |
+| Save / saved | `ListPlus` / `ListCheck` ("Save" / "Saved") | Account | `IdCard` |
+| Menu (mobile) | `Rows3`, labelled "Menu" | Close | `X` |
+| Filters | `SlidersVertical` | Sort | `ArrowDownUp` |
+| Disclosure (accordion, filter group) | `SquareChevronDown` (rotates 180°) | Select arrow | `ChevronsUpDown` |
+| Directional link, "All … →" | `ArrowBigRight` | Back | `ArrowBigLeft` |
+| External (platform redeem pages) | `MoveUpRight` | Breadcrumb separator | none: a mono "›" in faint |
+| Key | `KeySquare` | Reveal key | `ScanEye` |
+| Hide key / password | `EyeOff` / `Eye` | Copy / copied | `Copy` / `Check` |
+| Replacement key | `Replace` | Keys encrypted at rest | `Lock` |
+| Hosted card page | `CreditCard` | 3-D Secure (your bank) | `Landmark` |
+| PDF invoice | `Receipt` (download: `ArrowDownToLine`) | Delivered to your account | `Inbox` |
+| Region | `GlobeLock` | Languages | `Languages` |
+| System requirements | `Monitor` | Activation steps | `Signpost` |
+| Gift card | `Wallet` | Subscription | `CalendarRange` |
+| DLC | `LayersPlus` | Top-up | `Coins` |
+| Software | `AppWindow` | Genre routes | `Route` |
+| Success | `CircleCheckBig` | Error | `OctagonX` |
+| Warning | `TriangleAlert` | Info | `Info` |
+| Theme | `Sunrise` ("Day") / `Sunset` ("Night") | Currency | none: the code in mono ("EUR") |
+| Sign out | `DoorOpen` | Email sent | `MailOpen` |
+| No cover | `SquareDashed` | Help | `MessageCircleQuestion` |
+| Report a problem | `MessageCircleWarning` | Theater | `Play` / `Pause` / `Repeat` |
 
-Type icons (`PackagePlus`, `WalletCards`, `CalendarSync`) are used only in the vault map and on type landing headers, never on cards.
+Type icons (`LayersPlus`, `Wallet`, `CalendarRange`, `Coins`, `AppWindow`) appear only in the concourse map and on type landing openers, never on cards.
 
-Not used, because Patinaskins or siblings own them or they are decoration:
-- `ShoppingCart`, `ShoppingBag`, `ShoppingBasket`, `Handbag`;
-- `Bookmark`, `Heart`, `Star`;
-- `Plus`, `Trash2`, `ArrowUpRight`, `AlignRight`, `SlidersHorizontal`, `Repeat2`, `Link2`;
-- `Gamepad2`, `Joystick`, `Sparkles`, `Zap`, `Flame`, `Crown`, `Gem`;
-- `Package`, `Truck` (nothing physical ships);
-- any brand logo glyph (Lucide 1.x ships none; platform names are text).
+Not used:
+- Keyrook's: `Archive`, `Pin`, `PinOff`, `UserKey`, `SquarePlus`, `SquareMinus`, `Trash`, `ListFilter`, `ArrowDownWideNarrow`, `ArrowLeft`, `ArrowRight`, `SquareArrowOutUpRight`, `KeyRound`, `CopyCheck`, `RotateCcwKey`, `Vault`, `ShieldCheck`, `ReceiptText`, `FileDown`, `Timer`, `Hourglass`, `EarthLock`, `Cpu`, `ListOrdered`, `WalletCards`, `CalendarSync`, `PackagePlus`, `BadgeCheck`, `OctagonAlert`, `SunMoon`, `MailCheck`, `ImageOff`, `CircleHelp`, `MessageSquareWarning`, `Menu`;
+- Fablekeys': `Backpack`, `BookUser`, `TableOfContents`, `Eraser`, `Funnel`, `ArrowUpDown`, `ChevronRight`, `MoveLeft`, `MoveRight`, `ExternalLink`, `Key`, `EyeClosed`, `ClipboardCopy`, `ClipboardCheck`, `RefreshCcw`, `LockKeyhole`, `ShieldUser`, `ScrollText`, `Download`, `Clock3`, `Feather`, `Globe`, `MonitorCog`, `ListChecks`, `Gift`, `CalendarClock`, `BookPlus`, `CircleCheck`, `CircleX`, `CircleAlert`, `BadgeInfo`, `Lamp`, `Sun`, `Send`, `BookDashed`, `LifeBuoy`, `Flag`, `LibraryBig`;
+- other siblings': `ShoppingCart`, `ShoppingBag`, `ShoppingBasket`, `Handbag`, `Bookmark`, `Heart`, `Star`, `Plus`, `Trash2`, `ArrowUpRight`, `SlidersHorizontal`;
+- clichés: `Plane`, `PlaneTakeoff`, `TicketsPlane`, `TrainFront`, `Clock*` as decoration, `Gamepad2`, `Joystick`, `Sparkles`, `Zap`, `Flame`, `Crown`, `Gem`, `QrCode`, `Barcode`;
+- any brand glyph (platform names are text).
+
+Shared generics that are fine: `Search`, `X`, `Languages`, `CreditCard`, `Check`, `Copy`, `Eye`, `EyeOff`, `TriangleAlert`, `Info`, `Play`, `Pause`.
 
 ---
 
@@ -996,1833 +834,1177 @@ Not used, because Patinaskins or siblings own them or they are decoration:
 General states for every interactive component:
 - default;
 - hover (`hover-device` variant only);
-- active/pressed (the machined edge swaps to `--edge-machined-pressed` and the element moves down 1px);
-- focus-visible: 2px `--color-focus` outline, 2px offset (3px on cards), square, never removed;
+- active/pressed: translateY 1px; mustard fills drop to `--color-accent-hover`;
+- focus-visible: 2px `--color-focus` outline, 2px offset (3px on cards), following the element's radius; on board surfaces `--color-focus-on-board`; never removed;
 - disabled: `--color-text-tertiary` text, `--color-bg-secondary` fill, no hover, `cursor: not-allowed`, `aria-disabled` or `disabled`;
-- loading: `aria-busy="true"`, width locked, the dial loader (§8.22) replaces the label centre.
+- loading: `aria-busy="true"`, width locked, the flap loader (§8.22) replaces the label centre.
 
-Minimum touch target: 44×44px on touch devices.
+Minimum touch target 44×44px on touch devices.
 
 ### 8.1 Button (`src/components/ui/Button.tsx` — keep the API, restyle)
-Variant mapping:
-
 | Existing variant | New look |
 |---|---|
-| `primary` | **Key** (a keypad key) |
-| `secondary`, `outline`, `bordered` | **Steel** |
-| `tertiary`, `ghost`, `light`, `flat` | **Text** |
+| `primary` | **Go** (mustard) |
+| `secondary`, `outline`, `bordered` | **Sign** (outlined) |
+| `tertiary`, `ghost`, `light`, `flat` | **Link** (text) |
 | `danger` | **Danger** |
-| `danger-soft` | Text in danger colour |
+| `danger-soft` | Link in danger colour |
 
-Delete the `steam` variant.
-
-| | Key | Steel | Text | Danger |
+| | Go | Sign | Link | Danger |
 |---|---|---|---|---|
-| Shape | 0px, fill `--color-accent`, `--edge-machined`; light adds 1px `--color-accent-edge` | 0px, fill `--color-plate`, 1px `--color-border-control`, `--edge-machined` | no box; 1px underline offset 4px on hover | 0px, fill `--color-danger`, `--edge-machined` |
-| Label | Hubot 680 uppercase 0.06em, wdth 125, `--color-on-accent` | same face, `--color-text` | Mona 560 sentence case, `--color-text` | `--color-on-danger` |
-| Hover | fill `--color-accent-hover` | border `--color-text`, fill `--color-raised` | underline draws in from the left (120ms) | `filter: brightness(1.05)` |
-| Active | `--edge-machined-pressed`, translateY 1px | same | underline `--color-accent-ink` | same as Key |
-| Focus | green ring, offset 2px | same | same | same |
-| Disabled | fill `--color-bg-secondary`, text faint, no edge | border `--color-border`, text faint | faint, no underline | as Key disabled |
-| Loading | label kept for width (visibility hidden), dial loader 16px centred, `aria-busy` | same | same | same |
+| Shape | 6px, fill `--color-accent`, 1px `--color-accent-edge` (Day) | 6px, transparent, 1.5px `--color-text` border | no box; 2px underline `--color-link-line`, offset 4px | 6px, fill `--color-danger` |
+| Label | Overpass 700 sentence case, `--color-on-accent` | Overpass 700, ink | Overpass 600, ink | `--color-on-danger` |
+| Trailing arrow | optional `ArrowBigRight` 18px in a 1px-divided end cell (only on directional CTAs: hero Search, Checkout, Continue, Pay) | optional `ArrowBigRight` | `ArrowBigRight` 16px when it leads somewhere | none |
+| Hover | fill `--color-accent-hover` | fill `--color-bg-secondary` | underline 3px, text `--color-accent-ink` | fill darkens 6% via `--color-danger` mix in a token |
+| Active | translateY 1px | same | same | same |
+| Disabled | fill `--color-bg-secondary`, faint text, edge `--color-border` | border `--color-border`, faint text | faint, no underline | as Go disabled |
+| Loading | label `visibility: hidden`, flap loader 16px centred | same | same | same |
 
-Sizes:
-- sm: 36px high, 13px label, 14px padding;
-- md: 44px, 14px label, 20px padding;
-- lg: 52px, 15px label, 28px padding.
+Sizes: sm 36px / 14px label / 14px padding; md 44px / 15px / 20px; lg 52px / 16px / 24px. Icon-only buttons: 40px square (44 on touch), 6px radius, transparent, hover fill `--color-bg-secondary`, required `aria-label`.
 
-Icon-only buttons are 40px square (44 on touch), transparent, hover fill `--color-raised`, required `aria-label`. `startContent`/`endContent` icons are 18px with an 8px gap.
+One Go button per viewport region. Go + Sign may sit together; two Go buttons may not.
 
-The primary action on a page is the only Key button in its viewport region. A Key and a Steel button may sit together; two Keys may not.
+On board surfaces (`data-surface="board"`) the Sign variant uses `--color-on-board` border and text, and Go uses the board's mustard pair (§3.2).
 
 ### 8.2 Text inputs, textarea
-- 48px high, 0px, fill `--color-raised`, 1px `--color-border-control`, `--edge-machined-pressed` (an input is a recess, not a plate), 14px horizontal padding, Mona 16px.
-- Label above: Mona 560 15px, 6px gap. Required: " *" in muted plus `aria-required`.
-- Hint below: 14px muted. Placeholder: faint.
-- Hover: border `--color-text-secondary`. Focus: green ring (offset 2px), border unchanged.
-- Error: 2px `--color-danger` border, message below in danger with `OctagonAlert` 16px, linked by `aria-describedby`, `aria-invalid="true"`.
-- Disabled: fill `--color-bg-secondary`, faint text. Read-only: no border, fill `--color-bg-secondary`.
-- Password: an inline 40px `Eye`/`EyeOff` button with `aria-pressed`.
-- Data inputs use Red Hat Mono 400 15px for the value: price min/max, order number on contact, the key "spell-out" field. Their labels stay Mona.
-- Textarea: minimum 140px, vertical resize.
+- 48px, 6px radius, fill `--color-raised`, 1px `--color-border-control`, 14px padding, Overpass 400 16px.
+- Label above: Overpass 600 15px, 6px gap; required " *" muted + `aria-required`. Hint 14px muted; placeholder faint.
+- Hover: border muted. Focus: ring (offset 2px). Error: 2px danger border, message with `OctagonX` 16px, `aria-describedby`, `aria-invalid`.
+- Password: inline 40px `Eye`/`EyeOff` with `aria-pressed`.
+- Data inputs (min/max price, order number, the key spell-out) use Sometype 400 15px values.
+- Textarea min 140px, vertical resize.
 
 ### 8.3 Select
-- A native `<select>` styled like an input: 48px (36px in sort, currency and toolbar spots), `appearance: none`, `ChevronDown` 16px placed 14px from the right.
-- Country uses the single restricted-countries config.
-- A custom listbox only for the language filter search and country search, and then the WAI-ARIA combobox pattern.
+Native `<select>` styled like an input (48px; 36px in toolbars), `appearance: none`, `ChevronsUpDown` 16px 14px from the right. WAI-ARIA combobox only for language and country search.
 
 ### 8.4 Checkbox, radio, switch, segmented control
-- **Checkbox:** 18px square, 0px, 1.5px `--color-border-control`.
-  - Checked: fill `--color-accent`, 12px `Check` in `--color-on-accent`.
-  - Indeterminate: an 8×2 bar.
-  - Label 10px to the right. The whole row is the hit area (44px in filter lists).
-- **Radio:** 18px circle, 1.5px border. Checked: an 8px green dot (it reads as a lit lamp).
-- **Switch** (cookie preferences, "On sale" filter):
-  - 40×22 square track, 1px control border, a **round 16px knob** (hardware) that slides 18px.
-  - On: track green, knob `--color-on-accent`. Off: track `--color-bg-tertiary`, knob `--color-text-secondary`.
-  - Locked "Necessary": on and disabled, with the text "Always on".
-  - `role="switch"`, `aria-checked`.
-- **Segmented control** (type filter on mobile, theme in the mobile menu, theater tabs on mobile):
-  - one 0px frame with a 1px control border; segments 36px high, Hubot 680 12px caps at 125%;
-  - selected segment: fill `--color-plate`, `--edge-machined`, an 8px lit lamp before the label, ink text;
-  - `role="radiogroup"` with arrow-key movement.
+- **Checkbox:** 20px, 4px radius, 1.5px control border; checked = mustard fill + `--color-accent-edge` border + `Check` 14px in `--color-on-accent`; indeterminate 10×2 bar. Whole row is the hit area (44px in filter lists).
+- **Radio:** 20px circle, 1.5px border; checked = 3px ink ring + 8px mustard dot (a route stop).
+- **Switch:** 44×24 track with 6px radius (not a pill), 1px control border; a 18px square-ish knob with 4px radius slides 20px; on = mustard track + ink knob; off = `--color-bg-tertiary` track + muted knob. `role="switch"`, `aria-checked`. Locked "Necessary" = on + disabled + "Always on".
+- **Segmented control** (mobile type filter, theme in the mobile menu, theater tabs on mobile): one 6px frame with 1px control border; 36px segments in Overpass 700 14px; selected = ink fill with bg-colour text (an inverted sign), `role="radiogroup"` with arrow keys.
 
-### 8.5 Engraved tags (restyle `Plate`, which replaces HeroUI `Chip` in the storefront)
-All tags:
-- 22px high, 0px, 0 8px padding;
-- Hubot 600 11px→**12px minimum** uppercase 0.1em at `font-stretch: 125%` with `--engrave`;
-- never clickable.
+### 8.5 Tags (`Plate` → `Tag`)
+22px high, 2px radius, 0 8px padding, Overpass 700 12px uppercase 0.1em; never clickable.
 
 | Variant | Look | Use |
 |---|---|---|
-| `platform` | transparent, 1px `--color-border`, a 6px `var(--platform)` square pip, then the name in ink | "STEAM", "XBOX" (always the platform's own name) |
-| `region` | transparent, no border, mono 12px uppercase ink | "GLOBAL", "EU", "UK", "NA" |
-| `type` | transparent, 1px `--color-border`, text `var(--type)` | "DLC", "GIFT CARD", "SUBSCRIPTION", "SOFTWARE" (base games: no tag on cards) |
-| `edition` | fill `--color-bg-secondary`, ink | "DELUXE EDITION", "GOTY" (only when the title carries an edition) |
-| `neutral` | fill `--color-bg-secondary`, ink | "Out of stock", "Sample data" |
-| `success` / `warning` / `danger` / `info` | tint fill, semantic text, a lamp-shaped 6px circle before the word | key and order statuses |
-| `deal` | the inverted plate (§8.12) | "−32%" |
-| `count` | fill `--color-accent`, `--color-on-accent`, mono 12px in a tumbler | cart count only |
+| `platform` | the **platform tile** (§8.6) + name in ink, no box | "[1] STEAM" |
+| `region` | 1px `--color-border-hover`, mono 12px uppercase ink | "GLOBAL", "EU", "UK", "US", "NA" |
+| `type` | fill `--color-bg-tertiary`, ink | "DLC", "GIFT CARD", "SUBSCRIPTION", "TOP-UP", "SOFTWARE" (base games: no tag) |
+| `edition` | 1px `--color-border-hover`, ink | "DELUXE EDITION" (only when the title carries one) |
+| `neutral` | fill `--color-bg-tertiary`, muted | "Out of stock", "Sample data" |
+| `success`/`warning`/`danger`/`info` | tint fill, semantic text, a 6px square before the word | statuses |
+| `deal` | the deal tile (§8.12) | "NOW −18%" |
+| `count` | a single flap tile (§8.21) | cart count only |
 
-Limits:
-- at most one platform tag, one region tag and two more tags on a card;
-- the label row truncates the region before the platform, never the other way round.
+At most one platform, one region and two other tags on a card. Truncate the region before the platform.
 
-### 8.6 The label row (platform + region + type)
-This is the quiet system every key representation carries, in one fixed order:
+### 8.6 Platform tile and the gate line
+- **Platform tile** (`src/components/ui/PlatformTile.tsx`): a flap tile with the platform number in Sometype 600. Sizes: xs 18×22 (cards, rows), sm 24×30 (filters, menus), md 40×52 (platform signs), lg 64×84 (home platform signs, platform landing opener). Numbers 1–10; "other" shows "–". `aria-hidden`; the name beside it carries meaning.
+- **Gate line** (replaces Keyrook's label row): `[1] STEAM · GLOBAL · DLC` — tile, platform name in Overpass 700 12px caps 0.1em, region in mono, type tag; `·` separators in faint. On a dark gate strip it is set in `--color-on-board` / `--color-on-board-muted`.
+- Wrapped in a `<p>` with visually hidden text "Activates on Steam. Region: Global. Downloadable content."; visual parts `aria-hidden`.
 
-`[pip] STEAM   ·   GLOBAL   ·   DLC`
+### 8.7 Chips (active filters)
+32px, 4px radius, fill `--color-raised`, 1px control border, Overpass 600 14px, human values ("Steam", "EU", "DLC", "€8–€18", "Released 2024–2026", "On sale"). Platform chips carry the xs platform tile. `X` 14px inside the hit area with `aria-label="Remove filter: Steam"`. The row ends with Link "Clear all".
 
-- Hubot engraved caps for the platform and type, mono for the region, with `·` separators in faint.
-- On cards it sits directly under the cover.
-- On the PDP it becomes a larger row (14px) above the H1 with the edition tag appended.
-- In compact rows it is the second line.
-- It is wrapped in `<p>` with an accessible text "Activates on Steam. Region: Global. Downloadable content."; the visual tokens are `aria-hidden`.
+### 8.8 Remark (`src/components/ui/Remark.tsx`, new)
+The board's REMARKS column as a component. Mono 600 uppercase on the board in `--color-remark`; on page surfaces it renders as a `type`-style tag in ink (never mustard text on the floor). Allowed values, each **data-backed** (§16):
 
-### 8.7 The lamp (LED)
-- An 8px circle (`rounded-round`):
-  - lit: `--color-lamp-on` fill;
-  - unlit: `--color-lamp-off` fill with a 1px `--color-border-control` ring.
-- No glow, no pulse, no blinking. A state change fades the fill in over 120ms (`lamp-lit`).
-- **Used for:**
-  - "In stock" on the buy box;
-  - "Key ready" on the key plate;
-  - the current node of the order timeline;
-  - the selected segment;
-  - the active theater tab;
-  - the header status line (lit while the store takes orders).
-- **Always next to a word.** Never decorative.
+| Remark | Condition |
+|---|---|
+| `ON TIME` | in stock (`qty > 0`) at its regular price |
+| `NOW −18%` | a valid compare-at price from our own 30-day history, ≥ `STORE_POLICY.deals.minPercent` |
+| `NEW` | release date within `MERCH.releaseWindowDays` (56) and not in the future |
+| `NOT IN STOCK` | saved items and history only |
+| theater-only: `CHECK-IN`, `BOARDING`, `DEPARTED`, `ARRIVED`, `HELP DESK` | sample data in the theater (§12) |
 
-### 8.8 Chips (active filters)
-- 32px high, 0px, fill `--color-raised`, 1px `--color-border-control`, Mona 560 14px.
-- Content is the human value: "Steam", "EU", "DLC", "€10–€20", "Released 2024–2026", "On sale".
-- Platform chips carry their pip.
-- A 14px `X` sits inside the hit area, with `aria-label="Remove filter: Steam"`.
-- Hover: ink border.
-- The row ends with the Text button "Clear all".
+No `LAST CALL`, `DELAYED`, `GATE CLOSING`, `FINAL BOARDING`, countdowns or "hot".
 
-### 8.9 Cover (`src/components/product/Cover.tsx`, new)
-The single component for game art; every surface uses it.
-- **Stage:** a fixed aspect box, 0px, `--color-stage`, with a 1px inset dark line on its top edge, so the cover reads as recessed into the plate.
-- **Ratio:** **3:4** for cards, cart and order rows, the PDP and the vault map. This is the ratio keyarcade and Cartridge Club already use for these covers; Midnight Arcade's 8:7 wastes the portrait box art that dominates the feed.
-- **Fit, decided by the cover's real proportions** (the catalogue sync stores `coverWidth` and `coverHeight` by probing each mirrored image once):
-  - portrait art with an aspect between **0.68 and 0.82** fills the stage with `object-cover` (at most ~8% is cropped, from the top and bottom edges);
-  - anything else (square art, 16:9 screenshots used as a fallback, unknown size) is `object-contain`, centred, on the stage with `--steel-grain` behind it, so the empty band reads as the inside of a drawer.
+### 8.9 Cover (`src/components/product/Cover.tsx` — keep, restyle)
+- **Stage:** fixed aspect box, 0px inside its card (the card's radius clips it), `--color-stage`.
+- **Ratio:** 3:4 for cards, cart and order rows, PDP; 16:9 for screenshots and the feature card.
+- **Fit by real proportions** (keep Keyrook's `coverWidth`/`coverHeight` logic): portrait art 0.68–0.82 fills with `object-cover`; anything else `object-contain` centred on the plain stage. Never blurred backdrops, washes, rotation.
+- **No cover:** `SquareDashed` 24px muted and the platform tile + name. No invented artwork.
+- Mirrored images via `next/image` with correct `sizes` (card ≈ 260px, PDP ≈ 520px, compact row 72px). No supplier host anywhere.
+- Alt: "{title} cover art".
 
-  **Never** a blurred, scaled copy of the image behind it (keyarcade's approach is banned here: blur), never a colour wash, never rotation.
-- **No cover:** the stage shows `ImageOff` 24px muted and the platform name engraved in Hubot caps. No generated box art, no invented artwork.
-- **Images:** mirrored to our own storage at sync (`src/lib/r2.ts`) and served through `next/image` with correct `sizes`:
-
-  | Placement | `sizes` |
-  |---|---|
-  | card | ≈ 280px |
-  | PDP | ≈ 560px |
-  | compact row | 80px |
-
-  Never hotlinked from the supplier. No supplier host appears in `remotePatterns`, alt text or metadata.
-- **Alt text:** "{title} cover art".
-
-### 8.10 The deposit box (the product card, replaces `SkinTray` and `ShelfTile`)
-One `<article data-platform="steam" data-type="game">`.
+### 8.10 The departure card (product card; restyle `ProductCard`)
+One `<article>`, 8px radius, `--color-raised`, 1px `--color-border`, `overflow: hidden`.
 
 **Anatomy, top to bottom:**
-1. **Box:** 0px, fill `--color-plate`, 1px `--color-border`, `--shadow-card` (machined edge).
-2. **Drawer face:** the Cover (§8.9) at 3:4, inset 8px from the box's top, left and right edges, so a steel frame shows around it. The drawer face is the card's main link (`/product/[slug]`), stretched over the box with a pseudo-element; Pin and Add stay separate controls.
-3. **Label row** (§8.6), 12px below the cover.
-4. **Title:** Mona 640 16px, 2 lines reserved.
-5. **Facts line:** mono 12px muted, one line, chosen by type:
-   - Game / DLC: languages as up to three codes plus a count ("EN DE FR +9"), or nothing when the feed has no language data. DLC adds "Needs the base game".
-   - Gift card: "Value €20" (from the product name or a parsed value).
-   - Subscription: "12 months".
-
-   QC 18.4 requires language restrictions and expiry. The card shows what the data holds; the PDP states the rest explicitly (§8.23).
-6. **Price row:**
-   - left: the price (§8.11); with a discount, the struck was-price in faint above it and the deal plate (§8.12) beside it;
-   - right: `Pin` (40px icon button, `aria-pressed`, "Pin {title}" / "Pinned") and **Add** (40px square Steel icon button with `SquarePlus`, `aria-label="Add {title} to cart"`).
+1. **Gate strip** (30px, `--color-board`, `data-surface="board"`): xs platform tile, platform name in Overpass 700 12px caps 0.1em `--color-on-board`, right-aligned region in mono 12px `--color-on-board-muted`. It is the card's own little board row.
+2. **Cover** 3:4, full width, flush under the strip. The cover is the card's main link (`/product/[slug]`), stretched over the card with a pseudo-element; Save and Add stay separate controls.
+3. **Body** (14px padding):
+   - title: Overpass 700 16–17px, 2 lines reserved;
+   - facts: Overpass 400 14px muted, one line by type: games/DLC "EN · DE · FR +9" (or nothing without data), DLC adds "Needs the base game"; gift card "Value €20"; subscription "12 months"; top-up "1,000 coins" when parsed;
+   - type tag (non-games only) after the facts;
+   - **price row**: left the price (Sometype 600 step-1); with a deal, the struck was-price (faint, 13px) above it and the deal tile beside it. Right: `ListPlus` Save (40px icon button, `aria-pressed`, "Save {title}" / "Saved") and **Add** (40px icon-only Sign button with `TicketPlus`, `aria-label="Add {title} to cart"`).
 
 **States:**
-- **Hover / focus-within (fine pointer): the drawer pull.**
-  - The cover slides up 6px inside the frame, revealing a 6px dark slot (`--color-bg-tertiary`) beneath it.
-  - The box takes `--shadow-card-hover`.
-  - The title gets an underline.
-  - Add turns into the Key style (green fill).
-  - 180ms on `--ease-latch`.
-  - The focus ring wraps the whole box (offset 3px), never the cover alone.
-- **In cart:** Add becomes the Text button "In cart" with `Check` 16px, linking to the cart drawer.
-- **Adding:** Add shows the dial loader, then M7 (§13).
-- **Out of stock:** only possible on pinned items and order history, never in catalogue results. Cover at 55% opacity, neutral tag "Out of stock" in the label row, Add removed, price muted as "Last price €12.40".
-- **No cover:** the Cover fallback.
-- **Skeleton:** the box with the stage in `--color-bg-tertiary`, three bars (label 72px, title 80% width, price 64px) in `--color-bg-secondary`. No shimmer. Fades to content in 120ms.
+- **Hover / focus-within (fine pointer):** border `--color-border-hover` + `--shadow-card-hover`; the gate strip's platform tile flips once to the same number (a single 140ms flap — the "this departure is selected" cue, M6); the title underlines; Add becomes Go (mustard). 180ms on `--ease-sign`. The focus ring wraps the whole card (offset 3px).
+- **In cart:** Add becomes `TicketCheck` in a Sign button labelled "In cart" (opens the drawer).
+- **Adding:** flap loader, then M7.
+- **Out of stock** (saved items, history only): cover 55% opacity, `NOT IN STOCK` tag, Add removed, price muted "Last price €12.40".
+- **Skeleton:** card with `--color-bg-tertiary` stage, gate strip in `--color-board` (static), three bars (title 80%, facts 50%, price 64px) in `--color-bg-secondary`. No shimmer; 120ms fade to content.
 
 **Variants:**
-- **Compact row** (cart, search dropdown, orders, vault map preview): a 60×80 cover, the label row as line 2, title 1 line, price right. Rows are separated by hairlines, not boxed.
-- **Feature box** (home deal lead, platform page lead): spans 2 columns × 2 rows. The drawer face is the product's first **screenshot at 16:9** with the 3:4 cover set into its bottom-left corner as a second recessed well (34% of the width). Title in Hubot 680 step-3, full label row, facts, price at step-3.
-- **Gift card blank:** a plate at 1.586:1 (the ID-1 card ratio) with:
-  - the platform pip and name engraved top-left;
-  - "GIFT CARD" type text;
-  - the value in mono step-4 bottom-left;
-  - region bottom-right;
-  - no cover art unless the feed's cover is a real card image, in which case it is the drawer face at 1.586:1 with `object-contain`.
-- **Subscription row:** a table row (§14.1 section 8), not a card.
+- **Compact row** (cart drawer, search, orders, concourse map preview): a 54×72 cover, line 1 title, line 2 gate line, price right. Rows separated by hairlines, not boxed.
+- **Board row** (home timetable headers, revised fares, search kiosk): a row of flap text on `--color-board` — see §8.21.
+- **Feature card** (platform landing lead): spans 2×2; 16:9 screenshot with the 3:4 cover set in its lower left (32% width) on a 1px `--color-raised` mat; title Overpass 800 step-3, gate line, price step-3.
+- **Gift card blank** (§14.1 section 7, gift card type landing): 1.586:1, 10px radius, `--color-board`, `data-surface="board"`: platform tile + name top-left, "GIFT CARD" sign label, the value in flap tiles bottom-left (lg), region bottom-right. A real card image from the feed replaces the blank face at `object-contain` inside the same frame.
 
-**Grid:**
-- 5 columns ≥1536, 4 at 1280–1535, 3 at 840–1279, 2 below 840;
-- gaps 16px desktop, 10px mobile;
-- no extra row gap; the boxes' own frames give rhythm.
+**Grid:** 5 columns ≥1536, 4 at 1280–1535, 3 at 840–1279, 2 below 840; gaps 16px desktop, 12px mobile.
 
 ### 8.11 Price display (`PriceDisplay` — keep, restyle)
-- Red Hat Mono 600. The currency symbol comes from the currency provider at the same size; minor units at the same size (no superscript cents).
-- Converted currencies show "≈" only if the charge currency differs from the displayed one. The checkout says which currency is charged (existing logic).
-- Loading: a 64×18 block in `--color-bg-secondary`.
+Sometype 600; currency symbol at the same size; no superscript cents; "≈" only when the charge currency differs. Loading: 64×18 `--color-bg-secondary` block.
 
-### 8.12 Deal plate
-- A 22px inverted plate: fill `--color-deal` (ink), mono 600 12px "−32%" in `--color-on-deal`, 0 6px padding, 0px.
-- Shown only when a real compare-at price exists and is higher (the `wasPrice` from data, never computed from anything else).
-- The struck price is `--color-text-tertiary`, `line-through`, mono 400 13px, with an accessible label "Was €29.99".
-- Never red, never green, never "SALE!", never a countdown.
+### 8.12 Deal tile
+A flap tile row: `NOW` + `−18%`, Sometype 600 12px, `--color-remark` on `--color-flap`, 2px radius, 1px hinge line across, 22px high. Shown only with a valid compare-at price (§17). The struck price: `--color-text-tertiary`, `line-through`, Sometype 400 13px, accessible label "Was €29.99". Never red, never green, never "SALE!", never a countdown.
 
 ### 8.13 Quantity (`QuantitySelector`)
-- Three joined segments in one 0px frame: `SquareMinus` 40×40 | mono value 44px | `SquarePlus` 40×40.
-- Maximum: the lower of `STORE_POLICY.limits.maxQtyPerItem` (game keys default 3, gift cards per config) and real stock. At the maximum the hint reads "Up to 3 per order".
-- Labels "Decrease quantity" / "Increase quantity". Clamp on blur, with an `aria-live="polite"` announcement.
+A flap counter: `[⌄] [ 2 ] [⌃]` — 40px `ChevronDown` button, a 40×44 flap tile with the value (sm flap), 40px `ChevronUp` button, inside one 6px frame with a 1px control border. The value flips on change (one flap). Max = lower of `STORE_POLICY.limits.maxQtyPerItem` and stock; hint "Up to 3 per order". Labels "Decrease quantity" / "Increase quantity"; clamp on blur with `aria-live="polite"`.
 
-### 8.14 Filters (`ProductFilters`) — the "vault index"
-- **Desktop:** a left column 280px, sticky under the header, on `--color-bg` (no box), groups separated by 1px hairlines.
-- **Group header:** a 48px row with the engraved label (e.g. "PLATFORM"), the selected count in mono ink ("2") and `ChevronDown`. It is a button with `aria-expanded`. Panels open via grid-rows 0fr→1fr over 180ms.
-- **Open by default:** Type, Platform, Price, On sale.
-- Only values present in the current result set are listed, each with its real count (mono 12px muted, right-aligned).
-- **Groups and controls, in order:**
-  1. **Type:** checkbox rows Games, DLC, Gift cards, Subscriptions, Software, each with its type colour as a 2px underline of the label on hover only. Hidden on type pages.
-  2. **Platform:** checkbox rows with the 6px pip and the name. Hidden on platform pages.
-  3. **Region:** checkbox rows (Global, Europe, United Kingdom, North America; only regions the store accepts, per `catalog-types`). A one-line help text under the group: "A region-locked key activates only on accounts in that region."
-  4. **Genre:** checkbox rows; a search-in-list input appears above 10 values.
-  5. **Price:** two mono inputs (Min / Max in the active currency) over a **dial ruler** (§8.22) with two index-line thumbs. Ticks sit at the active currency's band boundaries (5 / 10 / 20 / 40).
-  6. **Language:** a combobox with multi-select ("Interface or audio language"), listing languages present in results with counts.
-  7. **Release year:** a ruled **year histogram**. One 6px-wide bar per year, height proportional to the real count, years as mono labels every 5 years, two thumbs selecting a contiguous range. Arrow keys move the thumbs by a year; Home/End jump to the ends. Each thumb is `role="slider"` with `aria-valuetext="From 2019"`.
-  8. **On sale:** a switch ("Only show discounted keys" + count).
-- **Above the grid:** a result sentence in mono 14px ("1,284 keys · Steam · Global · On sale") plus active chips.
-- **Mobile:**
-  - a sticky toolbar under the header: Steel "Filter" with the count in mono, and the sort select;
-  - Filter opens a full-height sheet from the bottom (`--color-raised`, 0px) with the same groups and a sticky footer holding the Key button "Show 1,284 keys" and Text "Clear all".
-- Filter state lives in the URL (existing logic); back/forward restores it.
+### 8.14 Filters (`ProductFilters`) — the "information panel"
+- **Desktop:** left column 272px, sticky under the header, on `--color-bg` (no box), groups separated by hairlines.
+- **Group head:** 48px row, sign label (e.g. "PLATFORM"), the selected count in mono, `SquareChevronDown`. A button with `aria-expanded`; panel opens via grid-rows 0fr→1fr over 180ms. A 3px mustard bar sits under the head of a group that has selections.
+- Open by default: Platform, Type, Price, On sale.
+- Only values present in the current result set, each with its real count (mono 12px muted, right-aligned).
+- **Groups, in this order** (different from Keyrook's Type-first and Fablekeys' Volume-first):
+  1. **Platform:** rows "[1] Steam … 40,737", in `PLATFORM_BOARD` order (not by count). Hidden on platform pages.
+  2. **Type:** Games, Gift cards, Subscriptions, DLC, Top-ups, Software (`TYPE_ORDER`, §18). Hidden on type pages.
+  3. **Price:** fare zone quick picks as 4px-radius chips ("Under €3", "€3–€8", "€8–€18", "€18–€35", "€35–€70", "€70 and up" in the active currency, from `FARE_ZONES`), then two mono inputs Min / Max. No slider track decoration.
+  4. **Region:** Global, Europe, United Kingdom, United States, North America; help line "A region-locked key activates only on accounts set to that region."
+  5. **Genre:** rows in `ROUTE_ORDER` with counts; a search-in-list input above 10 values. (Label "Genre" — the "route" metaphor stays on home.)
+  6. **Language:** combobox multi-select ("Interface or audio language").
+  7. **Release year:** two mono selects "From" / "To" listing years present in results, newest first. (No histogram, no ruler.)
+  8. **On sale:** switch "Only show price cuts" + count.
+- **Above the grid:** result sentence in Overpass 400 15px with mono numbers ("1,284 keys · Steam · Global · On sale") and active chips.
+- **Mobile:** sticky toolbar under the header: Sign button "Filter" (`SlidersVertical`, count in mono) and the sort select; Filter opens a full-height bottom sheet (`--color-raised`, top corners 8px) with the same groups and a sticky footer holding Go "Show 1,284 keys" and Link "Clear all".
+- Filter state in the URL (existing logic).
 
 ### 8.15 Sort (`ProductSort`)
-- A native select, 36px, with the inline label "Sort" as an engraved micro-label.
-- Options, only those the API supports:
-  - Relevance (search only);
-  - Price, low to high;
-  - Price, high to low;
-  - Biggest discount;
-  - Newest release;
-  - Recently added (only if `createdAt` reflects real catalogue additions);
-  - Title A–Z.
+Native select, 36px, inline sign label "SORT". Options in this order: **Board order** (default; tooltip text under the select on focus: "Newer releases first, mixed across platforms"), Price, low to high; Price, high to low; Newest release; Biggest price cut; Most ordered; Title A–Z; Relevance (search only). "Board order" is a new `SortKey` `board` (§18.3).
 
 ### 8.16 Pagination
-- Numbers in 40px squares, mono 14px, 0px. Hover: fill `--color-raised`.
-- Current: ink text with a 2px green bar along the bottom, `aria-current="page"`.
-- "Previous" / "Next" are Text buttons with `ArrowLeft` / `ArrowRight`. Ellipses after 1 … n.
-- Mobile: "Page 2 of 27" in mono with Previous / Next.
-- Load more variant: "Showing 48 of 1,284" in mono muted, then Steel md "Load 48 more".
+Numbers in 40px squares with 6px radius, mono 14px. Current: ink text + 3px mustard bar under it, `aria-current="page"`. "Previous"/"Next" as Link buttons with `ArrowBigLeft`/`ArrowBigRight`. Mobile: "Page 2 of 27" mono + Previous/Next. Load-more variant: "Showing 48 of 1,284" + Sign "Show 48 more".
 
 ### 8.17 Breadcrumbs
-- Mona 14px muted links, separated by a mono " / " in faint (`aria-hidden`). The current page is ink with `aria-current="page"`, inside `nav aria-label="Breadcrumb"`.
-- Mobile: only the parent, as a back link with `ArrowLeft` ("Steam").
-- `BreadcrumbList` JSON-LD via the existing `JsonLd`.
+Overpass 14px muted links, mono "›" separators in faint (`aria-hidden`), current page ink with `aria-current`. Mobile: parent only, with `ArrowBigLeft`. `BreadcrumbList` JSON-LD.
 
 ### 8.18 Tabs and accordion
-- **Tabs** (PDP sections on desktop, account keys filter):
-  - Hubot 680 uppercase 13px at 125%, 48px high, tablist on a 1px hairline;
-  - active tab: ink with a 2px green bar under the full label width, sitting on a 1px `--color-rule` baseline;
-  - inactive tabs muted; hover ink;
-  - WAI-ARIA tabs. On mobile, PDP tabs become accordions.
-- **Accordion** (FAQ, mobile filter groups, mobile footer columns, PDP sections on mobile):
-  - 56px header rows, Mona 560 step-1, `ChevronDown` that rotates 180° over 180ms;
-  - open panel on `--color-bg` with 20px padding; rows separated by hairlines;
-  - the open row's header gets an unlit→lit lamp at its left;
-  - several can be open at once.
+- **Tabs** (PDP on desktop, account keys filter): Overpass 700 15px sentence case, 48px, tablist on a hairline; active = ink + 3px mustard bar the width of the label; inactive muted. WAI-ARIA tabs. PDP tabs become accordions on mobile.
+- **Accordion** (FAQ, mobile filters, mobile footer, PDP on mobile): 56px heads, Overpass 700 step-1, `SquareChevronDown` rotating 180° over 180ms; open panel on `--color-bg` with 20px padding; hairline rows; several can be open.
 
-### 8.19 Toasts
-- Position: desktop bottom-right 24px; mobile top under the header, full width minus 32px.
-- `--color-raised`, 0px, `--shadow-lg`, max-width 380px, a 2px left bar in the semantic colour (green for cart).
-- **Cart toast:** a compact row, "Added to cart", Text "View cart" and Key sm "Checkout".
-- **Status toasts:** 16px `BadgeCheck` / `OctagonAlert` / `TriangleAlert` / `Info` in the semantic colour, plus the text.
-- Auto-dismiss after 5s, paused on hover/focus, close `X`. `role="status"` (`role="alert"` for errors).
-- Entrance translateY 8px→0 + opacity over 180ms; reduced motion: opacity only.
+### 8.19 Toasts — "announcements"
+Desktop bottom-right 24px; mobile top under the header, full width minus 32px. `--color-raised`, 6px radius, `--shadow-overlay`, max 380px, a 4px left bar (mustard for cart, semantic otherwise). Cart toast: `TicketCheck` + "Added to cart", Link "View cart", Go sm "Checkout". Status toasts: semantic icon + text. 5s auto-dismiss, paused on hover/focus, `X`. `role="status"` (`alert` for errors). Entrance `sign-in` 180ms; reduced: opacity.
 
-### 8.20 Dialog (`Dialog`, `ConfirmDialog`, preference centre, cover zoom, report-a-problem)
-- Centred, 0px, `--color-raised`, `--shadow-xl`, max-width 560px, 32px padding. Title Hubot 600 step-2.
-- Close `X` top-right. Scrim `--color-scrim`, no blur.
-- Focus trap, Esc, focus return, `role="dialog"`, `aria-modal`, `aria-labelledby`.
-- Entrance: rise 8px + fade over 260ms on `--ease-latch`.
-- Destructive dialogs: Danger on the right, Steel "Cancel" on the left.
+### 8.20 Dialog
+Centred, 8px radius, `--color-raised`, `--shadow-xl`, max 560px, 28px padding; title Overpass 700 step-2; close `X`; scrim without blur; focus trap, Esc, focus return, `role="dialog"`, `aria-modal`, `aria-labelledby`; entrance rise 8px + fade 240ms `--ease-sign`. Destructive: Danger right, Sign "Cancel" left.
 
-### 8.21 Tumbler window and tumbler counter (new, `src/components/ui/Tumbler.tsx`)
-**The window:**
-- one glyph per slot: width `1ch + 0.32em`, height `1.45em`;
-- fill `--color-bg-tertiary`, `--edge-machined-pressed` (a slot cut into the plate), a 1px `--color-border` hairline between adjacent slots;
-- glyph centred in Red Hat Mono 500.
+### 8.21 Flaps (`src/components/ui/Flap.tsx`, new — replaces `Tumbler`)
+**`Flap`** — one character tile:
+- width `1ch + 0.4em`, height `1.55em`, font Sometype 600 at the size token (`flap-sm` 14px, `flap-md` 18px, `flap-lg` up to 28px, `key` for keys);
+- `--color-flap` face (top half `--color-flap-top`), `--color-on-board` glyph (or `--color-remark` in remark columns), 2px radius, `--shadow-flap`;
+- the **hinge**: a 1px (≤18px) / 2px (larger) `--color-hinge` line across the middle, plus a 1px gap between adjacent tiles showing `--color-board`;
+- built from two halves (`.flap-top`, `.flap-bottom`) each clipping the same glyph, plus a third `.flap-leaf` used only while flipping;
+- blank tile = an empty flap (not a dot, not a bullet).
 
-**Tumbler counter** (live counts, cart count, order numbers):
-- When the value changes, each digit's wheel rolls through intermediate digits to the new one:
-  - the rightmost wheel travels furthest;
-  - each wheel takes `--dur-tumbler`, staggered 40ms from right to left;
-  - `tumbler-roll` on `--ease-latch`.
-- First render shows the value without animation, except where a motion hook (§13) explicitly animates on entering view.
-- Accessibility: the container has `role="img"` or plain text with `aria-label="4,812 keys in stock"`; the rolling glyphs are `aria-hidden`; changes are announced only where a live region is specified (cart count).
-- Reduced motion: the value swaps instantly.
+**`FlapRow`** — a row of tiles from a string, fixed `cells` length, `align` left/right, padding with blanks; separators (space, `-`, `·`) are flaps too, exactly like a real board.
 
-**Separators** (commas, dashes in keys) sit outside slots as plain mono characters in muted.
+**`FlapCounter`** — numbers (cart count, quantity, order number on the confirmation page). Changes flip each changed digit once through the drum order (§6), right digit first.
 
-### 8.22 The dial family (new, `src/components/ui/Dial*.tsx`)
-**Dial loader** (replaces `ReadoutLoader` / `LoadingSpinner`):
-- a 24px (16px in buttons) ring of 12 ticks in `--color-border-hover`;
-- one tick is lit green and **steps** clockwise every 90ms, a discrete click like a combination dial, never a smooth spin;
-- `role="status"` with hidden text "Loading";
-- reduced motion: a static ring with the 12 o'clock tick lit, plus the text "Loading…".
+**Accessibility:** the visual row is `aria-hidden`; a sibling visually hidden span holds the real text. Live regions only where specified (cart count). Reduced motion: final characters, no flip.
 
-**Dial ruler** (checkout progress, price filter, order timeline track, footer platform index underline):
-- a 1px `--color-rule` baseline;
-- minor ticks every 8px (4px tall, `--color-border-hover`), major ticks every fifth (8px, `--color-text-tertiary`), detents (12px, ink) with labels under them;
-- the **index line**: a 2px × 14px green vertical bar standing on the baseline at the active detent. It is the ruler's cursor and every slider thumb in the store. As a thumb it sits in a 24×32 transparent hit box, which carries the focus ring as a clean rectangle;
-- `aria-hidden` when decorative. As a slider: `role="slider"`, arrow keys step between detents, `aria-valuetext`.
+**DOM flip** (everywhere except the WebGL hero): CSS 3D on the leaf (`perspective: 300px` on the tile, `flap-fall` then `flap-land`, transform/opacity only), driven by `flapFrame()` on the shared ticker, so the same timing powers DOM and GL.
 
-**Rotary dial control** (home price-band explorer, §14.1 section 11):
-- a ring 300px (desktop) / 232px (mobile) with 100 ticks, numerals at the band boundaries, a centre knob plate (a circle in `--color-plate` with 24 radial grip notches and `--edge-machined`), and the green index line fixed at 12 o'clock;
-- turning the knob rotates the ring so the chosen band sits under the index line;
-- input:
-  - drag (angle from the centre, snapping to detents with the detent spring);
-  - arrow keys (one detent);
-  - Home/End;
-  - clicking a band label around the ring;
-- `role="slider"`, `aria-valuemin=0`, `aria-valuemax=bands-1`, `aria-valuetext="€10 to €20, 412 keys"`;
-- the band labels around the ring are also real buttons (44px targets) for touch and screen-reader users;
-- reduced motion: the ring jumps to the detent instantly.
+### 8.22 Flap loader (replaces `ReadoutLoader`/`LoadingSpinner`/the dial loader)
+A single blank flap tile (16px in buttons, 24px standalone) whose leaf falls every 280ms (70ms fall + 210ms rest) — a discrete, mechanical tick, never a spin. `role="status"` with hidden "Loading". Reduced motion: static tile + visible "Loading…".
 
-### 8.23 Buy box, edition selector, requirements panel, system requirements (PDP)
-**Buy box** (`src/components/product/BuyBox.tsx`), a plate with 24px padding:
-1. The label row at 14px with the edition tag.
-2. The price at step-4 (mono 600). If discounted, the was-price struck in faint and the deal plate on the same line.
-3. Stock line: the lit lamp and "In stock" (from real `qty > 0`), or the unlit lamp and "Out of stock". No counts, no urgency.
-4. **Quantity** (only when the max is above 1), then **Key lg "Add to cart"** full width, then **Steel lg "Buy now"** (straight to checkout with this item).
-5. A Text button with `Pin`: "Pin for later" / "Pinned".
-6. Three ruled rows with 18px icons (copy from `POLICY_FACTS`; each row hidden if its fact is not true in config):
-   - `Timer`: "Delivered to your account, usually within minutes after payment is confirmed."
-   - `ShieldCheck`: "Card payment on a hosted page with 3-D Secure."
-   - `RotateCcwKey`: "Replacement or refund if the key doesn't work." This links to the Refund policy anchor.
+### 8.23 Route line (`src/components/ui/RouteLine.tsx`, new)
+An SVG + DOM component used horizontally and vertically:
+- line 3px `--color-stop`; upcoming segments dashed `--color-rule`;
+- stops: 14px circles, 3px `--color-stop` ring, fill `--color-bg` (done: fill ink; current: fill mustard with the ink ring and a 3px mustard bar under its label);
+- labels under (horizontal) or beside (vertical) each stop: Overpass 600 14px ink; meta (counts, times) in mono 12px muted;
+- the end of a line is a **terminus bar**: a 6×28px (horizontal) bar in `--color-terminus`; on rest-state route diagrams it is ink and turns mustard on hover/focus of the line;
+- `pathLength="1"` on the line path so M5/M8 can draw it;
+- semantics: an `<ol>` of stops with `aria-current="step"` on the current one; decorative SVG `aria-hidden`.
+
+### 8.24 Buy box, edition timetable, "Before you buy", system requirements (PDP)
+**Buy box** (`BuyBox.tsx`): `--color-raised`, 8px radius, 1px border, 24px padding:
+1. Gate line at 14px with the edition tag.
+2. Price at step-4 (Sometype 600); with a deal, the struck was-price and deal tile on the same line.
+3. Stock line: `ON TIME` remark tag + "In stock" (real `qty > 0`), or "Not in stock". No counts, no urgency.
+4. Quantity (only when max > 1), then **Go lg "Add to cart"** full width, then **Sign lg "Buy now"**.
+5. Link with `ListPlus`: "Save for later" / "Saved".
+6. Three ruled rows with 18px icons (copy from `POLICY_FACTS`; each hidden when its fact is false):
+   - `Inbox`: "Delivered to your account, usually within minutes after payment is confirmed."
+   - `CreditCard`: "Card payment on a hosted page with 3-D Secure."
+   - `Replace`: "Replacement or refund if the key doesn't work." (links to the Refund policy anchor)
 7. Visa / Mastercard / PCI DSS at 20px.
 
-**States:** ready; adding (loading); in cart ("In cart · View cart" Text plus Key "Checkout"); out of stock (Add disabled "Out of stock", the line "This key isn't in stock right now.", and links to the same title on other platforms if they exist); price unavailable ("Price unavailable right now", Add disabled).
+States: ready; adding; in cart ("In cart · View cart" + Go "Checkout"); out of stock (Add disabled "Not in stock", "This key isn't in stock right now.", links to the same title on other platforms); price unavailable.
 
-**Edition selector**, above the buy box price:
-- Shown only when ≥2 in-stock products share the normalised base title, platform and region.
-- A `role="radiogroup"` list of rows, each a link to the sibling product with `aria-current` on the current one:
-  - edition name in Mona 560;
-  - what it adds (only if the feed's name carries it, e.g. "+ Season Pass"; otherwise nothing);
-  - price in mono on the right.
-- The current row: fill `--color-accent-light`, lit lamp at the left.
-- Other rows: hairline-separated, unlit lamp.
+**Edition timetable** (replaces the edition selector look, same data and logic): a small ruled table above the price, shown when ≥2 in-stock products share base title, platform and region. Columns: EDITION (Overpass 600) · ADDS (only from the feed name, e.g. "+ Season Pass") · PRICE (mono, right). Each row is a link; `role="radiogroup"` semantics with `aria-current` on the current one, which gets `--color-accent-light` fill and a 3px mustard left bar.
 
-**Requirements panel: "Before you buy"** (a ruled definition list, not a card; placed directly under the buy box on desktop and above the description on mobile):
+**"Before you buy"** (ruled definition list, not a card; under the buy box on desktop, above the description on mobile):
 
 | Row | Icon | Content |
 |---|---|---|
-| Platform | `KeyRound` | "Activates on Steam. You need a Steam account and the Steam app." (sentence from the platform table) |
-| Region | `EarthLock` | "Global: no regional lock" / "Europe only: activates on accounts registered in the EU, EEA, UK and Switzerland" (per the region map), then the supplier's verbatim limitation note in mono 12px muted |
-| Languages | `Languages` | the full list, or "Not specified by the publisher" |
-| Requires | `PackagePlus` | DLC: "The base game {title} on the same platform and region" if the base game is in the catalogue (linked), else "The base game on the same platform" |
-| Validity | `CalendarSync` / `WalletCards` | subscriptions: the duration; gift cards: the value and "Expiry set by the issuer, see activation details" unless the feed states a date |
-| Age rating | — | only if the feed has one, as given ("PEGI 16") |
-| Delivery | `Timer` | "To your account, usually within minutes after payment is confirmed" |
+| Platform | `KeySquare` | "Activates on Steam. You need a Steam account and the Steam app." |
+| Region | `GlobeLock` | "Global: no regional lock" / "Europe only: activates on accounts set to a European country", then the supplier's verbatim note in mono 12px muted |
+| Languages | `Languages` | full list, or "Not specified by the publisher" |
+| Requires | `LayersPlus` | DLC: "The base game {title} on the same platform and region" (linked if listed), else "The base game on the same platform" |
+| Validity | `CalendarRange` / `Wallet` | subscriptions: duration; gift cards: value and "Expiry set by the issuer, see activation details" unless the feed states a date |
+| Age rating | — | only if the feed has one ("PEGI 16") |
+| Delivery | `Inbox` | "To your account, usually within minutes after payment is confirmed" |
 
-**System requirements:**
-- Rendered only when **all three** hold:
-  - the platform is a PC launcher (Steam, Epic, EA app, Ubisoft Connect, GOG, Battle.net, Rockstar);
-  - the type is Game, DLC or Software;
-  - the feed's text is non-empty.
-- When the feed is structured into Minimum / Recommended, render a two-column ruled table (labels in engraved caps, values in Mona 15px). Otherwise render the verbatim text as a list.
-- Never shown for Xbox, PlayStation, Nintendo, gift cards or subscriptions (QC 18.4).
+**System requirements:** only when the platform is a PC launcher, the type is Game/DLC/Software and the feed text is non-empty (keep Keyrook's logic). Two-column ruled table with sign-label heads when structured, verbatim list otherwise. Never for Xbox, PlayStation, Nintendo, gift cards, subscriptions, top-ups.
 
-### 8.24 Order timeline (`OrderTimeline`, rebuilt from `PurchaseTimeline`)
-**Happy path:** **Order placed → Payment confirmed → Key issued**. The account adds a fourth, informational node, **Revealed**, with the time of the first reveal (it is not a delivery step).
+### 8.25 Order timeline (`OrderTimeline`)
+A **route line** (§8.23). Stops: **Order placed → Payment confirmed → Key issued**, plus an informational **Revealed** stop in the account (not a delivery step). Done stops filled ink; current stop mustard; upcoming hollow with dashed segments; real timestamps under done stops (mono 12px muted). Horizontal on desktop, vertical on mobile.
 
-**Desktop:**
-- the dial ruler as the track, nodes 10px circles;
-- done nodes: filled ink;
-- current node: the lit lamp in its place and a label in ink 600;
-- upcoming nodes: hollow `--color-border-hover`, label faint;
-- timestamps under done nodes in mono 12px muted, real values only (`createdAt`, `paidAt`, `issuedAt`, `revealedAt`).
+"Issuing" (paid, not yet issued): the flap loader at the current stop + "Usually within minutes after payment is confirmed. We'll email you when it's ready." No countdown.
 
-**Mobile:** the same as a vertical track.
+Branches replace the rest of the line with a terminus bar in `--color-danger` (failure) or `--color-text-secondary` (neutral) and one sentence (§16): Payment failed; Issuing delayed; Refund pending; Refunded; Replacement issued. The line never shows a future the order can no longer reach.
 
-**"Issuing" state** (paid, key not yet issued): the dial loader at the current node and the line "Usually within minutes after payment is confirmed. We'll email you when it's ready." No countdown.
+Polling stays; a change animates once (M8) and `aria-live="polite"` announces it.
 
-**Branches** replace the remaining track with a danger or neutral end node and one sentence of copy (§16):
-- Payment failed;
-- Issuing delayed;
-- Refund pending;
-- Refunded;
-- Replacement issued.
-
-The track never shows a future the order can no longer reach.
-
-While in flight the page polls (existing logic). A change animates once (M8), and `aria-live="polite"` announces it.
-
-### 8.25 Key plate (`src/components/account/KeyPlate.tsx`, new — the core component)
-A bolted plate (four bolts), `--color-plate` with `--steel-grain`, 24px padding, max-width 720px.
+### 8.26 Key board (`KeyPlate.tsx` → `KeyBoard.tsx` — the core component)
+A board housing: `--color-board`, 10px radius, 1px `--color-board-edge`, 20px padding, max-width 760px, `data-surface="board"`.
 
 **Anatomy:**
-1. **Header row:**
-   - engraved "KEY 1 OF 2" (when the order has several);
-   - the label row (platform, region, type);
-   - on the right, the key status tag (§8.5): "Ready" (success), "Reported" (warning), "Replaced" (info), "Refunded" (neutral).
-2. **Title** in Mona 640 step-1, linked to the PDP.
-3. **The key, in tumbler windows** (§8.21):
-   - one slot per character, keeping the issued string exactly as delivered (dashes, spaces and case are never reformatted);
-   - long keys wrap by group;
-   - masked: every slot shows `•` in muted.
-4. **Action row:**
-   - masked: Key md "Reveal key" with `Eye`;
-   - revealed: Steel md "Copy key" with `Copy` (→ `CopyCheck` "Copied" for 2s); Steel md "Redeem on Steam" with `SquareArrowOutUpRight`, opening the platform's own redeem page from `src/config/activation.ts` in a new tab with `rel="noopener noreferrer"`; Text "Hide" with `EyeOff`.
-5. **Meta line** in mono 12px muted: "Issued 6 Oct 2026, 14:21 · First revealed 6 Oct 2026, 14:25".
-6. **Disclosures:**
-   - Text "How to redeem on Steam" opens the steps from §14.13 inline;
-   - Text "Activation notes from the publisher" shows the verbatim `activationDetails`;
-   - Text "Spell it out" shows a second mono line under the key with every character disambiguated, for reading to a console or a TV keyboard: `7 X K 2 Q – zero O(letter) Q D 9 – …`.
-7. **Problem link:** Text "Key not working? Report it" opens the report dialog (reason select: "Already redeemed", "Invalid key", "Wrong region", "Wrong product", "Other"; an optional note; an optional screenshot), which creates a support ticket tied to the order item.
+1. **Header row:** sign label "KEY 1 OF 2" (when several) in `--color-on-board-muted`; the gate line in board colours; right, the status in board semantic colour with a 6px square: "Ready" (`--color-board-success`), "Reported" (warning), "Replaced" (info), "Refunded" (muted).
+2. **Title:** Overpass 700 step-1, `--color-on-board`, linked to the PDP (link underline `--color-remark`).
+3. **The key on flaps:** one `Flap` per character at `text-key` size; the issued string exactly as delivered (dashes, spaces, case never reformatted); long keys wrap by group. **Masked = blank flaps** (the key isn't on the board yet).
+4. **Action row** (board buttons):
+   - masked: Go md "Reveal key" with `ScanEye`;
+   - revealed: Sign md "Copy key" (`Copy` → `Check` "Copied" for 2s); Sign md "Redeem on Steam" with `MoveUpRight` (platform's own page from `src/config/activation.ts`, new tab, `rel="noopener noreferrer"`); Link "Hide" with `EyeOff`.
+5. **Meta** (mono 12px `--color-on-board-muted`): "Issued 6 Oct 2026, 14:21 · First revealed 6 Oct 2026, 14:25".
+6. **Disclosures** (Links in board colours): "How to redeem on Steam" (steps inline); "Activation notes from the publisher" (verbatim `activationDetails`); "Spell it out" — a second mono line under the key with every character disambiguated (`R T 4 Q Z – zero O(letter) K 7 M – …`) for console and TV keyboards.
+7. **Problem link:** "Key not working? Report it" opens the report dialog (reasons: Already redeemed, Invalid key, Wrong region, Wrong product, Other; optional note and screenshot) → support ticket tied to the order item.
 
-**Security behaviour (the design depends on it):**
-- The key is **never in the initial HTML**. "Reveal" calls the server, which:
-  - decrypts the stored key (encrypted at rest, AES-256-GCM with a key from env, §17);
-  - logs `revealedAt` on the first reveal;
-  - returns the plain string to the signed-in owner only.
-- Copying uses `navigator.clipboard.writeText`. On failure the key text is selected and the hint reads "Press Ctrl+C / ⌘C to copy".
-- The page sets `Cache-Control: no-store`.
+**Security behaviour (unchanged contract):** the key is never in the initial HTML; Reveal calls the server, which decrypts (AES-256-GCM, key from env), logs `revealedAt` on first reveal and returns the plain string to the signed-in owner only; `navigator.clipboard.writeText` with select-and-hint fallback ("Press Ctrl+C / ⌘C to copy"); `Cache-Control: no-store`.
 
-**States:**
-- **Issuing:** the plate shows empty slots with the dial loader and "Usually within minutes after payment is confirmed".
-- **Masked**, then **Revealing:** M6, the decrypt, ≤900ms. Then **Revealed** and **Copied**.
-- **Copy failed:** as above.
-- **Image key** (the supplier issued an image instead of text): the slots are replaced by the image in a recessed well, "Open full size", and "Download image". Copy is not offered.
-- **Code + PIN** (some gift cards): two rows, "Code" and "PIN", each in tumbler slots, each with its own Copy.
-- **Reported:** a warning tag plus the line "We're checking it. We reply within 1 business day." (from config).
-- **Replaced:** the old key plate collapses to one struck line "Replaced on 7 Oct 2026", and a new plate appears above it with the bolts shooting home (`bolt-shoot`).
-- **Refunded:** the plate is neutral, the key slots are removed, and the line reads "Refunded to your card on {date}".
+**States:** issuing (blank flaps + flap loader + "Usually within minutes after payment is confirmed"); masked; **revealing** (M9: flaps flip into place left→right via `flapFrame`, ≤1100ms); revealed; copied; copy failed; **image key** (the image in a 10px-radius well on the board, "Open full size", "Download image", no Copy); **code + PIN** (two flap rows, each with Copy); reported (warning status + "We're checking it. We reply within 1 business day."); replaced (old board collapses to one struck line "Replaced on 7 Oct 2026"; the new board's flaps flip in); refunded (neutral, flaps removed, "Refunded to your card on {date}").
 
-**Accessibility:**
-- The key is plain text in the DOM once revealed (inside the slots, with `aria-hidden` on the visual slots and a visually hidden text copy).
-- Reveal moves focus to "Copy key". `aria-live` announces "Key revealed" and "Key copied".
+**Accessibility:** once revealed, the key is plain text in a visually hidden span next to the `aria-hidden` flaps; Reveal moves focus to "Copy key"; `aria-live` announces "Key revealed" and "Key copied".
 
-### 8.26 Cart drawer (`CartSheet`)
-- Right panel 420px (100% on mobile), `--color-raised`, `--shadow-panel`, scrim behind.
-- Slides translateX(100%)→0 over 260ms on `--ease-latch`; closes in 200ms. Reduced motion: a 120ms fade.
-- **Header:** `Archive` 20px, "Cart" in Hubot 680 step-2, the count in a tumbler, close `X`.
-- **Rows:** compact rows (§8.10) with the label row, quantity (§8.13), price in mono, and Text "Remove" with `Trash` 16px. Removing collapses the row over 180ms and is announced.
-- **Footer (sticky):**
-  - Subtotal in mono;
-  - the line "Keys are delivered to your account after your payment is confirmed." (14px muted);
-  - "Total", or "Total incl. VAT" only when `COMPANY.vatRegistered`;
-  - Key lg full-width "Checkout";
-  - Text "View cart";
-  - payment logos at 24px.
-- **Empty:** the empty deposit box illustration (§8.30), "Your cart is empty", Text links to Games, Gift cards and Deals, and Steel "Browse the catalogue".
+### 8.27 Cart drawer (`CartSheet`) and the ticket summary
+- Right panel 420px (100% mobile), `--color-raised`, `--shadow-panel`, scrim; slides in over 240ms `--ease-sign`, closes 180ms; reduced: 100ms fade.
+- Header: `Ticket` 20px, "Cart" Overpass 700 step-2, the count as a `FlapCounter`, close `X`.
+- Rows: compact rows with gate line, quantity (§8.13), price, Link "Remove" with `TicketX`. Removing collapses the row over 180ms and is announced.
+- **Footer — the ticket summary** (also used on `/cart` and checkout): an 8px-radius panel split in two by a dashed vertical tear line with a 10px semicircle notch top and bottom (the only notches in the system):
+  - **stub** (left, 96px, `--color-board`, `data-surface="board"`): sign label "KEYS" over a `FlapCounter` with the item count;
+  - **body** (right, `--color-bg-secondary`): Subtotal; "Total" (or "Total incl. VAT" only when `COMPANY.vatRegistered`) in Sometype 600 step-2; the line "Keys are delivered to your account after your payment is confirmed."; Go lg full-width "Checkout" with the arrow cell; Link "View cart"; payment logos at 24px.
+- Empty: the empty-board illustration (§8.31), "Your cart is empty", Links to Games, Gift cards and Price cuts, and Sign "Browse the catalogue".
 - Focus trap, Esc, focus return, `role="dialog"`, `aria-label="Cart"`.
 
-### 8.27 Search dialog (`SearchDialog`)
-- Opens from the header field or the `/` key. A full-width panel drops from under tier 1 (`--color-raised`, `--shadow-lg`, max-height 80vh), translateY −6px→0 + opacity over 180ms.
-- One input at step-2 in Mona 400 with a leading `Search` 20px, the placeholder "Search 4,812 keys: title, platform or genre" (real count), and Text "Close" with an Esc hint in mono 12px.
-- **Live results** (debounced 200ms):
-  - "Keys" as compact rows (max 6);
-  - "Platforms" and "Genres" as text links with counts ("Steam · 214");
-  - Text "See all 318 results".
-- Combobox pattern: arrow keys, Enter opens, Esc closes.
-- **No results:** "Nothing matches “xyz”." plus platform links and the hint "Try the title without the edition name."
+### 8.28 Search — the information kiosk (`SearchDialog`)
+- Opens from the header field or `/`. A panel drops under the concourse bar (`--color-raised`, 8px radius bottom corners, `--shadow-overlay`, max-height 80vh), `panel-drop` 180ms.
+- Input at step-2 Overpass 400 with `Search` 20px; placeholder "Search {count} keys: title, platform or genre" (real count, rounded down to the nearest 100 above 10,000: "Search 69,700 keys"); Link "Close" with an Esc hint in mono.
+- Live results (debounced 200ms): **"Departures"** as compact rows (max 6), "Platforms" as rows "[1] Steam · 40,737", "Genres" as text links with counts; Link "See all 318 results" with `ArrowBigRight`.
+- Combobox pattern. No results: "Nothing on the board matches “xyz”." + platform links + "Try the title without the edition name."
 
-### 8.28 Checkout steps (`Stepper` restyle)
-- **Progress:** the **dial ruler** across the top of the checkout column with three detents, **01 ACCOUNT · 02 DETAILS · 03 REVIEW & PAY**.
-  - The green index line stands at the current detent; completed detents show `Check` 14px over their tick.
-  - Moving forward slides the index line along the ruler (260ms, `--ease-latch`) with the ticks it passes stepping lit→unlit (§13 M11).
-  - A visually hidden live region announces "Step 2 of 3, Details".
-- **Panel:** one step at a time on `--color-bg`. Completed steps collapse into one-line summaries above the panel (Mona 14px muted, e.g. "Signed in as alex@… · Change").
-- **Buttons:** Continue (Key lg) bottom-right; Back (Text) bottom-left except on step 1.
-- **Errors:** field messages, plus a summary at the top of the panel ("Check 2 fields") that links to the fields and receives focus.
-- **Mobile:** the ruler shortens to three detents with labels under the active one only; the summary sits above as an accordion "Show summary · €29.99".
+### 8.29 Checkout progress (`Stepper` restyle)
+A horizontal **route line** across the top of the checkout column: stops **Account · Details · Review & pay**, terminus bar after the last stop. Current stop mustard; done stops ink with a `Check` 12px in bg colour inside. Moving forward draws the next segment (M8). A visually hidden live region announces "Step 2 of 3, Details". Completed steps collapse into one-line summaries above the panel ("Signed in as alex@… · Change"). Buttons: Continue (Go lg, arrow cell) bottom-right, Back (Link) bottom-left except on step 1. Errors: field messages plus a focused summary "Check 2 fields". Mobile: the line keeps 3 stops, label under the current stop only; summary as an accordion "Show summary · €29.99".
 
-### 8.29 Cookie banner and preference centre
-- **Banner** (first visit, nothing stored):
-  - a docked plate at the bottom-left, 420px wide (full width minus 32px on mobile), `--color-raised`, 0px, `--shadow-lg`, 20px padding;
-  - it never covers the mobile sticky buy bar or the checkout bar, and docks above them when they exist.
-- **Copy:** "We use necessary cookies to run the store. Analytics and marketing cookies load only if you allow them." plus the link "Cookie policy".
-- **Buttons:** three **visually identical** Steel sm buttons in one row: "Accept all", "Reject all", "Customise".
-- `role="region"`, `aria-label="Cookie consent"`, not modal. Analytics and marketing load only after consent.
-- **Preference centre:** the dialog "Cookie settings" with three switch rows:
-  - Necessary, locked "Always on";
-  - Analytics;
-  - Marketing.
+### 8.30 Cookie banner and settings
+- Banner: bottom-left panel 420px (full width minus 32px on mobile), `--color-raised`, 8px radius, `--shadow-overlay`, 20px padding; never covers the mobile sticky buy or checkout bar (docks above them).
+- Copy: "We use necessary cookies to run the store. Analytics and marketing cookies load only if you allow them." + "Cookie policy".
+- Three visually identical Sign sm buttons: "Accept all", "Reject all", "Choose cookies".
+- `role="region"`, `aria-label="Cookie consent"`, not modal; analytics/marketing load only after consent.
+- Settings dialog "Cookie settings" with three switch rows (Necessary locked "Always on", Analytics, Marketing), each with a purpose sentence and a "Show cookies" disclosure (name, provider, purpose, expiry). Footer: Go "Save choices", Sign "Accept all", Sign "Reject all". Opens from the banner and from the footer.
+- Storage key `keyterminus-consent` (version + timestamp).
 
-  Each has a one-sentence purpose and a "Show cookies" disclosure listing name, provider, purpose and expiry (the same table as the Cookie Policy). Footer: Key "Save choices", Steel "Accept all", Steel "Reject all". It opens from the banner and from the footer's "Cookie settings".
-- The storage key becomes `keyrook-consent` (with version and timestamp). Update the Cookie Policy table.
+### 8.31 Empty state (`EmptyState` restyle)
+- An **empty board**: a 168×96 inline SVG of three board rows of blank flaps (12 tiles each) on a 10px-radius housing, drawn in `currentColor` muted strokes with the hinge lines — no fill colours from outside tokens.
+- H2 Overpass 700 step-2, one muted sentence, one primary action and at most one Link.
 
-### 8.30 Empty state (`EmptyState` restyle)
-- An **empty deposit box**: a 160×104 line drawing in Lucide's style (1.75 stroke, square caps, `currentColor` muted) of a drawer pulled open with nothing inside. One inline SVG component, no illustration library.
-- H2 Hubot 600 step-2, one sentence muted, one primary action and at most one Text link.
-- **Copy per context:**
+| Context | Copy |
+|---|---|
+| Cart | "Your cart is empty" |
+| Saved | "Nothing saved yet" |
+| Keys | "No keys yet" + "Keys you buy appear here after your payment is confirmed." |
+| Orders | "No orders yet" |
+| Search | "Nothing on the board matches “…”" |
+| Filters | "No keys match these filters" + the three broadest real suggestions ("Remove Europe to see 214 more") |
+| Platform without stock | "No Nintendo keys in stock right now" |
 
-  | Context | Copy |
-  |---|---|
-  | Cart | "Your cart is empty" |
-  | Pinned | "Nothing pinned yet" |
-  | Keys | "No keys yet" + "Keys you buy appear here after your payment is confirmed." |
-  | Orders | "No orders yet" |
-  | Search | "Nothing matches “…”" |
-  | Filters | "No keys match these filters" (with the three broadest real suggestions) |
-  | Platform with no stock | "No Nintendo keys in stock right now" |
-
-- No people, no emoji.
-
-### 8.31 Alert and error
-- 0px, tint fill, 1px semantic border, 16px semantic icon, Mona 15px.
-- Page fetch error: "Something went wrong loading this page." plus Steel "Try again".
-- Payment return error: "Your payment didn't go through. You haven't been charged." plus Key "Try again".
-
-### 8.32 Skeletons
-- Page-level loading uses skeletons (card, compact row, PDP, key plate), never spinners.
-- Fills are `--color-bg-secondary` on `--color-bg-tertiary` stages. No shimmer. They fade to content in 120ms.
+### 8.32 Alert, error, skeletons
+- Alert: 6px radius, tint fill, 1px semantic border, 16px semantic icon, Overpass 15px. Page fetch error "Something went wrong loading this page." + Sign "Try again". Payment return error "Your payment didn't go through. You haven't been charged." + Go "Try again".
+- Skeletons for page loading (card, compact row, PDP, key board), never spinners; `--color-bg-secondary` bars on `--color-bg-tertiary` stages; no shimmer; 120ms fade.
 
 ---
 
 ## 9. Logo and favicon
 
-### 9.1 The mark: the key rook (revised at the owner's request; replaces the dial-o wordmark and the dial monogram)
-- **Idea:** a key stood upright is a rook. The key's bit becomes the tower's battlement, cut to an uneven bitting code (four teeth of different heights, never an even crenellation); the shank is the tower; the bow is a round ring at the base. Inside the bow sits a lit lamp: the only signal-green element. Square steel for the bit and shank, round hardware for the bow, as in §5.3.
-- **Not** a chess piece, not a padlock, not a shield, no gradient or glow.
-- **Geometry** lives in `src/lib/brand-mark.ts` (`MARK`, 512 grid) in three hand-fitted drawings:
-  - `full` (≥48px and all lockups): four teeth, lamp at 52% of the bow hole;
-  - `small` (32px): three teeth, heavier shank and ring, lamp 66% of the hole;
-  - `tiny` (16px): two teeth on the pixel grid, lamp 56% of the hole, no tile edge.
-- Stroke weights match Hubot 760 at `wdth` 125: shank and ring ≈ the K stem at lockup size.
-- One-colour use: the lamp may be dropped (the bow stays an open ring).
+### 9.1 The mark: the key line
+- **Idea:** a key lying on its side drawn as a line on a route map. The bow is a ring (an interchange on a transit map), the shaft is the line, two teeth of different depths form the bit, and the line ends at a perpendicular **terminus bar** — the symbol for the end of a line — in mustard. Read left to right it is both "a key" and "the last stop". The terminus bar recurs as the end of every route line in the UI (§8.23).
+- **Distinct from Keyrook's key rook:** Keyrook's key stands upright with a battlement bit and a green lamp inside its bow; ours lies horizontal, the bow is an open ring with nothing inside, the bit hangs below the shaft, and the colour lives on the terminus bar. No lamp, no battlements, no chess or castle reading.
+- **Two hand-fitted drawings** on a 512 grid (store both in `src/lib/brand-mark.ts` as `MARK.full` and `MARK.small`):
+  - `full` (≥48px and every lockup): ring centre (150, 256), outer r 86, inner r 44; shaft 226–404 × 235–277 (42 thick); teeth 296–330 to y 318 and 338–372 to y 340 (8-unit cut between them); terminus bar 404–446 × 166–346.
+  - `small` (favicons, ≤32px): heavier ring (outer 92, inner 40), thicker shaft (52), one wide bit block 300–384 to y 348, wider bar 400–452 × 156–356.
 
-### 9.2 Lockup and wordmark
-- "Keyrook" in Hubot Sans 760 at `wdth` 125, sentence case, tracking −0.01em, outlined (`WORDMARK` in `src/lib/brand-mark.ts`). No detail inside the letters: the mark carries the idea.
-- Lockup: mark height = 1.78 × cap height, centred on the cap height; gap = 0.36 × cap height (`LOCKUP`). In the header the lockup is 39px high (22px cap height), 32px below 1024px.
-- **Files:** `public/logo.svg` (ink `#0F1513`, lamp `#0F7A50`), `public/logo-dark.svg` (`#E4EBE7`, lamp `#46D39A`), `public/email-logo.png` (light lockup for the dark email band, 2×).
-- **App icon / favicon:** the mark in `#E4EBE7` on a square `#0F1513` tile (0px) with a 1px `#26302D` edge at 32px and up; the tile stays dark on light and dark browser chrome.
-- Clear space: the cap height of the "K" on all sides. Minimum lockup width 88px; below that use the mark alone. Never on a cover, no effects.
+**Final path data** (light-background colours; in components use `currentColor` for the key and `var(--color-terminus)`/`var(--color-accent-hover)` for the bar):
 
-### 9.3 Files and code
-- Regenerate `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-192x192.png`, `android-chrome-512x512.png` and `email-logo.png` with `scripts/gen-favicons.mjs` (its inline SVGs are the `full`, `small` and `tiny` drawings).
-- `src/app/icon.svg`.
-- `public/manifest.json`: `theme_color: #0C110F`, `background_color: #0F1513`, name "Keyrook".
-- `viewport.themeColor` in `layout.tsx`: dark `#0C110F`, light `#F5F7F5`.
-- `src/components/layout/BrandMark.tsx`: `Wordmark` (lockup; `mark={false}` for letters only) and `Mark`, `currentColor` for ink and `var(--color-accent)` for the lamp; no hex.
-- **Root metadata:**
-  - title template: "%s · Keyrook";
-  - description: "Game keys, DLC, gift cards and subscriptions for Steam, Epic, Xbox, PlayStation, Nintendo and more. Pay on a hosted card page; your key is delivered to your account, usually within minutes after payment is confirmed.";
-  - OG image: the Strongroom bg, the closed vault door poster (SVG) at the right, the wordmark and the H1 at the left. No covers in OG images: covers are third-party art and change.
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 150 416 212">
+  <path d="M64 256A86 86 0 1 1 236 256A86 86 0 1 1 64 256ZM106 256A44 44 0 1 0 194 256A44 44 0 1 0 106 256ZM226 235H404V277H372V340H338V277H330V318H296V277H226Z" fill="#222426"/>
+  <rect x="404" y="166" width="42" height="180" fill="#D29D1A"/>
+</svg>
+```
+`small` key path: `M54 256A92 92 0 1 1 238 256A92 92 0 1 1 54 256ZM106 256A40 40 0 1 0 186 256A40 40 0 1 0 106 256ZM224 230H400V282H384V348H300V282H224Z`, bar `x=400 y=156 width=52 height=200`. Both use the default nonzero fill rule (the inner circle is drawn counter-clockwise to punch the hole); keep it that way so the shaft overlap with the ring stays solid.
+
+- **Colours of the bar:** on light backgrounds `#D29D1A` (the Day `--color-accent-hover`; plain mustard on warm white is too faint for a mark), on dark and on graphite `#E6B84A`. One-colour use: the bar takes the key colour.
+
+### 9.2 Wordmark and lockup
+- "Keyterminus" in **Overpass 800**, sentence case, tracking −0.012em, kerned (harfbuzz `kern`), outlined. No detail inside the letters and **no bar or caret after the word** (it reads as a terminal cursor).
+- **Lockup:** mark height (terminus bar) = 1.25 × cap height; the shaft's centre line sits on the middle of the cap height; gap = 0.42 × cap height. File `public/brand/keyterminus-lockup.svg`, viewBox `0 -1620 16186 2240` (aspect 7.23:1). The wordmark group is `<path transform="translate(4301.9 0)" d="…">` with this outline (font units, baseline at y 0, cap top y −1400):
+
+```
+M156 0V-1400H444V-735L970 -1400H1314L900 -895L1394 0H1058L706 -653L444 -326V0ZM1911 24Q1762 24 1654 -41Q1546 -106 1488 -226Q1430 -346 1430 -512Q1430 -676 1489 -796Q1548 -916 1656 -981Q1764 -1046 1911 -1046Q2038 -1046 2141 -993.5Q2244 -941 2304.5 -833.5Q2365 -726 2365 -562Q2365 -534 2364 -494.5Q2363 -455 2358 -416H1699Q1701 -353 1727.5 -307Q1754 -261 1801 -235.5Q1848 -210 1912 -210Q1988 -210 2041 -234.5Q2094 -259 2143 -315L2301 -154Q2232 -73 2135.5 -24.5Q2039 24 1911 24ZM1702 -626H2101Q2095 -685 2071 -727Q2047 -769 2005.5 -790.5Q1964 -812 1905 -812Q1824 -812 1768.5 -764Q1713 -716 1702 -626ZM2678 388 2832 -15 2448 -1022H2732L2945 -457Q2953 -437 2962 -411Q2971 -385 2977 -361Q2983 -385 2992 -411Q3001 -437 3009 -457L3220 -1022H3504L2963 388ZM4008 24Q3880 24 3817.5 -44.5Q3755 -113 3755 -250V-780H3611V-1022H3755V-1314L4028 -1444V-1022H4253V-780H4028V-291Q4028 -252 4045.5 -232.5Q4063 -213 4100 -213Q4175 -213 4265 -256L4234 -22Q4187 0 4131 12Q4075 24 4008 24ZM4898 24Q4749 24 4641 -41Q4533 -106 4475 -226Q4417 -346 4417 -512Q4417 -676 4476 -796Q4535 -916 4643 -981Q4751 -1046 4898 -1046Q5025 -1046 5128 -993.5Q5231 -941 5291.5 -833.5Q5352 -726 5352 -562Q5352 -534 5351 -494.5Q5350 -455 5345 -416H4686Q4688 -353 4714.5 -307Q4741 -261 4788 -235.5Q4835 -210 4899 -210Q4975 -210 5028 -234.5Q5081 -259 5130 -315L5288 -154Q5219 -73 5122.5 -24.5Q5026 24 4898 24ZM4689 -626H5088Q5082 -685 5058 -727Q5034 -769 4992.5 -790.5Q4951 -812 4892 -812Q4811 -812 4755.5 -764Q4700 -716 4689 -626ZM5574 0V-1022H5849V-920Q5874 -973 5933.5 -1009.5Q5993 -1046 6054 -1046Q6168 -1046 6246 -964L6209 -713Q6165 -751 6125 -766Q6085 -781 6035 -781Q5976 -781 5934.5 -754.5Q5893 -728 5871 -677Q5849 -626 5849 -554V0ZM6371 0V-1022H6646V-928Q6697 -990 6756 -1018Q6815 -1046 6890 -1046Q6981 -1046 7044 -1010Q7107 -974 7142 -902Q7193 -972 7274.5 -1009Q7356 -1046 7458 -1046Q7654 -1046 7750 -945Q7846 -844 7846 -636V0H7571V-538Q7571 -666 7533 -724Q7495 -782 7411 -782Q7353 -782 7316.5 -757.5Q7280 -733 7263 -681Q7246 -629 7246 -545V0H6971V-538Q6971 -667 6933.5 -724.5Q6896 -782 6812 -782Q6724 -782 6685 -727Q6646 -672 6646 -547V0ZM8120 0V-1022H8395V0ZM8257 -1131Q8192 -1131 8145 -1178Q8098 -1225 8098 -1290Q8098 -1355 8144.5 -1401Q8191 -1447 8257 -1447Q8326 -1447 8371.5 -1402Q8417 -1357 8417 -1290Q8417 -1224 8370.5 -1177.5Q8324 -1131 8257 -1131ZM8679 0V-1022H8954V-926Q9003 -986 9072.5 -1016Q9142 -1046 9231 -1046Q9398 -1046 9492 -942.5Q9586 -839 9586 -654V0H9311V-541Q9311 -669 9271 -725.5Q9231 -782 9140 -782Q9044 -782 8999 -724.5Q8954 -667 8954 -545V0ZM10203 24Q10038 24 9943 -80.5Q9848 -185 9848 -368V-1022H10123V-481Q10123 -352 10163 -296Q10203 -240 10293 -240Q10390 -240 10435 -297.5Q10480 -355 10480 -477V-1022H10755V0H10480V-95Q10434 -37 10363 -6.5Q10292 24 10203 24ZM11381 24Q11258 24 11145 -28.5Q11032 -81 10968 -169L11144 -318Q11195 -266 11262 -234Q11329 -202 11390 -202Q11460 -202 11498 -224.5Q11536 -247 11536 -289Q11536 -315 11518 -335.5Q11500 -356 11452 -379Q11404 -402 11314 -435Q11140 -498 11069 -571.5Q10998 -645 10998 -758Q10998 -887 11102 -966.5Q11206 -1046 11374 -1046Q11487 -1046 11584 -1003Q11681 -960 11751 -878L11574 -731Q11484 -820 11368 -820Q11313 -820 11279 -799.5Q11245 -779 11245 -747Q11245 -715 11286 -688.5Q11327 -662 11441 -627Q11561 -591 11636.5 -544Q11712 -497 11747.5 -434.5Q11783 -372 11783 -290Q11783 -143 11675.5 -59.5Q11568 24 11381 24Z
+```
+The mark group inside the lockup is `<g transform="translate(-622.2 -3188.9) scale(9.7222)">` around the `full` mark. Copy both strings into `src/lib/brand-mark.ts` (`WORDMARK`, `LOCKUP`), as Keyrook did.
+
+- **Sizes:** header lockup 32px high at ≥1280px (≈231px wide), 28px at 1024–1279px (≈202px), 26px on mobile (≈188px); below 120px of available width use the mark alone. Clear space: the cap height of "K" on all sides. Never on a cover, never with effects.
+- **Monochrome:** everything `currentColor` (key, bar and letters) — used in the PDF invoice footer, print and single-colour placements.
+- **Dark / board placements:** letters and key `--color-on-board` / `--color-text`, bar `#E6B84A`.
+
+### 9.3 Favicon and app icons
+- `src/app/icon.svg` (done): the `small` mark in warm white `#F2EDE1` with a mustard `#E6B84A` bar on a graphite `#222426` tile with a 40-unit radius (≈2px at 28px — the flap radius), and a 12-unit **hinge** `#0E0F10` across the middle, so the icon is literally the key printed on a split flap. The tile stays graphite on light and dark browser chrome.
+- `scripts/gen-favicons.mjs`: replace its inline SVGs with the same tile — `small` + hinge 12 for 16/32px and `favicon.ico`; `full` + hinge 8 for `apple-touch-icon.png` (180), `android-chrome-192x192.png`, `android-chrome-512x512.png`; and generate `email-logo.png` (2×, 286×56) from the lockup in Night colours (warm white letters, `#E6B84A` bar) for the graphite email header. Replace `public/favicon.svg` with a copy of `src/app/icon.svg`; replace `public/logo.svg` / `logo-dark.svg` with the lockup in Day (`#1B1C1D` + `#D29D1A`) and Night (`#EEE9DE` + `#E6B84A`) colours.
+- `public/manifest.json`: `name`/`short_name` "Keyterminus", description "Game keys, DLC, gift cards and subscriptions for every major platform, delivered to your account.", `theme_color: #222426`, `background_color: #F4F1EA`.
+- `viewport.themeColor` in `layout.tsx`: light `#F4F1EA`, dark `#121314`.
+- `BrandMark.tsx`: `Mark` (`size: "full" | "small"`) and `Wordmark` (lockup; `mark={false}` for letters only), `currentColor` for ink and `var(--color-accent-hover)` (Day) / `var(--color-terminus)` (Night, board) for the bar via a `--logo-bar` custom property set per theme; no hex.
+- **Root metadata:** title template "%s · Keyterminus"; description "Game keys, DLC, gift cards and subscriptions for Steam, Xbox, PlayStation, Nintendo and more. Pay on a hosted card page; your key is delivered to your account, usually within minutes after payment is confirmed."; OG/Twitter images: the warm white floor, a graphite board panel at the right with four blank-then-filled flap rows of the store's *own words* ("GAME KEYS", "GIFT CARDS", "DLC", "SUBSCRIPTIONS" with `ON TIME` remarks) — no covers, no product titles (they change) — and the lockup + H1 at the left.
 
 ---
 
 ## 10. Motif usage rules
 
-### 10.1 The dial
-- **Is:** the graduated ring (door, price explorer, 404) and its straightened form, the dial ruler (checkout progress, price slider, order timeline track, filters). The **index line** is its cursor.
-- **Used on:**
-  - the hero door;
-  - the price-band explorer;
-  - checkout;
-  - the order timeline;
-  - price and year sliders;
-  - the dial loader;
-  - the 404.
-- **Never:** as decoration with no value behind it; as a progress bar for anything other than checkout steps, order status or a price/year range; spinning continuously.
+### 10.1 Flaps
+- **Are:** graphite tiles with a hinge, one character each; rows of them are boards.
+- **Used on:** the hero board, home mini-boards (platform peek, revised fares, theater tabs board), platform tiles, gate strips, the deal tile, the cart and quantity counters, the order number on confirmation, the key board, the 404, the gift card value, the OG image.
+- **Never:** on body text, on prices in grids (prices are plain mono; flaps are slower to read), with invented content, or animating continuously. Every flap shows a real value, or sample data inside the theater labelled "Sample data".
 
-### 10.2 Tumbler windows
-- **Are:** mono glyphs in recessed slots that roll to their value.
-- **Used on:**
-  - the hero catalogue readout;
-  - the cart count;
-  - order numbers (order page, account);
-  - the key plate (the key itself);
-  - the theater's decrypt scene;
-  - the price-band count;
-  - the 404 ("4 0 4").
-- **Never:** on prices in grids (prices must be read instantly; they are plain mono); on body text; with invented numbers. Every tumbler shows a real value or sample data inside the theater, labelled "Sample data".
+### 10.2 Route lines and the terminus bar
+- **Used on:** home genre routes, the "through the gate" payment line, checkout and registration progress, the order timeline, the footer platform line, the mark.
+- **Never:** as a decorative divider, a progress bar for anything that isn't a sequence of real steps or a list of real destinations, or a transit map with invented geography.
 
-### 10.3 Bolted plates
-- **Are:** plates with four 6–8px bolt heads, 10px in from the corners.
-- **Used on exactly four objects:**
-  - the hero door poster;
-  - the key plate;
-  - the home security ledger;
-  - the footer credentials plate.
-- **Never:** on product cards, buttons, dialogs, the buy box or the theater bezel. The point is that bolts mean "held" or "proved here".
+### 10.3 Signage
+- **Sign labels** (uppercase Overpass 700 12px, 0.14em) are the only uppercase text off the board.
+- **Platform tiles** always sit next to the platform's name.
+- **`ArrowBigRight`** marks directional links; never decorative, never two in a row.
+- **Sign plates** (4px radius, 1.5px ink border or `--color-board` fill) are reserved for large platform signs, "through the gate" plates and "Company notice". Not for generic boxes.
 
 ### 10.4 Material rules
-- Plates are square, hardware is round (§5.3).
-- Plates get the machined edge; recesses (inputs, cover stages, tumbler slots) get the pressed edge.
-- `--steel-grain` is used only on the three hardware faces named in §3.4.
-- There is no other texture: no noise, carbon fibre, grid paper or scanlines.
-- Depth comes from recess versus plate, never from outlines stacked on outlines.
+- The board is the only dark object on Day pages besides the information strip, gate strips and the hero hall.
+- No textures, grain, noise, paper, metal, glass. Depth comes from the board versus the floor, never from stacked outlines.
+- One WebGL context per page, home only.
 
 ---
 
-## 11. Header, vault map, mobile menu, footer
+## 11. Header, concourse map, mobile menu, footer
 
-### 11.1 Header — two steel tiers (≥1024px)
-**Tier 1, the counter** (64px, `--color-rig`, 1px bottom hairline, inner `max-w-container`):
-- **Left:** the lockup (key rook + wordmark, 22px cap height) linking to "/".
-- **Centre:** **search is the primary action of a key store**, so the field is wide and early.
-  - Width: flex up to 640px, 44px high, `--color-raised`, `--edge-machined-pressed`, 1px control border.
-  - `Search` 18px and the placeholder "Search 4,812 keys" (real count, rounded down to the nearest 10 when over 1,000 to avoid flicker between syncs).
-  - The `/` key hint sits in a mono tumbler slot at the right edge.
-  - It opens the search dialog.
-- **Right:**
-  - account: `UserKey` + "Account", or "Sign in";
-  - cart: `Archive` + "Cart" + the count in a tumbler (§8.5 `count`) when above 0.
+### 11.1 Header (≥1024px) — information strip + concourse bar
+Keyrook had an overlap bug in its status rail. Here every cell has a declared budget and the rules guarantee no overlap from 1024 to 1920px.
 
-**Tier 2, the rail** (40px, `--color-rig`, 1px bottom hairline):
-- **Left:** nav in Hubot 680 13px caps at 125%, 0.06em:
-  - **CATALOGUE** with `ChevronDown` (opens the vault map, §11.2);
-  - GAMES;
-  - DLC;
-  - GIFT CARDS;
-  - SUBSCRIPTIONS;
-  - DEALS;
-  - NEW RELEASES.
+**Information strip** (32px, `--color-board`, `data-surface="board"`, full bleed, inner `max-w-container`; `max-w-wide` ≥1600px):
+- Grid: `grid-template-columns: minmax(0, 1fr) auto`, column gap 24px.
+- **Left cell** (`min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis`): a 6×14px mustard terminus bar, then `STORE_POLICY.delivery.rail` ("Delivery: usually within minutes", ≈223px in Sometype 400 12px, `--color-on-board`), as a link to the Delivery policy. Short form only, at every width. Nothing else lives here: no clock, no ticker, no counts.
+- **Right cell** (`flex-shrink: 0`, ≈230px): Link "Help" (→ /faq) · currency select (mono "EUR", 56px, board colours) · theme toggle (`Sunrise` "Day" / `Sunset` "Night", 13px label; `aria-label` "Switch to Night" / "Switch to Day"). 1px `--color-board-edge` separators.
+- Worst case at 1024px: 223 + 24 + 230 = 477px of 944px available.
 
-  Active: a 2px green bar under the full label. Hover: ink (from muted) over 120ms.
-- **Right:**
-  - the status line (Mona 13px muted), a link to the delivery policy: a lit lamp and `STORE_POLICY.delivery.rail` ("Delivery: usually within minutes"). The full sentence does not fit beside the seven nav labels in the 1360px container, so the rail uses the short form; the right cluster is a size container and falls back to lamp + "Delivery" below 340px, and never wraps or overlaps the nav;
-  - a hairline;
-  - the currency select (mono "EUR", 32px);
-  - the theme toggle (`SunMoon`, "Switch to Counter Hall" / "Switch to Strongroom").
+**Concourse bar** (64px, `--color-rig` = floor colour, 1px bottom hairline; inner `max-w-container`, `max-w-wide` ≥1600px):
+- Grid: `grid-template-columns: auto minmax(0, auto) minmax(180px, 440px) auto`, column gap 28px (24px below 1280), `align-items: center`. Column 2 is `overflow: hidden` and its links are `white-space: nowrap; flex-shrink: 0`; a nav item that doesn't fit is **removed by breakpoint**, never wrapped or squeezed.
+- **Col 1 — lockup** linking to "/": 28px high (≈202px) below 1280, 32px (≈231px) from 1280.
+- **Col 2 — nav** (Overpass 700 15px, sentence case, 20px gaps; active = 3px mustard bar under the full label; hover ink from muted):
 
-**Behaviour:**
-- Sticky. After 120px of scroll down, tier 2 slides up behind tier 1 (translateY −40px, 200ms) and tier 1 compacts to 56px. Scrolling up 40px brings tier 2 back.
-- Header height is reserved: no layout shift.
-- 1024–1279px: tier 2 nav keeps CATALOGUE, GAMES, GIFT CARDS and DEALS; the status line keeps the same short form.
+  | Item | Width at 15px | Shown from |
+  |---|---|---|
+  | Platforms + `SquareChevronDown` 14px (opens the concourse map) | 90px | 1024 |
+  | Games | 48px | 1024 |
+  | Gift cards | 68px | 1024 |
+  | Price cuts | 70px | 1024 |
+  | DLC | 28px | 1280 |
+  | Subscriptions | 95px | 1440 |
+  | New arrivals | 87px | 1600 |
 
-### 11.2 Vault map (the mega-menu)
-- A full-width panel under tier 2: `--color-rig`, `--shadow-lg`, 32px padding, max-height 76vh, 1px top hairline. Laid out as a floor plan.
-- **Left block (8 columns): Platforms.** A grid of **lockers** in 3 rows. Each locker is a tall plate showing:
-  - the pip and the platform name engraved;
-  - the real count ("1,940 keys");
-  - "from €1.49" (real minimum, active currency).
+- **Col 3 — search field** (40px, 6px radius, `--color-raised`, 1px control border, `Search` 18px, placeholder "Search 69,700 keys" (real, §8.28), a mono `/` hint in a sm flap at the right). Flexes between 180px and 440px. Opens the kiosk.
+- **Col 4 — actions:** Account (`IdCard`) and Cart (`Ticket` + `FlapCounter`). **Icons only below 1280px** (44px each, `aria-label`s, ≈112px with the count), **icon + word from 1280px** ("Account" or "Sign in"; "Cart") ≈213px.
+- **Width budget (measured with Overpass 700 15px, content = viewport − 80px, capped by the container):**
 
-  Only platforms with stock appear. Locker widths follow count rank (the largest platform spans 2 columns). Hover or focus lights the locker's lamp and shows its 3 most-bought or newest covers in the preview column.
-- **Middle block (2 columns): Types and price.** Games, DLC, Gift cards, Subscriptions, Software (each with an icon and count), then a hairline, then the price bands for the active currency ("Under €5", "€5–€10", "€10–€20", "€20–€40", "€40 and up") with counts.
-- **Right block (2 columns): Preview.** For the hovered locker or type, three compact covers (3:4) with title and price, plus the link "All Steam keys · 1,940" with `ArrowRight`. Real data only; omitted if nothing has a cover.
-- Below the blocks, a full-width row of genre text links with counts (top 12 by count) and "All genres".
-- **Behaviour:**
-  - opens on click and on hover-intent (150ms); closes on leave (250ms grace), Esc, or focus leaving;
-  - the trigger has `aria-expanded` and `aria-controls`;
-  - arrow keys move within and across blocks;
-  - animation `panel-in` 180ms.
+  | Viewport | Content | Lockup | Nav (items + gaps) | Search min | Actions | Gaps | Total at search min | Spare |
+  |---|---|---|---|---|---|---|---|---|
+  | 1024 | 944 | 202 | 336 | 180 | 112 | 72 | 902 | 42 |
+  | 1280 | 1200 | 231 | 384 | 180 | 213 | 84 | 1092 | 108 |
+  | 1440 | 1360 | 231 | 499 | 180 | 213 | 84 | 1207 | 153 |
+  | 1600 | 1520 | 231 | 606 | 180 | 213 | 84 | 1314 | 206 |
+  | 1920 | 1520 | 231 | 606 | 180 | 213 | 84 | 1314 | 206 |
+
+  Spare width goes to the search field up to 440px. Verify with Playwright at 1024, 1100, 1279, 1280, 1439, 1440, 1599, 1600 and 1920 that no element's bounding box intersects another (assert in the e2e smoke test).
+- **Behaviour:** sticky. After 120px of scroll down the strip slides up behind the bar (translateY −32px, 180ms) and the header occupies 64px; scrolling up 32px brings it back. Height reserved (`--header-height` 96px); no layout shift.
+
+### 11.2 Concourse map (replaces `VaultMap`; opens from "Platforms")
+A full-width panel under the bar: `--color-raised`, `--shadow-overlay`, 32px padding, max-height 76vh, `panel-drop` 180ms. Laid out as a station's wall map:
+- **Cols 1–5 — Platforms:** a two-column list of platform signs in `PLATFORM_BOARD` order with stock only: sm platform tile, name (Overpass 700 16px), real count and "from €0.49" (mono 12px muted). Hover/focus highlights the row with `--color-accent-light` and fills the preview.
+- **Cols 6–8 — Types and fare zones:** types in `TYPE_ORDER` with icons and counts; a hairline; the six fare zones (§18.4) with counts in the active currency.
+- **Cols 9–12 — Preview:** a mini-board (board housing, 3 board rows of the hovered platform's top real titles: price | title | remark) plus "All Steam keys · 40,737" with `ArrowBigRight`. Rows flip in (M2) on change. Omitted when there is no data.
+- Below: genre routes as a single row of text links in `ROUTE_ORDER` with counts (top 12) and "All genres".
+- Opens on click and hover-intent (150ms); closes on leave (250ms grace), Esc, or focus leaving; `aria-expanded`, `aria-controls`; arrow keys within and across columns.
 
 ### 11.3 Mobile header (<1024px)
-- A 56px rig: the wordmark on the left (18px cap height); on the right, the `Search` icon button, `Archive` with the tumbler count, and the `Menu` icon button labelled "Catalogue".
-- **Search** opens a full-screen search sheet: the input at the top, then "Platforms" as a 2-column grid of mini lockers, then recent searches (local only).
-- **Menu** opens a **bottom sheet** rising to 92vh (`--color-rig`, 0px, `--shadow-panel`), the vault map composed for thumbs:
-  - Platforms as a 2-column locker grid (largest full width);
-  - Types as large rows with counts and `ArrowRight`;
-  - Deals and New releases rows;
-  - Account rows (Keys, Orders, Pinned, Profile, or Sign in);
-  - Help (How activation works, FAQ, Contact);
-  - the currency select;
-  - the theme as a segmented control (Strongroom / Counter Hall).
+- No information strip. A 56px bar: lockup 26px left; right: `Search` icon button, `Ticket` with `FlapCounter`, `Rows3` labelled "Menu". 1px bottom hairline. Total right cluster 3×44 + count ≈ 152px; lockup 188px; at 360px viewport (328 content) this leaves −12px — so **below 400px the lockup becomes the mark only (40px)** and below 340px the search button moves into the menu. Assert at 320, 360, 390, 430px.
+- **Search** opens a full-screen kiosk: input on top, platform rows as a 2-column list of platform signs, recent searches (local only).
+- **Menu** opens a bottom sheet to 92vh (`--color-raised`, top corners 8px, `--shadow-xl`): the delivery line (with the terminus bar) at the top; Platforms as a 2-column list of signs; Types as large rows with counts; Price cuts and New arrivals rows; Account rows (Keys, Orders, Saved, Profile, or Sign in); Help (How activation works, FAQ, Contact); currency select; theme as a segmented control (Day / Night). A 36×4 grab handle (2px radius), `X`, focus trap, Esc.
 
-  It has a drag handle (a 32×4 bar, 0px) plus a close `X`, a focus trap and Esc.
-- The status line moves into the sheet's top.
-
-### 11.4 Footer — the vault floor
-Inside `max-w-wide`, on `--color-floor`, ink text:
-1. **Platform index:** a full-width row of the platforms with stock as engraved caps links, each with its pip, separated by the dial ruler's minor ticks drawn as a hairline baseline. It is the footer's top edge and a real navigation row. After it, 56px of space.
-2. **Four columns** (desktop; hairline-separated):
-   - **Shop:** Games, DLC, Gift cards, Subscriptions, Deals, New releases, All keys.
-   - **Your keys:** Account, Keys, Orders, Pinned, Cart.
+### 11.4 Footer — the end of the line
+On `--color-floor` (= band; theme-following: warm band by day, near-black by night), inside `max-w-wide`. Keyrook and Fablekeys both used dark slab footers; this one is part of the concourse.
+1. **The platform line:** a horizontal route line (§8.23) spanning the container with one stop per stocked platform in `PLATFORM_BOARD` order — each stop a link with the sm platform tile and name under it — ending in a 6×40px mustard **terminus bar** at the right edge with the sign label "ALL KEYS" (link to /catalog) beside it. It is the footer's top edge and a real navigation row. 64px of space after it.
+2. **Four columns** (desktop; 32px gaps, no rules):
+   - **Shop:** Games, Gift cards, Subscriptions, DLC, Top-ups, Software, Price cuts, New arrivals, All keys.
+   - **Your account:** Keys, Orders, Saved, Profile, Cart.
    - **Help:** How activation works, Delivery, Key not working?, FAQ, Contact us.
-   - **Legal:** Terms & conditions, Privacy policy, Refund policy, Cookie policy, All policies, and the button "Cookie settings".
+   - **Legal:** Terms and conditions, Privacy policy, Refund policy, Cookie policy, All policies, and the button "Cookie settings".
 
-   Heads are engraved micro-labels in muted. Links are Mona 15px ink with an underline on hover.
-3. **Credentials plate:** a **bolted plate** with `--steel-grain`, holding a ruled two-row definition grid:
-   - labels as engraved micro-labels; values in Mona 15px; identifiers in mono 14px;
-   - rows: Company `COMPANY.name` · Company number `COMPANY.companyNumber` · VAT number (only when `COMPANY.vatRegistered`) · Registered office `COMPANY.registeredOffice` · Email (mailto) · Phone (only when not null) · Support hours `COMPANY.supportHours`;
-   - above it, the line "Keyrook is a trading name of {COMPANY.name}.";
-   - all values from `src/lib/company.ts`.
-4. **Disclaimer** (Mona 14px muted): "Keyrook is an independent store. It is not affiliated with or endorsed by Valve, Epic Games, Electronic Arts, Ubisoft, CD PROJEKT, Blizzard Entertainment, Microsoft, Sony Interactive Entertainment, Nintendo or Rockstar Games. Game titles, platform names and cover art belong to their respective owners."
-5. **Bottom row** (1px top hairline, 24px padding):
-   - left: "© {year} Keyrook" in 14px muted;
-   - right: a **light logo strip**, a 0px plate in `--color-logo-strip` (`#F5F7F5` in both themes) holding `/payments/visa.svg`, `/payments/mastercard.svg` and `/payments/pci-dss.svg` via `next/image` at 28px high, width auto, **in colour as supplied**, with alts "Visa", "Mastercard", "PCI DSS compliant" and 12px gaps;
-   - social text links only if env URLs are set.
-6. **Mobile:**
-   - the platform index becomes a horizontal scroller;
-   - the columns become accordions;
-   - the credentials plate is one column (the bolts stay);
-   - the logo strip is centred at 24px;
-   - the copyright comes last.
+   Heads are sign labels (muted). Links Overpass 15px ink, underline on hover.
+3. **Company notice:** a sign plate (4px radius, 1.5px ink border, `--color-raised`, 24px padding) titled with the sign label "COMPANY NOTICE", then "Keyterminus is a trading name of {COMPANY.name}." in Overpass 700 step-1, then a ruled two-column definition list (sign-label terms, Overpass 15px values, identifiers in mono 14px): Company number `COMPANY.companyNumber` · VAT number (only when `COMPANY.vatRegistered`) · Registered office `COMPANY.registeredOffice`, `COMPANY.country` · Email (mailto `COMPANY.email`) · Phone (only when not null) · Support hours `COMPANY.supportHours`. All values from `src/lib/company.ts` (placeholders until supplied).
+4. **Disclaimer** (Overpass 14px muted, 66ch): "Keyterminus is an independent store and is not affiliated with or endorsed by Valve, Microsoft, Sony Interactive Entertainment, Nintendo, Epic Games, CD PROJEKT, Electronic Arts, Ubisoft, Blizzard Entertainment or Rockstar Games. Game titles, platform names and cover art belong to their owners." (Order differs from the siblings' on purpose; platform order matches `PLATFORM_BOARD`.)
+5. **Bottom row** (1px top hairline, 24px padding): left "© {year} Keyterminus" 14px muted; right the **logo strip** — a 4px-radius plate in `--color-logo-strip` (white in both themes) holding `/payments/visa.svg`, `/payments/mastercard.svg`, `/payments/pci-dss.svg` via `next/image` at 28px high, width auto, **in colour as supplied**, alts "Visa", "Mastercard", "PCI DSS compliant", 14px gaps. Social text links only if env URLs are set. **Mandatory on every store page.**
+6. **Mobile:** the platform line turns vertical (stops top to bottom, terminus bar at the bottom); columns become accordions; Company notice one column; the logo strip centred at 24px; copyright last.
 
-The checkout uses a compact footer: policy links, the credentials one-liner and the logo strip.
+Checkout uses a compact footer: policy links, the trading-name line, the logo strip.
 
 ---
 
-## 12. The theater: code-rendered product demos instead of videos
+## 12. The theater: "Your key departs"
 
 ### 12.1 What it is and where it lives
-The theater plays short scripted scenes inside a steel bezel:
-- a cursor moves;
-- real Keyrook components respond (search, deposit boxes, buy box, checkout, key plate);
-- captions explain each step.
+The engine in `src/components/theater` (ported from allship-ai for Keyrook) stays: `define.ts`, `engine/runner.ts`, `engine/geometry.ts`, `engine/engine.tsx` (on the shared ticker), `stage.tsx` (election, lazy load, `visibilitychange`, reduced-motion stills, finish/replay), `still.tsx`, `sync.tsx`, `spotlight.tsx`, `mini-still.tsx`, `tabs.tsx`/`tabs-client.tsx` (keyboard, auto-advance), `scenes/loaders.ts`, timing constants (`lead 450`, `press 120`, `release 240`, `char 55`, `stream 16`, `scroll 560`, `highlight 1700`, `highlightGap 260`, `tail 2200`, `fade 380`, cursor travel `340 + d × 0.55` clamped 420–950ms). Views stay pure functions of state.
 
-Scenes are React views driven by a timeline, not recordings. They stay sharp at any size, follow the theme, cost a few KB, and can never drift from the real UI, because they **use the real components in demo mode**.
+Retold as one journey with five stops (scene ids change; update `SceneId`, `SCENE_ORDER`, loaders, `messages/en/theater.json`):
+
+| Old id | New id | Tab label | Remark shown on the tabs board |
+|---|---|---|---|
+| `pick` | `checkin` | Check in | `CHECK-IN` |
+| `pay` | `pay` | Pay | `BOARDING` |
+| `decrypt` | `depart` | Departs | `DEPARTED` |
+| `redeem` | `arrive` | Arrives | `ARRIVED` |
+| `support` | `help` | Help desk | `HELP DESK` |
+
+`pay` stays gated by `STORE_POLICY.payment.hostedPage && threeDSecure`; `help` by `STORE_POLICY.guarantee.faultyKey`.
 
 | Surface | Use |
 |---|---|
-| Home §14.1 section 5 | `TheaterTabs` with all five scenes, auto-advancing |
-| How activation works (§14.13) | `FeatureSpotlight` with **Decrypt** and **Redeem** (per platform) |
-| Home §14.1 section 9 | `MiniStill` of **Redeem** for the selected platform (static, no engine) |
-| Home §14.1 section 10 | `MiniStill` of **Pay** at its "challenge" state |
+| Home §14.1 section 4 | `TheaterTabs` with all scenes, auto-advancing |
+| How activation works | `FeatureSpotlight` with **Departs** and **Arrives** (per platform) |
+| Home section 9 (Arrivals) | `MiniStill` of **Arrives** for the selected platform |
+| Home section 10 (Through the gate) | `MiniStill` of **Pay** at its challenge state |
 
-There is no theater on catalogue, product, cart, checkout or account pages. Store surfaces stay quiet.
+No theater on catalogue, product, cart, checkout or account pages.
 
-### 12.2 Port from allship-ai (reuse, don't reinvent)
-Copy `/home/claude/ref/keys/allship-ai/src/components/theater` to `src/components/theater/` and adapt:
+### 12.2 What changes
+| File | Change |
+|---|---|
+| `types.ts`, `scenes/meta.ts`, `scenes/loaders.ts`, `scenes/index.ts` | new ids (§12.1) |
+| `frame.tsx` | rebuilt as the **station monitor** (§12.4) |
+| `tabs-client.tsx` | rendered as the **tabs board** (§12.5) |
+| `sync.tsx` | step list restyled (§12.5) |
+| `sample-cover.tsx` | new flat compositions (§12.3) |
+| `scenes/kit.tsx` | `DemoHeader` = the new strip-less concourse bar (lockup, search, `IdCard`, `Ticket` + `FlapCounter`) |
+| `scenes/data.ts` | new sample titles, key, order (§12.3) |
+| `scenes/*.tsx` | views use the new components in demo mode: `DepartureCard`, `BuyBox`, edition timetable, `KeyBoard`, `OrderTimeline` (route line), `Field`, `Button`, `Choice`, `Tag`, `PriceDisplay`, `Flap*`, `RouteLine` |
+| `src/styles/theater.css` | colours from tokens; `--sample-*` pairs replaced |
 
-| File | Keep | Change |
-|---|---|---|
-| `types.ts` | `Step`, `Patch`, `SceneDef`, `SceneViewProps`, `StringKeys`/`NumberKeys` | `SceneId = "pick" \| "pay" \| "decrypt" \| "redeem" \| "support"`; `DeviceKind = "desktop" \| "phone"`; drop the `device` step kind (no device morphing here) |
-| `define.ts` | `defineScene`, `scriptBuilder`, `foldStep`, `resolveEnd`, `captionsOf`, `urlFor`, `erase` | remove `morphs` and the device branch |
-| `engine/runner.ts` | segment compiler, cursor travel, press/release, type/stream/tween/highlight/caption, background tweens, loop fade | delete the `device` case |
-| `engine/geometry.ts` | `eases`, `cursorEase`, `arcControls`, `bezierPoint`, `aimPoint`, `travelMs`, `charDelay`, `timing` | presets: desktop 1200×720, phone 390×720; no tablet, no island, no status bar |
-| `engine/engine.tsx` | stage API, `flushSync` commits, `data-demo` targeting, auto-scroll | replace the private `rafTicker` with `addTick` from `src/lib/motion/ticker.ts` (one heartbeat for the whole site); cursor, spot and tip restyled (below) |
-| `stage.tsx` | the exclusive "election" (only the most visible theater plays), lazy load on near/idle/first interaction, `visibilitychange` pause, reduced-motion still, finish/replay | controls restyled (§12.5); `afterLoadIdle` and `onFirstInteraction` move to `src/lib/motion/idle.ts` (create them there if the project has no equivalent) |
-| `still.tsx` | `Still`, `boxFor`, `Poster` | `Poster` becomes the bezel with three skeleton bars in our tokens |
-| `frame.tsx` | structure | rebuilt as the **bezel** (§12.4); no traffic lights, no browser chrome, no phone hardware |
-| `tabs.tsx`, `tabs-client.tsx` | server meta + client tablist, keyboard, auto-advance on finish (900ms) | restyled (§12.5) |
-| `sync.tsx` | `TheaterSync`, `TheaterSteps` | restyled step list (§12.5) |
-| `spotlight.tsx` | `FeatureSpotlight` 5/7 grid with synced steps | headings and spacing from our scale |
-| `scenes/loaders.ts`, `scenes/index.ts` | lazy per-scene loaders | five scenes |
-| `pages/home/mini-still.tsx` | `MiniStill` (IntersectionObserver, end-state still) | moves to `src/components/theater/mini-still.tsx` |
-| `theater.css` | container sizing (`.th-box` aspect + container queries), frame scaling via `--k`, cursor and spotlight layers | moves to `src/styles/theater.css` (imported by `globals.css`), all colours from tokens |
+Demo mode keeps the contract: `demo?: boolean`, links as `<span>`, no fetches, targets via `data-demo`. Components never import theater code.
 
-**Timing constants** stay as in allship: `lead 450`, `press 120`, `release 240`, `char 55`, `stream 16`, `scroll 560`, `highlight 1700`, `highlightGap 260`, `tail 2200`, `fade 380`. Cursor travel is `340 + distance × 0.55`, clamped to 420–950ms.
+### 12.3 Sample data (new — nothing shared with siblings)
+- Titles (fictional): "Copperline Express", "Harbour Lights Rally", "Northbound", "Salt Flats GP", "Signal Hill", "Midnight Shuttle". Main title **Copperline Express** (Standard €22.49, Deluxe Edition €31.99, "+ Season Pass"), Steam, Global, languages EN/DE/FR/ES/PL.
+- Order number `KT-30517`, created 2026-10-06 14:18 UTC, paid 14:19, issued 14:20.
+- Sample key `RT4QZ-0OK7M-I1XQ8` (contains `0`/`O` and `1`/`I`, so the slashed zero and the distinct `1 I` are visible).
+- Library rows (Arrives): "Signal Hill", "Northbound", "Salt Flats GP", "Midnight Shuttle".
+- `SampleCover`: deterministic flat composition from the title seed — a horizon band and one large route line with a terminus bar, or two stacked rectangles and a ring — from six two-colour pairs defined as `--sample-1-a/b` … `--sample-6-a/b` in `theater.css` (muted, non-mustard, non-green: slate/sand, rust/stone, olive/cream, plum/fog, teal-grey/bone, brick/oat), title in Overpass 800 at the bottom left. No gradients, no images. Every stage shows the neutral tag "Sample data".
 
-**Demo mode for real components:**
-- `DepositBox`, `BuyBox`, `KeyPlate`, `OrderTimeline`, `Field`, `Button`, `Choice`, `Plate`, `PriceDisplay` and `Tumbler` accept `demo?: boolean`. In demo mode, links render as `<span>`, nothing fetches, and the engine targets elements via `data-demo="…"` attributes passed through props.
-- Components never import theater code.
+### 12.4 The station monitor (`frame.tsx`)
+- Housing: `--color-board`, 10px radius, 12px border (10px on phone), 1px `--color-board-edge`, `data-surface="board"`. No browser chrome, no traffic lights.
+- Top strip (36px inside the housing): left an **address flap row** — the scene's URL path in mono 12px on a `--color-flap` slot with 2px radius ("keyterminus.com/account/keys"); right a small remark flap row with the scene's remark (§12.1) in `--color-remark`, flipping when the scene changes, and the tag "SAMPLE DATA". When Pay moves to the hosted page, the address reads "secure payment page · your payment provider" and a 3px `--color-board-info` bar appears at its left (the visitor left Keyterminus); the real provider name only once `STORE_POLICY.payment.providerName` is set.
+- Screen: `--color-bg` of the current theme, 4px radius inside the housing.
+- Cursor: inline SVG arrow, rounded 1px joins, ink fill with 1.5px `--color-bg` outline; text mode a 2px I-beam; phone preset a 28px tap ring (2px `--color-accent` circle scaling 0.6→1 and fading over 240ms). No glow.
+- Spotlight: 2px `--color-accent` outline, 6px radius, 6px padding; the rest dims with `box-shadow: 0 0 0 100vmax var(--color-scrim)` clipped by the screen.
+- Tip: `--color-raised` panel (max 300px, 6px radius, `--shadow-overlay`) with the sign label "NOTE" and Overpass 14px text.
 
-**Sample data** lives in `src/components/theater/scenes/data.ts`:
-- fictional titles only ("Lantern Coast", "Ironvale Tactics", "Night Ferry", "Saltmarsh Run", "Orbit Freight", "Hollowstone") with sample prices, so no real product is shown with a made-up price;
-- real platform names, because those are facts.
+### 12.5 Tabs board and controls
+- **Tabs board** (`tabs-client.tsx`): the tablist is a mini departures board (board housing, 10px radius). Each tab is a board row (48px): `0 1` in flaps, the label in Overpass 700 15px `--color-on-board`, the duration in mono ("14s") muted, and a REMARKS cell: `PLAYING` (mustard) on the active row, `DONE` (muted) on finished rows, blank on the rest. The active row gets a `--color-flap` background. When a scene finishes, the next row's remark flips to `PLAYING` (auto-advance 900ms). WAI-ARIA tabs (vertical orientation on desktop, arrows/Home/End).
+- **Mobile:** the tabs become a horizontal scroller of compact rows (`01 Check in`), active scrolled into view.
+- **Under the stage:** chapter counter "02/04" as a small `FlapRow`; the current caption (Overpass 16px ink, `aria-hidden`); the play/pause/replay control — a 44px **circle** (`rounded-round`), 1.5px ink border, `Play`/`Pause`/`Repeat` 18px, labels "Play demo"/"Pause demo"/"Replay demo".
+- **`TheaterSteps`:** an ordered list styled as a vertical route line: each caption is a stop; done = ink stop with `Check`; current = mustard stop, ink text; upcoming = hollow, muted.
 
-**Sample covers** are `SampleCover`: a deterministic flat composition from the title's seed (two large geometric masses and the title set in Hubot at 125%, from six duotone pairs defined as `--sample-*` tokens in `theater.css`). No gradients, no images. Every stage shows the neutral tag **"Sample data"**.
+### 12.6 Scenes, frame by frame
+Times are start times (ms) using the constants and a nominal 650ms travel; `click` ≈ 1,010; `highlight` ≈ 1,960; tail 2,200.
 
-### 12.3 Scene definition (the contract)
-```ts
-export const decrypt = defineScene<DecryptState>({
-  id: "decrypt",
-  title: "Decrypt",
-  summary: "After payment is confirmed, the key is issued to your account, stays masked until you reveal it, and can be copied or taken straight to the platform's redeem page.",
-  url: "/account/keys",
-  device: "desktop",
-  initial: { issue: 0, status: "paid", masked: true, decrypt: 0, copied: false },
-  end: { decrypt: 1, copied: false },
-  View: DecryptView,
-  script: ({ caption, tween, set, highlight, click, wait }) => [
-    caption("Payment confirmed: your key is issued to your account"),
-    tween("issue", 1, 1400),
-    set({ status: "issued" }),
-    caption("It stays masked and encrypted until you reveal it"),
-    highlight("plate", "Stored encrypted. Decrypted only when you choose Reveal."),
-    click("reveal", { masked: false }),
-    tween("decrypt", 1, 1600, { ease: "out" }),
-    caption("Copy it, or open the platform's redeem page"),
-    click("copy", { copied: true }),
-    wait(900),
-    highlight("redeem", "Opens Steam's own redeem page in a new tab"),
-    wait(800),
-  ],
-});
-```
+#### S1 — Check in (`checkin`, `/search?q=…` → `/product/copperline-express-deluxe-steam-key`, ≈14.4s)
+State `{ q: "", results: false, open: false, edition: "standard", added: false, cart: 0, cartFlip: 0 }`.
 
-- **Views are pure functions of state** (`SceneViewProps<S>`): no timers, no effects, no randomness. Every frame can be rendered as a still, and `resolveEnd` produces the reduced-motion frame.
-- **Decrypt glyphs** come from a pure function `decryptGlyph(key, i, progress)`:
-  - character `i` of `n` settles at `t_i = 0.08 + 0.84 × i / (n − 1)`;
-  - before `t_i − 0.18` it shows `•`;
-  - between `t_i − 0.18` and `t_i` it shows a glyph from `0123456789ABCDEFGHJKLMNPQRSTUVWXYZ`, picked by `hash(i, floor(progress × 48))`;
-  - for 0.04 after `t_i` it is the real character in `--color-accent-ink`;
-  - after that it is ink.
-
-  Separators never scramble. The account's real KeyPlate uses the same function with the same visual, over 900ms (M6).
-- Scenes are responsive through container queries (`@container`), as in allship's `@3xl` variants. Below 840px the stage uses the **phone** preset, and the View composes a single column.
-
-### 12.4 The bezel (`frame.tsx`)
-The bezel is a steel monitor plate, not a browser window:
-- **Outer plate:** 0px, `--color-plate`, `--edge-machined`, 12px border on desktop (10px on phone), `--shadow-card`.
-- **Top strip** (36px, inside the border):
-  - left: an **address slot**, a recessed mono 12px field (`--edge-machined-pressed`) showing the scene's URL path as `keyrook.com/account/keys`;
-  - right: the engraved neutral tag "SAMPLE DATA".
-  - When the Pay scene moves to the hosted page, the slot text changes to "secure payment page · your payment provider" and a 2px `--color-info` bar appears along the slot's left edge. This shows that the visitor has left Keyrook's own pages. Use the real provider's name only once `STORE_POLICY.payment.providerName` is set.
-- **Screen:** `--color-bg` of the current theme, with the scene inside.
-- **Cursor:**
-  - an inline SVG arrow, 0px corners, square-tipped, ink fill with a 1px `--color-bg` outline;
-  - in text mode, a 2px ink I-beam;
-  - on the phone preset, a 28px **tap ring**: a 2px `--color-accent` circle that scales 0.6→1 and fades over 240ms on press. No glow.
-- **Spotlight:** a 2px `--color-accent` outline rectangle (0px) around the target with 6px padding. The rest of the screen dims with `box-shadow: 0 0 0 100vmax var(--color-scrim)`, clipped by the screen's `overflow: hidden`.
-- **Tip:** a plate tooltip (max 300px, `--color-raised`, `--shadow-lg`) with the engraved label "NOTE" and Mona 14px text, placed above or below the target as in allship.
-
-### 12.5 Controls and steps
-**Tabs** (`tabs-client.tsx`):
-- A row of engraved toggles on a plate, each 52px high, laid out as "01 PICK", "02 PAY", "03 DECRYPT", "04 REDEEM", "05 SUPPORT". The number is in a tumbler slot; the label is Hubot 680 caps at 125%.
-- **Active tab:** the lit lamp before the number, ink label, a 2px green bar under the full tab, and **a mini dial ruler** along its bottom edge with one tick per caption. Ticks light as chapters pass, so the tab doubles as a progress meter.
-- **Keyboard:** WAI-ARIA tabs (arrows, Home, End), as allship.
-- **Auto-advance:** 900ms after a scene finishes. Choosing a tab plays that scene from the start, and auto-advance continues after it.
-- **Mobile:** tabs become a horizontal scroller of the same toggles, with the active one scrolled into view.
-
-**Under the stage:**
-- the chapter counter "02/04" in mono tumblers;
-- the current caption (Mona step-0, ink, `aria-hidden`);
-- the neutral tag "Sample data" (≥840px);
-- the **knob**: a 44px **round** play/pause/replay control (`rounded-round`, `--color-plate`, `--edge-machined`, Lucide `Play` / `Pause` / `RotateCcw` 18px), `aria-label` "Play demo" / "Pause demo" / "Replay demo".
-
-**`TheaterSteps`:** an ordered list.
-- Each row has a mono number in a tumbler slot, then the caption.
-- Done rows show `Check` in the slot. The current row shows the lit lamp and ink text. Upcoming rows are muted.
-- No coloured left bars.
-
-### 12.6 Accessibility and reduced motion
-- The stage is a `<figure aria-label={summary}>`. The animated box is `aria-hidden` and `inert`.
-- A visually hidden `figcaption` carries the summary plus "Illustration with sample data."
-- The full caption list is an `<ol>`: visually hidden while playing, visible under reduced motion.
-- Auto-play runs only when the stage is ≥20% visible **and** elected (the most visible theater on the page), and pauses when the tab is hidden. There is always a pause control (WCAG 2.2.2). No sound.
-- **Reduced motion:** the engine is never loaded. Each scene renders as a `Still` of `resolveEnd(scene)` merged with `scene.end`, and the step list is visible. Tabs switch the still instantly.
-- Nothing flashes more than three times a second across a large area. The dial loader inside scenes steps a single 2×5px tick.
-- The cursor and spotlight are decorative and never take focus.
-
-### 12.7 Performance
-- The engine chunk (runner + engine + geometry, ≈12 KB gzip) loads only when a theater is near the viewport (300px margin), after load-idle or on the first interaction, as in allship.
-- Each scene is its own lazy chunk.
-- Scenes render ≤150 DOM nodes and no raster images (sample covers are inline SVG).
-- The frame scales by a single transform from container units (`--k`), so the layout never thrashes.
-- Only one theater plays at a time. It unsubscribes from the ticker when paused, finished or off-screen.
-
-### 12.8 Scene scripts, frame by frame
-Times are start times in ms from scene start, computed with the timing constants and a nominal 650ms cursor travel. A `click` is travel + press 120 + release 240 (≈1,010). A `highlight` is 1,700 + 260 (≈1,960). The tail is 2,200 after the last step. When a scene runs alone with `loop`, a 380ms fade follows.
-
-#### S1 — Pick (`pick`, url `/search?q=…` → `/product/lantern-coast-deluxe-steam`, ≈14.2s)
-State: `{ q: "", results: false, open: false, edition: "standard", added: false, cart: 0, cartRoll: 0 }`.
-
-| # | Start | Step | Target | ms | Effect | Chapter caption |
+| # | Start | Step | Target | ms | Effect | Caption |
 |---|---|---|---|---|---|---|
-| 0 | 0 | lead | — | 450 | cursor appears at its home point (lower right) | |
-| 1 | 450 | caption | — | 0 | chapter 1 | Search by title or browse by platform |
+| 0 | 0 | lead | — | 450 | cursor appears lower right | |
+| 1 | 450 | caption | — | 0 | | Search the board by title, platform or genre |
 | 2 | 450 | wait | — | 400 | | |
-| 3 | 850 | type | `search` | ≈1,740 | header search fills "lantern coast" | |
-| 4 | 2,590 | set | — | 0 | `results: true`; six deposit boxes rise in (`plate-in`, 70ms stagger inside the View) | |
-| 5 | 2,590 | wait | — | 500 | | |
-| 6 | 3,090 | caption | — | 0 | chapter 2 | Every card shows platform, region and type |
-| 7 | 3,090 | highlight | `card-1-label` | 1,960 | tip: "Steam · Global · Base game. Global means no regional lock." | |
-| 8 | 5,050 | click | `card-1` | 1,010 | `open: true`; the PDP view replaces results (translateX 24px→0 + fade, 260ms) | |
-| 9 | 6,060 | caption | — | 0 | chapter 3 | Choose the edition and check the requirements |
-| 10 | 6,060 | click | `edition-deluxe` | 1,010 | `edition: "deluxe"`; the selected row lights its lamp; price swaps to the Deluxe price | |
-| 11 | 7,070 | wait | — | 400 | | |
-| 12 | 7,470 | highlight | `requirements` | 1,960 | tip: "Needs a Steam account. Languages: EN, DE, FR, ES. Delivered to your account." | |
-| 13 | 9,430 | caption | — | 0 | chapter 4 | Add it to your cart |
-| 14 | 9,430 | click | `add` | 1,010 | `added: true, cart: 1`; Add becomes "In cart" | |
-| 15 | 10,440 | tween | `cartRoll` → 1 | 320 | header cart tumbler rolls 0→1 | |
-| 16 | 10,760 | wait | — | 1,200 | | |
-| — | 11,960 | tail | — | 2,200 | | |
+| 3 | 850 | type | `search` | ≈1,870 | kiosk fills "copperline" | |
+| 4 | 2,720 | set | — | 0 | `results: true`; six departure cards appear (`sign-in`, 70ms stagger in the View) | |
+| 5 | 2,720 | wait | — | 500 | | |
+| 6 | 3,220 | caption | — | 0 | | Every card names its platform and region |
+| 7 | 3,220 | highlight | `card-1-gate` | 1,960 | tip: "Platform 1 · Steam · Global. Global means no regional lock." | |
+| 8 | 5,180 | click | `card-1` | 1,010 | `open: true`; PDP replaces results (translateX 24px→0 + fade 240ms) | |
+| 9 | 6,190 | caption | — | 0 | | Pick the edition and check the requirements |
+| 10 | 6,190 | click | `edition-deluxe` | 1,010 | edition timetable row selected; price flips to €31.99 | |
+| 11 | 7,200 | wait | — | 400 | | |
+| 12 | 7,600 | highlight | `requirements` | 1,960 | tip: "Needs a Steam account. Languages: EN, DE, FR, ES, PL. Delivered to your account." | |
+| 13 | 9,560 | caption | — | 0 | | Add it to your cart |
+| 14 | 9,560 | click | `add` | 1,010 | `added: true, cart: 1`; Add → "In cart" | |
+| 15 | 10,570 | tween | `cartFlip` → 1 | 280 | header cart flap flips 0→1 | |
+| 16 | 10,850 | wait | — | 1,200 | | |
+| — | 12,050 | tail | — | 2,200 | | |
 
-End/still: the PDP with the Deluxe edition selected and "In cart". Phone: results 2-up, the PDP single column, the buy box below the cover.
+#### S2 — Pay (`pay`, `/checkout` → hosted page → `/order/KT-30517`, ≈17.2s)
+State `{ terms: false, consent: false, step: "review", card: "", exp: "", cvc: "", approving: 0 }`. Same step structure as Keyrook's Pay scene (it is the functional truth of the payment flow), restyled: route-line progress at "Review & pay", the waiver checkbox text is exactly `STORE_POLICY.waiver.text`, sample card "4000 0000 0000 4821", exp "09/29", cvc rendered "•••", the bank dialog with the flap loader and "Approve this payment in your banking app", then back on Keyterminus with "Payment confirmed" and the order timeline's second stop current. Captions: "Confirm the order and the delivery terms" · "Card details go into the payment provider's hosted page" · "Your bank confirms it's you with 3-D Secure" · "We receive the confirmation, never your card number". Highlight tip at the end: "Keyterminus receives: payment confirmed, amount, order number. The card number stays with the payment provider." `MiniStill` override for section 10: `{ step: "challenge", approving: 0.6 }`.
 
-#### S2 — Pay (`pay`, url `/checkout` → hosted page → `/order/KR-…`, ≈17.2s)
-State: `{ terms: false, consent: false, step: "review", card: "", exp: "", cvc: "", approving: 0 }`.
-Shown only when `STORE_POLICY.payment.hostedPage` and `STORE_POLICY.payment.threeDSecure` are both true; otherwise it is dropped from the tabs.
+#### S3 — Departs (`depart`, `/account/keys`, ≈13.6s)
+State `{ issue: 0, status: "paid", masked: true, flip: 0, copied: false }`.
 
-| # | Start | Step | Target | ms | Effect | Chapter caption |
+| # | Start | Step | Target | ms | Effect | Caption |
 |---|---|---|---|---|---|---|
 | 0 | 0 | lead | — | 450 | | |
-| 1 | 450 | caption | — | 0 | chapter 1 | Confirm the order and the delivery terms |
-| 2 | 450 | click | `terms` | 1,010 | `terms: true` | |
-| 3 | 1,460 | click | `consent` | 1,010 | `consent: true`; the checkbox text is the exact `STORE_POLICY.waiver.text` | |
-| 4 | 2,470 | click | `pay` | 1,010 | `step: "hosted"`; the address slot changes to the hosted-page label with the info bar | |
-| 5 | 3,480 | wait | — | 700 | | |
-| 6 | 4,180 | caption | — | 0 | chapter 2 | Card details go into the payment provider's hosted page |
-| 7 | 4,180 | type | `card` | ≈2,200 | "4000 0000 0000 4821" (sample) | |
-| 8 | 6,380 | type | `exp` | ≈1,270 | "09/29" | |
-| 9 | 7,650 | type | `cvc` | ≈1,160 | "123", rendered as "•••" | |
-| 10 | 8,810 | click | `submit` | 1,010 | `step: "challenge"`; the bank dialog opens over the hosted page | |
-| 11 | 9,820 | caption | — | 0 | chapter 3 | Your bank confirms it's you with 3-D Secure |
-| 12 | 9,820 | tween | `approving` → 1 | 2,000 | the dial loader steps; "Approve this payment in your banking app"; at 1, `Check` + "Approved" | |
-| 13 | 11,820 | set | — | 0 | `step: "confirmed"`; back on Keyrook, order page with "Payment confirmed" | |
-| 14 | 11,820 | caption | — | 0 | chapter 4 | We receive the payment confirmation, never your card number |
-| 15 | 11,820 | highlight | `confirmation` | 1,960 | tip: "Keyrook receives: payment confirmed, amount, order number. The card number stays with the payment provider." | |
-| 16 | 13,780 | wait | — | 1,200 | | |
-| — | 14,980 | tail | — | 2,200 | | |
-
-End/still: `step: "confirmed"`. The `MiniStill` on the home security ledger uses the override `{ step: "challenge", approving: 0.6 }`.
-
-#### S3 — Decrypt (`decrypt`, url `/account/keys`, ≈13.3s)
-State and script as in §12.3.
-
-| # | Start | Step | Target | ms | Effect | Chapter caption |
-|---|---|---|---|---|---|---|
-| 0 | 0 | lead | — | 450 | | |
-| 1 | 450 | caption | — | 0 | chapter 1 | Payment confirmed: your key is issued to your account |
-| 2 | 450 | tween | `issue` → 1 | 1,400 | the order timeline's segment draws from "Payment confirmed" to "Key issued"; sample times appear | |
-| 3 | 1,850 | set | — | 0 | `status: "issued"`; the key plate's bolts shoot home (`bolt-shoot`), the lamp lights, tag "Ready" | |
-| 4 | 1,850 | caption | — | 0 | chapter 2 | It stays masked and encrypted until you reveal it |
-| 5 | 1,850 | highlight | `plate` | 1,960 | tip: "Stored encrypted. Decrypted only when you choose Reveal." | |
+| 1 | 450 | caption | — | 0 | | Payment confirmed: your key departs for your account |
+| 2 | 450 | tween | `issue` → 1 | 1,400 | the order timeline draws from "Payment confirmed" to "Key issued"; sample times appear | |
+| 3 | 1,850 | set | — | 0 | `status: "issued"`; the key board's status reads "Ready"; the monitor remark flips to `DEPARTED` | |
+| 4 | 1,850 | caption | — | 0 | | It waits on blank flaps until you reveal it |
+| 5 | 1,850 | highlight | `board` | 1,960 | tip: "Stored encrypted. Decrypted only when you choose Reveal." | |
 | 6 | 3,810 | click | `reveal` | 1,010 | `masked: false` | |
-| 7 | 4,820 | tween | `decrypt` → 1 (ease out) | 1,600 | tumblers scramble and settle left to right (`decryptGlyph`) | |
-| 8 | 6,420 | caption | — | 0 | chapter 3 | Copy it, or open the platform's redeem page |
-| 9 | 6,420 | click | `copy` | 1,010 | `copied: true`; "Copied" with `CopyCheck` | |
-| 10 | 7,430 | wait | — | 900 | | |
-| 11 | 8,330 | highlight | `redeem` | 1,960 | tip: "Opens Steam's own redeem page in a new tab" | |
-| 12 | 10,290 | wait | — | 800 | | |
-| — | 11,090 | tail | — | 2,200 | | |
+| 7 | 4,820 | tween | `flip` → 1 (linear) | 1,100 | flaps flip into place left→right (`flapFrame`) | |
+| 8 | 5,920 | caption | — | 0 | | Copy it, or open the platform's redeem page |
+| 9 | 5,920 | click | `copy` | 1,010 | "Copied" with `Check` | |
+| 10 | 6,930 | wait | — | 900 | | |
+| 11 | 7,830 | highlight | `redeem` | 1,960 | tip: "Opens Steam's own redeem page in a new tab" | |
+| 12 | 9,790 | wait | — | 800 | | |
+| — | 10,590 | tail | — | 2,200 | | |
 
-Sample key: `7XK2Q-0OQD9-H1LMP`, chosen to contain both `0` and `O`, so the slashed zero is visible. End/still: revealed, not copied.
+End/still: revealed, not copied.
 
-#### S4 — Redeem (`redeem`, url label "Steam app", ≈10.5s)
-State: `{ platform: "steam", menu: false, dialog: false, key: "", agreed: false, done: false, added: 0 }`.
+#### S4 — Arrives (`arrive`, address label "{Platform} app", ≈10.5s)
+Keep Keyrook's Redeem structure and config-driven menu paths (generic neutral launcher window: a `--color-raised` panel, title bar with the platform name as text, a left library column; no platform logos or chrome imitation). Restyle and recaption: "Open {name}: {path}" · "Paste your key" · "The game arrives in your library". When `done`, the monitor remark flips to `ARRIVED`. The library row slides in at the top (translateY −8px→0 + fade, 260ms).
 
-The launcher is a **generic neutral window** (plate, title bar with the platform name as text, a left column of library rows). There are no platform logos and no imitation of their UI chrome. Only the real menu labels appear, as words from `src/config/activation.ts`. The same View renders every platform from config, which is how the activation selector shows Epic, EA, Ubisoft, Xbox, PlayStation and Nintendo.
+#### S5 — Help desk (`help`, `/account/orders/KT-30517`, ≈13.6s)
+Keep Keyrook's Support structure (report → reason "Already redeemed" → note "Steam says this key was already used." → send → "Checking" with the flap loader → `outcome: "replaced"`): the old key board collapses to "Replaced on …" and the new board's flaps flip in. Captions: "Key not working? Report it from the order" · "We check it and reply within {replyTime}" · "A faulty key is replaced, or refunded". Tip: "Sample outcome. A key that doesn't work through no fault of yours is replaced, or refunded if no replacement is available."
 
-| # | Start | Step | Target | ms | Effect | Chapter caption |
-|---|---|---|---|---|---|---|
-| 0 | 0 | lead | — | 450 | | |
-| 1 | 450 | caption | — | 0 | chapter 1 | Open Steam: Games, then Activate a Product on Steam |
-| 2 | 450 | click | `menu-0` | 1,010 | `menu: true`; menu shows the config's path items | |
-| 3 | 1,460 | click | `menu-1` | 1,010 | `menu: false, dialog: true` | |
-| 4 | 2,470 | caption | — | 0 | chapter 2 | Paste your key |
-| 5 | 2,470 | click | `key-field` | 1,010 | field focused | |
-| 6 | 3,480 | set | — | 0 | `key: "7XK2Q-0OQD9-H1LMP"` (a paste, not typing) | |
-| 7 | 3,480 | wait | — | 500 | | |
-| 8 | 3,980 | click | `agree` | 1,010 | `agreed: true` (only when the platform's config lists an agreement step; otherwise skipped by the script builder) | |
-| 9 | 4,990 | click | `confirm` | 1,010 | `done: true`; "Activation complete" | |
-| 10 | 6,000 | caption | — | 0 | chapter 3 | The game is added to your library |
-| 11 | 6,000 | tween | `added` → 1 | 900 | a library row slides in at the top of the left column | |
-| 12 | 6,900 | wait | — | 1,400 | | |
-| — | 8,300 | tail | — | 2,200 | | |
-
-#### S5 — Support (`support`, url `/account/orders/KR-…`, ≈13.6s)
-State: `{ open: false, reason: "", note: "", sent: false, review: 0, outcome: "none" }`.
-
-| # | Start | Step | Target | ms | Effect | Chapter caption |
-|---|---|---|---|---|---|---|
-| 0 | 0 | lead | — | 450 | | |
-| 1 | 450 | caption | — | 0 | chapter 1 | Key not working? Report it from the order |
-| 2 | 450 | click | `report` | 1,010 | `open: true`; the report dialog | |
-| 3 | 1,460 | click | `reason` | 1,010 | select opens | |
-| 4 | 2,470 | click | `reason-redeemed` | 1,010 | `reason: "Already redeemed"` | |
-| 5 | 3,480 | type | `note` (char 22ms) | ≈1,970 | "Steam says this key was already used." | |
-| 6 | 5,450 | click | `send` | 1,010 | `sent: true`; dialog closes; tag "Reported" | |
-| 7 | 6,460 | caption | — | 0 | chapter 2 | We check it and reply within 1 business day (from `STORE_POLICY.support.replyTime`) |
-| 8 | 6,460 | tween | `review` → 1 | 1,800 | status "Received" → "Checking" with the dial loader | |
-| 9 | 8,260 | set | — | 0 | `outcome: "replaced"`; old plate collapses to "Replaced on …", the new plate's bolts shoot home | |
-| 10 | 8,260 | caption | — | 0 | chapter 3 | A faulty key is replaced, or refunded |
-| 11 | 8,260 | highlight | `outcome` | 1,960 | tip: "Sample outcome. A key that doesn't work through no fault of yours is replaced, or refunded if no replacement is available." | |
-| 12 | 10,220 | wait | — | 1,200 | | |
-| — | 11,420 | tail | — | 2,200 | | |
-
-All five scenes back to back, with 900ms gaps, take ≈72s.
+### 12.7 Accessibility and performance
+- Stage = `<figure aria-label={summary}>`; animated box `aria-hidden` + `inert`; visually hidden `figcaption` (summary + "Illustration with sample data."); full caption list as `<ol>` (hidden while playing, visible under reduced motion).
+- Auto-play only when ≥20% visible and elected; pauses on hidden tab; always a pause control; no sound.
+- Reduced motion: engine never loads; each scene renders as a `Still` of `resolveEnd(scene)` + `scene.end`; tabs switch stills instantly; tabs-board remarks static.
+- Nothing flashes more than three times per second over a large area; flap flips in scenes affect ≤ 20 small tiles at once.
+- Engine chunk (≈12 KB gzip) loads when near (300px), after load-idle or on first interaction; scenes are lazy chunks; ≤150 DOM nodes per scene; sample covers inline SVG; one theater plays at a time.
 
 ---
 
 ## 13. Motion hooks for the motion engineer
 
-Use the data-attribute engine (`src/lib/motion/engine.ts`; `WEBGL-3D-KNOWLEDGE.md` §4.2) and the single ticker (`src/lib/motion/ticker.ts`):
-- the implementing engineer leaves the markup hooks and the static end state of every moment;
-- the motion engineer adds behaviour;
-- remove the `bay-hero`, `inspect`, `trays` and `lamp-gl` registrations from `SCENES` and register the new ones.
+Use the data-attribute engine (`src/lib/motion/engine.ts`) and the single ticker (`src/lib/motion/ticker.ts`). The store-pages engineer leaves markup hooks and the **static end state** of every moment; the motion engineer adds behaviour. Remove the `vault-door`, `door-ajar`, `ledger`, `releases`, `tumblers`, `index-slide` registrations and register the scenes below.
 
 ### 13.1 Depth layers (pointer amplitudes are maxima at the viewport edge, fine pointers only)
 | Layer | Content | Pointer offset | Scroll speed |
 |---|---|---|---|
-| D0 | vault wall: section bands, the door frame recess, the locker wall back | 0 | 0 |
-| D1 | dial rulers, tick bands, locker frames, the release ruler | 3px | ±0.04 |
-| D2 | plates: door, locker doors, deposit boxes in set-pieces, the security ledger | 6px + swing | ±0.08 |
-| D3 | covers inside plates (parallax inside the drawer face, moving 4px against their plate) | 10px | ±0.12 |
-| D4 | engraved readouts attached to plates (the hero's tumbler readout, locker counts) | 12px | ±0.05 |
-| GL | the door scene: camera and uniforms only | — | scene-driven |
+| D0 | hall floor, section bands, the hero hall background | 0 | 0 |
+| D1 | board housings, route lines, rail tracks, the footer platform line | 2px | ±0.03 |
+| D2 | flaps inside housings, departure cards inside rails, gift card blank | 4px | ±0.06 |
+| D3 | covers inside cards (move 3px against their card) | 6px | ±0.1 |
+| GL | the hero board scene: camera and uniforms only | — | scene-driven |
 | L0 | headlines, body, CTAs, prices, filters, search | 0 | 0 |
 
-Readable text, prices and CTAs never move with parallax.
-- Catalogue, product, cart, checkout, account and policy pages get only the drawer pull (M5), the key decrypt (M6), add to cart (M7), the timeline (M8) and the index slide (M11).
-- They get no scroll parallax.
+Readable text, prices and CTAs never move with parallax. Store surfaces (catalogue, product, cart, checkout, account, policies) get only M6, M7, M8, M9 and the flap counters — no scroll parallax.
 
 ### 13.2 Named moments
-| ID | Name | Where | What it communicates | Static / reduced-motion state |
+| ID | Name | Where | Communicates | Static / reduced-motion state |
 |---|---|---|---|---|
-| M1 | The door | home hero | your keys are held behind real security; it opens for you | the door poster ajar at 35°, covers visible, readout shown |
-| M2 | Tumbler readout | hero catalogue numbers, cart count, order numbers, price-band count | these numbers are counted, not claimed | final values |
-| M3 | Lockers | home platform vault, vault map | each platform has its own locker; look inside | doors ajar at 14° |
-| M4 | Theater | home, how activation works | this is exactly what happens, step by step | stills + full step lists |
-| M5 | Drawer pull | every deposit box on fine pointers | the box opens toward you | rest |
-| M6 | Decrypt | the key plate on Reveal, theater S3 | the key was locked; now it's yours | key shown at once |
-| M7 | Into the box | add to cart from any card or the buy box | it went into your cart | count updates, toast |
-| M8 | Next node | order timeline status change | your order moved on | new state shown |
-| M9 | Release ruler | home new releases | recent releases, placed on a time scale | horizontal snap scroller |
-| M10 | Wire packets | home security ledger | where your card data goes, and where it doesn't | static diagram with labels |
-| M11 | Index slide | checkout progress, price dial, sliders | you moved one detent on | instant |
-| M12 | Directory peek | home genre directory | what's behind this word | none |
-| M13 | Door ajar | home final CTA | the door's open; come in | static ajar |
-| M14 | Plate in | landing section headings and plates | this section arrived | visible |
+| M1 | **The board** (signature) | home hero | the whole catalogue is live and searchable; real keys, real prices | DOM board, page 1, complete |
+| M2 | Platform peek | home Platforms, concourse map preview | what's on this platform right now | mini-board shows platform 1 |
+| M3 | Rail glide | home timetable rails | where you are along the line | native scroller, position bar static |
+| M4 | Theater | home, activation guide | exactly what happens, step by step | stills + step lists |
+| M5 | Route trace | home routes, through the gate, footer line | where each line goes, and where it ends | lines fully drawn |
+| M6 | Gate flip | departure card hover | this departure is selected | none |
+| M7 | Check-in | add to cart anywhere | it went into your cart | count updated, toast |
+| M8 | Next stop | order timeline, checkout progress | your order / checkout moved on | new state shown |
+| M9 | Key flip | key board reveal, theater S3 | your key is on the board now | key shown at once |
+| M10 | Fare revision | home revised fares | these prices really dropped | was and now shown side by side |
+| M11 | Denomination flip | home gift cards | the value you chose | chosen value shown |
+| M12 | Sign in | landing section headings and sign plates | this section arrived | visible |
 
-#### M1 The door (home hero, the signature moment)
-**Markup:**
-- section `data-scene="vault-door"`;
-- right 6 columns: `<div data-door>` with the **poster** (`DoorPoster`, an inline SVG generated from the same geometry constants in `src/lib/motion/door/geometry.ts`) and a `<canvas data-door-gl aria-hidden="true">`;
-- a DOM list `data-door-contents` of the same 12 covers (real links, visually hidden until the door is open on desktop, visible on mobile).
+#### M1 The board (home hero, the signature moment)
+**Markup** (store-pages engineer):
+- `section#departures[data-scene="board"]` full bleed on `--color-board` (the hall), `data-surface="board"`.
+- Inside, `div[data-board]` = the **DOM board**: a `<table>` with `<caption class="sr-only">Departures: keys on the board right now</caption>`, column heads (sign labels in `--color-on-board-muted`: PRICE · DESTINATION · PLATFORM · REMARKS), and 6 `<tr>` rows (4 on mobile). Each row's title cell holds a real `<a href="/product/…">`; every cell renders its text as a `FlapRow` (`aria-hidden`) plus a visually hidden plain-text copy. Row height and cell size come from CSS variables `--board-cell-w`, `--board-cell-h`, `--board-cols` so the canvas can match them exactly.
+- `canvas[data-board-gl][aria-hidden="true"]` absolutely positioned over the DOM board's flap area; `pointer-events: none` (links stay clickable underneath).
+- Server data: `boardPages` — 3 pages × 6 rows (18 distinct real products, §18.5) with `{ href, priceLabel, title (uppercased, trimmed at a word boundary to the title column width), platformBoardLabel, remark }`.
+- Controls under the board (L0): Sign sm "Pause board" / "Play board" (`aria-pressed`), mono "Page 1 of 3" (`aria-live="polite"`), Sign sm "Next 6". Under reduced motion only "Next 6" and the page readout.
 
-**Library: `ogl` 1.0.11** (verified with `npm view`). It provides `Renderer`, `Camera`, `Transform`, `Program`, `Mesh`, `Cylinder`, `Box`, `Plane` and `Texture` at roughly 12 KB gzip for the modules used.
-- It is dynamically imported in an idle callback after LCP.
-- Why not raw WebGL: the door needs procedural cylinders, a perspective camera, a scene graph for hinge and bolts, and 13 textures, so hand-rolled matrices would cost more code than OGL.
-- Why not three.js 0.186.1 (also verified): ≥150 KB gzip would break the budget.
-- Reuse `lamp-gl.ts`'s scaffold patterns: context-loss handling, DPR cap, idle boot, pause on hidden.
+**Column layout (cells):**
+| Breakpoint | PRICE | gap | DESTINATION | gap | PLATFORM | gap | REMARKS | Total | Cell size |
+|---|---|---|---|---|---|---|---|---|---|
+| ≥1280 | 7 | 1 | 22 | 1 | 11 | 1 | 9 | 52 | ≈24×36px within `max-w-container` |
+| 1024–1279 | 7 | 1 | 16 | 1 | 11 | 1 | 9 | 46 | ≈19×30px |
+| 640–1023 (two lines per row) | line 2: 7 | 1 | line 1: 22 | — | line 2: 11 | 1 | line 2: rest (2) or a tag under the row | 22 per line | ≈24×34px |
+| <640 (two lines per row, 4 rows) | line 2: 7 | 1 | line 1: 16 | — | line 2: 8 | — | a tag under the row | 16 per line | ≈20×30px at 390 |
 
-**Geometry** (procedural, no model files):
-- **Wall and frame:** a plane at z 0 with an open cylinder recess (r 1.12, depth 0.22) for the door frame, plus two hinge barrels on the left.
-- **Door:** a cylinder (r 1.0, thickness 0.2, 96 segments) with a 0.02 chamfer ring. The front face has a **turned finish**: concentric micro-rings (`sin(r × 620) × 0.015` on albedo) plus an anisotropic highlight along the tangent, which reads as machined steel without any texture file.
-- **Dial:** a cylinder (r 0.32, thickness 0.06) at (0, 0.18). Its face texture (1024²) is drawn at boot with Canvas2D after `document.fonts.ready`: 100 ticks, numerals every 10 in Red Hat Mono, a knurled rim. The **green index line** is fixed on the door face at 12 o'clock above the dial (the dial turns beneath it).
-- **Handle:** a hub and three spokes at (0, −0.34).
-- **Bolts:** 8 instanced cylinders (r 0.045, length 0.24) around the rim at 22.5° + 45°·k, reaching into the frame.
-- **Status lamp:** an 8px-equivalent disc at 3 o'clock on the door face; unlit, then lit `--color-accent` (flat emissive, **no bloom, no glow**).
-- **Interior:** a back wall at z −1.2 with a 4×3 grid of deposit-box niches (instanced boxes) holding 12 cover planes at 3:4.
-  - The covers are the 12 most-ordered in-stock products with covers, or the newest when there is no order data, recomputed on revalidate.
-  - They load through `/_next/image?w=256` (same origin) and are `decode()`d before upload.
+Prices are right-aligned in their column ("€22.49", "€149.99"); titles left-aligned; blank flaps pad the rest. On <640 platform labels use the 8-character forms (`STEAM`, `XBOX`, `PS`, `NINTENDO`, `EPIC`, `GOG`, `EA APP`, `UBISOFT`, `BNET`… only where 11 doesn't fit; the visually hidden text always says the full name).
 
-**Light and colour:**
-- a key light from the upper left, a weak fill, hemispheric ambient;
-- Blinn-Phong with a brushed term;
-- colours read at boot from tokens (`--color-plate` lifted 30% for steel, `--color-steel-hi`, `--color-accent`) and re-read on theme change. Counter Hall gets a brighter, softer key light and lighter steel.
+**Library:** `ogl` 1.0.11 (already installed), dynamically imported in an idle callback after LCP. Reuse the scaffold patterns from the old door controller (context loss, DPR cap, idle boot, pause on hidden, dispose with `WEBGL_lose_context`).
 
-**Timeline** (desktop, pinned 200vh, progress p):
+**Geometry and rendering** (procedural, no model files):
+- **Glyph atlas:** Canvas2D after `document.fonts.ready`, Sometype Mono 700, the drum characters (§6) in `--color-on-board` on transparent, one 64×96 cell per glyph, 2048×512 texture; remark glyphs reuse the atlas and are tinted by an instance colour attribute (`--color-remark`). Colours are read from tokens at boot.
+- **Per cell, three instanced quads:** static top half (shows the *next* character's top), static bottom half (shows the *current* character's bottom until the leaf lands), and the **leaf** (front = current top, back = next bottom) rotating 0→−180° about the hinge. Three instanced meshes total (tops, bottoms, leaves) plus one housing quad = **4 draw calls**.
+- **Shading:** flat flap colour (top half `--color-flap-top`, bottom `--color-flap`); the leaf darkens with `cos(angle)` toward 90° (light from above) and the bottom half under a falling leaf darkens by up to 18% proportional to the leaf angle (its shadow); a 2px hinge line; no bloom, no glow, no reflections.
+- **Camera:** perspective, the board slightly pitched as if hung above eye level (rotateX −4°). Fine pointers: yaw/pitch ±2° with damping (D-GL).
 
-| p | What happens |
+**Behaviour:**
+| Trigger | What happens |
 |---|---|
-| 0.00–0.08 | Rest. On fine pointers the door shifts ±6px and the camera ±1.5° (D2). |
-| 0.08–0.40 | The dial turns three times, alternating direction, seating in three detents with the detent spring (no overshoot). The tumbler readout beside the door stays on its **real** numbers; the dial's position is mechanism, not data. |
-| 0.40–0.52 | The bolts retract 0.16 units, staggered 30ms around the rim. The handle turns 90°. The door lamp lights. |
-| 0.52–0.86 | The door swings open on its hinge 0→108° (`--ease-in-out`). Interior exposure rises 0.2→1. |
-| 0.86–1.00 | The camera dollies 0.6 units into the interior, covers parallax (D3), and the `data-door-contents` list fades in as an overlay of real links on the right edge. |
+| First frame | The canvas cross-fades in over the identical DOM board (400ms); nothing flips. |
+| Load + 900ms | One "arrival" pass: every cell flips from blank to its page-1 character (§6 timing; whole board ≤1.6s). |
+| Every 7s (`boardPage`) | Rows flip to the next page (rows staggered 60ms, cells 18ms). Stops after 3 full cycles, when off-screen, on a hidden tab, or when the visitor pauses, hovers the board, or focuses the search field. |
+| Hero search typing | Debounced 250ms, the existing search endpoint returns the top 6 live matches; the board flips to them (title, platform, price, remark), and the page readout reads "Results for “copper”". Clearing the field flips back to page 1. No match: rows flip to `NO DEPARTURES MATCH` / `TRY THE TITLE WITHOUT THE EDITION`. Enter submits to `/search?q=`. The DOM rows update to the same data so links and screen readers stay right (`aria-live="polite"` on the page readout). |
+| Pointer riffle (fine pointers) | Cells within 60px of the pointer lift their leaf 4–10° (damped), so the board reacts to the hand like real flaps in a draught. Hovering a row brightens its flap colour one step and shows the DOM row's link underline; clicking navigates. |
+| Scroll out | As the hero leaves the viewport (progress 0→1 over its height), the board pitches back 0→12° and the hall darkens 6% (uniform). |
 
-- **On load:** after the first rendered frame the canvas crossfades in over 600ms and the dial makes one 36° settle into position 0 (500ms). Nothing else moves until scroll.
-- **Poster first:** the SVG poster shows the closed door and paints instantly. LCP is the H1 text, never the canvas.
+- **Poster first:** the DOM board is the poster — complete and readable before any JS. LCP is the H1, never the canvas.
+- **Fallbacks:** coarse pointer, `deviceMemory < 4`, `saveData`, software renderer (`WEBGL_debug_renderer_info` matching swiftshader/llvmpipe/software), or context loss → **DOM flaps** animate with CSS (`Flap` leaf, changed cells only, same `flapFrame` timing; ≤ 160 cells). Mobile always uses DOM flaps.
+- **Reduced motion:** static DOM board on page 1, no paging, no riffle, no pitch; "Next 6" swaps instantly; search swaps instantly.
+- **Budgets:** 4 draw calls; one 2048×512 atlas; DPR ≤1.5; GPU ≤4ms/frame on desktop; board JS ≤40 KB gzip including OGL; paused off-screen and on hidden tabs; fully disposed on route change; `?t=` freezes time and `?page=2` freezes the page for screenshots.
 
-**Mobile and fallbacks:**
-- Mobile (<1024px or coarse pointer): no WebGL, no pin. The poster door (88vw) sits under the search field. When it is 50% in view, a **CSS 3D swing** plays once (rotateY 0→−28° on the left edge, perspective 1200px, 1,200ms `--ease-in-out`) to reveal a 3×2 recessed grid of real covers behind it (`next/image`).
-- The same CSS swing is the desktop fallback for:
-  - software renderers (`WEBGL_debug_renderer_info` matching swiftshader, llvmpipe or software);
-  - `deviceMemory < 4`;
-  - `saveData`;
-  - context loss.
-- Reduced motion: the poster rendered ajar at 35° with covers visible, no pin, no swing.
+#### M2 Platform peek
+`[data-scene="peek"]` on home section 2 and the concourse map preview. Hover/focus on a platform sign → the mini-board's three rows flip to that platform's titles (DOM flaps), covers strip cross-fades (180ms). Default: platform 1. Touch: tap selects without navigating; a second tap (or the sign's own link) navigates. Reduced: instant swap.
 
-**Budgets:**
-- ≤18 draw calls (bolts and niches instanced);
-- textures: 12 × 256×341 plus one 1024² dial;
-- DPR ≤1.5; GPU ≤6ms per frame on desktop;
-- door JS ≤45 KB gzip including OGL;
-- paused off-screen and on hidden tabs;
-- fully disposed on route change (`WEBGL_lose_context`).
-- `?t=` freezes time and `?p=0.6` freezes progress for screenshots (§16 of the manual).
+#### M3 Rail glide
+`[data-rail]` on each timetable rail. Fine pointers: drag-to-scroll with momentum (damped on the ticker), wheel-shift scroll, Sign icon buttons `ArrowBigLeft`/`ArrowBigRight`. The **position bar** under the rail (a 3px track in `--color-rule` with a mustard segment the width of the visible fraction) slides with scroll — it says where you are along the line. Cards entering the view rise 6px (D2) once. Mobile: native scroll-snap, position bar still updates. Reduced: no momentum, no rise.
 
-#### M2 Tumbler readout
-- `data-tumbler` on a `Tumbler` (§8.21). On first entering view (once per page load), each number rolls from 0 to its value, with 120ms between numbers.
-- Cart count: rolls on change, with `aria-live` on the cart button's hidden label.
-- Order numbers: roll once when the confirmation page loads.
+#### M5 Route trace
+`[data-scene="routes"]`, `[data-scene="gate"]`, `[data-route-line]` in the footer. On first entering view (20%), each line draws left→right (`route-draw`, 700ms, lines staggered 90ms), stops pop in behind the drawing head (`stop-in`, 160ms), and the terminus bar appears last. Hover/focus on a route: its terminus bar turns mustard and a 10×4px mustard marker travels the line once from the first stop to the terminus (600ms `--ease-in-out`). Reduced: drawn complete, marker never travels.
 
-#### M3 Lockers
-- `data-scene="lockers"`. Entrance: lockers rise 16px with a 60ms stagger (D2).
-- Hover or focus on a locker:
-  - its door plate swings open on its left edge to −24° (rotateY, perspective 900px, 260ms `--ease-latch`);
-  - the 3 covers inside slide forward 8px (D3);
-  - the locker lamp lights;
-  - leaving closes it in 200ms.
-- Each locker is one link; motion never blocks navigation.
-- Touch: no swing (the first two lockers sit permanently ajar at −14°, so the idea reads).
-- Reduced motion: all doors ajar at −14°.
+#### M6 Gate flip
+`[data-gate]` on the gate strip's platform tile of departure cards: on card hover/focus-within, the tile flips once to the same number (single 140ms leaf). Fine pointers only. Grids never flip all at once.
 
-#### M5 Drawer pull
-- `data-drawer` on deposit boxes; fine pointers only (§8.10).
-- On home set-pieces it adds D3 pointer parallax of ±4px inside the drawer face. On catalogue grids, the pull only.
+#### M7 Check-in
+On add: a ghost of the cover (40px wide) travels to the header `Ticket` along a gentle arc (380ms, `--ease-sign`); the cart `FlapCounter` flips; then the toast. Reuse `cart-flight.ts` with `data-cart-target`; skip the ghost if the header is off-screen.
 
-#### M6 Decrypt
-- `data-decrypt` on the KeyPlate.
-- On a successful reveal, `decryptGlyph` (§12.3) runs over 900ms on the ticker, with 4 intermediate glyphs per slot.
-- Focus moves to Copy at the end. Reduced motion: instant.
+#### M8 Next stop
+The route-line segment to the new stop draws (scaleX or dashoffset, 420ms) and the mustard current marker moves to the new stop. Once per transition, never on first render.
 
-#### M7 Into the box
-- On add: a FLIP ghost of the cover (40px wide, opacity 0.9) flies to the header `Archive` along a gentle arc in 400ms on `--ease-latch`.
-- The Archive glyph's lid nudges up 2px and back (120ms), the cart tumbler rolls, then the toast appears.
-- Reuse `cart-flight.ts` with `data-cart-target`. If the header is off-screen, skip the ghost.
+#### M9 Key flip
+`[data-key-board]` on `KeyBoard`. On successful reveal, `flapFrame` runs over ≤1100ms on the ticker (cells staggered 30ms left→right, each ≤6 visible steps); focus moves to Copy at the end. Replacement keys flip in the same way. Reduced: instant.
 
-#### M8 Next node
-- The track segment draws from the previous node to the new one (scaleX, 420ms) and the lamp moves to the new node.
-- Once per transition, never on first render.
+#### M10 Fare revision
+`[data-scene="fares"]`. On first entering view, the NOW column of each row flips from the WAS value to the NOW value (row stagger 60ms), then the remark flips to `NOW −18%`. It shows the change that really happened; both values stay visible afterwards. Reduced: final state.
 
-#### M9 Release ruler
-- `data-pin="releases"`, desktop only, pinned ≤140vh.
-- A long dial ruler spans the track, one major tick per week for the last 8 weeks of real release dates, with "Today" as the green index line at the right end.
-- Covers hang below their release tick, with the date in mono. Scroll moves the track right to left (D1 ruler, D2 boxes, D3 covers).
-- Mobile and reduced motion: a horizontal snap scroller with the same ruler drawn statically.
+#### M11 Denomination flip
+`[data-scene="giftcard"]`. Choosing a denomination flips the card's value flaps to the new value and swaps the price; choosing a platform flips the card face (rotateX 0→90° then a new face 90→0°, 300ms total). Reduced: instant swap.
 
-#### M10 Wire packets
-- `data-scene="ledger"`. An SVG mechanism diagram (manual §7.8) with nodes: You → Hosted card page → Your bank (3-D Secure) → Payment provider → Keyrook → Your account.
-- Small square packets travel along the wires (SMIL `animateMotion`):
-  - **card-data packets** (outlined squares) travel only You → Hosted page → Bank → Provider and **stop** there;
-  - at the provider they become a **confirmation token** (a filled square), which travels to Keyrook;
-  - Keyrook then sends a **key token** (a filled square with the key glyph) to Your account.
-
-  The geometry itself says "card data never reaches us".
-- Paused off-screen (`pauseAnimations()` via IntersectionObserver).
-- Reduced motion: static, with each packet type drawn at rest in its segment and the legend visible.
-
-#### M11 Index slide
-- The green index line moves to the new detent (260ms `--ease-latch`) and the ticks it passes step lit→unlit (3ms stagger).
-- Used by checkout, the price dial and the sliders.
-
-#### M12 Directory peek
-- Hover or focus on a genre row slides three real covers in from the right (translateX 16px→0 + opacity, 180ms).
-- Fine pointers only; rows are plain links on touch.
-
-#### M13 Door ajar
-- The final CTA's small door poster (SVG, ajar at 22°). On fine pointers it rotates ±4° with pointer X, and the covers behind move 6px against it.
-- No WebGL (one context per page, and the hero holds it).
-
-#### M14 Plate in
-- `data-anim="plate"` on landing section headings and plates: `plate-in` once at 640ms when 20% in view.
-- Never on store surfaces.
+#### M12 Sign in
+`data-anim="sign"` on landing section headings, leads and sign plates: `sign-in` once at 560ms when 20% in view. Never on store surfaces.
 
 ### 13.3 Budgets and rules
-- **WebGL:** only M1 (home). One context per page, DPR ≤1.5, paused off-screen or on hidden tabs, initialised after LCP via idle callback, never created on coarse pointers, `deviceMemory < 4`, `saveData` or reduced motion. The SVG poster plus CSS swing looks complete on its own.
-- **Home motion JS:** ≤45 KB gzip before interaction (engine scan, tumblers, lockers, door + OGL loaded after LCP). The theater engine (≈12 KB) and scenes load lazily when near. GSAP and Lenis are **not** needed: the existing ticker plus CSS scroll-driven animations (`@supports (animation-timeline: view())`) cover M3, M9 and M14. Pin progress for M1 and M9 comes from one scroll listener feeding the ticker.
-- **CLS 0.** Exactly two pins on the home page on desktop (M1, M9). Every scene reverts on route change.
-- **Store surfaces:** functional motion only.
+- **WebGL:** only M1, home only; one context; DPR ≤1.5; after LCP via idle callback; never on coarse pointers, `deviceMemory < 4`, `saveData` or reduced motion. The DOM board is complete without it.
+- **Home motion JS:** ≤40 KB gzip before interaction (engine scan, flaps, rails, route trace); OGL + board after LCP; theater engine and scenes lazy. GSAP and Lenis are **not** needed: the ticker plus CSS scroll-driven animations (`@supports (animation-timeline: view())`) cover M5 and M12; M1's scroll pitch uses one passive scroll listener feeding the ticker.
+- **No pins on the home page.** (Keyrook pinned two; nothing here needs scroll-jacking.)
+- **CLS 0.** Every scene reverts on route change.
 
 ---
 
 ## 14. Pages — layout specs
 
-**Global skeleton:** the two-tier header → breadcrumbs (everywhere except home, checkout and auth) → main → the vault-floor footer. The page H1 is the first heading in `main`. Every page has a unique title and description.
+**Global skeleton:** information strip + concourse bar → breadcrumbs (everywhere except home, checkout and auth) → main → the end-of-line footer. The page H1 is the first heading in `main`. Unique title and description on every page. Routes stay as in the codebase: `/`, `/catalog`, `/catalog/[category]`, `/platform/[platform]`, `/genre/[slug]`, `/deals`, `/new-releases`, `/product/[slug]`, `/search`, `/cart`, `/checkout`, `/order/confirmed`, `/account/**`, `/auth/**`, `/how-activation-works`, `/about`, `/faq`, `/contact`, `/policies/**`, `/pages/[slug]`.
 
-Suggested routes are below. If the lead keeps different paths, apply the same specs there.
-- `/`, `/catalog`, `/platform/[slug]`, `/type/[slug]`, `/genre/[slug]`, `/deals`, `/new-releases`;
-- `/product/[slug]`, `/search`, `/cart`, `/checkout`, `/order/confirmed`;
-- `/account`, `/account/keys`, `/account/orders`, `/account/orders/[id]`, `/account/pinned`, `/account/profile`;
-- `/auth/login`, `/auth/register`, `/auth/forgot`, `/auth/reset`;
-- `/how-activation-works`, `/about`, `/faq`, `/contact`, `/policies/*`.
+### 14.1 Home — twelve set-pieces, a different hall from Keyrook's vault and Fablekeys' theatre
+Every count, minimum price, ranking and list comes from `getHomeData()` (rewritten per §18.5). A section whose data is empty or below its minimum is **omitted**, not padded. No product appears twice (claimed set). No stats tiles, testimonials, ratings, partner logos or invented numbers.
 
-### 14.1 Home — a rich landing with thirteen set-pieces
-Every count, minimum price, ranking and list is computed from the database at request time (revalidated). A section whose data is empty, or below its stated minimum, is **omitted**, not padded. No product appears twice on the home page; keep the existing claimed-set logic in `getHomeData`. There are no stats tiles, testimonials, ratings or partner logos.
+Keyrook: door → security strip → lockers → price cuts → theater → genre directory → release ruler → prepaid → activation → ledger → budget dial → questions → final door. Fablekeys: stage → volumes → shelves → fresh ink → storybook → redeem → formats → price cuts → editions → bookplates → questions → colophon → endpaper. Keyterminus:
 
-| # | Section | Composition | Density | Padding top / bottom (desktop) | Background |
-|---|---|---|---|---|---|
-| 1 | The door (hero) | 6 / 6 split, pinned WebGL | medium | 0 / 0 | `--color-bg` |
-| 2 | Security strip | 5 ruled cells, one row | dense | 0 / 0 (80px tall) | `--color-rig`, hairlines top and bottom |
-| 3 | Platform vault | unequal locker wall | medium | 112 / 96 | `--color-bg` |
-| 4 | Price cuts | 3-col intro + feature box + rail | dense | 80 / 80 | `--color-bg-secondary`, full bleed |
-| 5 | The theater | 4 / 8 spotlight with tabs | sparse | 128 / 112 | `--color-bg` |
-| 6 | Genre directory | 3-column ruled directory | dense | 96 / 96 | `--color-rig`, full bleed |
-| 7 | New releases | pinned horizontal ruler | medium | 96 / 80 | `--color-bg` |
-| 8 | Gift cards & subscriptions | 5 / 7 split: card blanks + timetable | dense | 96 / 96 | `--color-bg` |
-| 9 | How activation works | 4 / 8 selector + steps + still | medium | 96 / 96 | `--color-bg-secondary`, full bleed |
-| 10 | Security ledger | bolted plate, 3-column ledger + diagram | sparse | 112 / 112 | `--color-bg` |
-| 11 | Set a budget | 5 / 7 dial + grid | medium | 96 / 96 | `--color-bg` |
-| 12 | Questions | 4 / 8 accordion | medium | 80 / 112 | `--color-bg`, hairline top |
-| 13 | The door's open | 7 / 5 asymmetric CTA | sparse | 0 / 0 (min 72vh) | `--color-bg-tertiary` |
+| # | Section | Composition | Density | Padding top / bottom (desktop) | Background | Data |
+|---|---|---|---|---|---|---|
+| 1 | **Departures** (hero) | full-bleed graphite hall: H1 + lead + kiosk over a full-width board | medium | 56 / 40 | `--color-board` | `live`, `boardPages`, `syncedAt` |
+| 2 | **Platforms** | 7 / 5: four large platform signs + compact rows · mini-board peek | medium | 104 / 88 | `--color-bg` | `platforms` |
+| 3 | **Timetable** | three rails, each with a fixed route header (3 cols) + scrolling cards (9 cols) | dense | 88 / 88 | `--color-bg-secondary`, full bleed | `lines` |
+| 4 | **Your key departs** (theater) | 8 / 4: monitor left, tabs board + steps right | sparse | 136 / 120 | `--color-bg` | — |
+| 5 | **Routes** (genres) | 3 / 9: heading column · eight horizontal route lines | medium | 112 / 104 | `--color-bg` | `routes` |
+| 6 | **Revised fares** (price cuts) | 4 / 8: explanation · a fares board | dense | 88 / 88 | `--color-bg-secondary`, full bleed | `fares` |
+| 7 | **Gift cards** | 4 / 5 / 3: platform list · card blank · denominations | medium | 104 / 96 | `--color-bg` | `giftCards` |
+| 8 | **Season tickets** (subscriptions) | 4 / 8: heading · printed timetable | dense | 64 / 96 | `--color-bg`, hairline top | `timetable` |
+| 9 | **Arrivals** (how to redeem) | stacked: platform tiles row · 3 step columns + still | medium | 104 / 104 | `--color-bg-secondary`, full bleed | `activationPlatforms` |
+| 10 | **Through the gate** (payment and key safety) | two sign plates side by side + a route line + Pay still | sparse | 120 / 120 | `--color-bg` | `POLICY_FACTS` |
+| 11 | **Information desk** (questions) | 7 / 5: accordion · desk block | medium | 96 / 104 | `--color-bg`, hairline top | FAQ copy |
+| 12 | **Terminus** (final search) | full-width track ending at a terminus bar; search + platform tiles | sparse | 96 / 120 | `--color-bg-tertiary` | `live`, `platforms` |
 
-#### 1. The door (M1, M2)
-**Desktop:** 12 columns, height 100svh minus the header; the section pins for 200vh.
+#### 1. Departures (M1)
+**Desktop:** full-bleed `--color-board` hall, `data-surface="board"`, height `min(100svh − var(--header-height), 860px)`, content in `max-w-container`.
+- **Top band (L0), 12 columns:**
+  - cols 1–8: sign label "DEPARTURES · ALL PLATFORMS" in `--color-on-board-muted`; H1 at `--text-display`, Overpass 900, `--color-on-board`: **"Game keys, departing for your account."**; the lead (step-1, `--color-on-board-muted`, max 56ch): "Search {live} keys for Steam, Xbox, PlayStation, Nintendo and more. Pay on a hosted card page; your key is delivered to your account, usually within minutes after payment is confirmed." — platform list from the top four stocked platforms in `PLATFORM_BOARD` order, each clause from config and dropped if false.
+  - cols 9–12, aligned to the H1's baseline: the board's own header facts in mono 12px `--color-on-board-muted`: "Board updated {HH:MM} UTC" (last successful `CatalogSyncRun.finishedAt`; date added if older than 48h; omitted if none) and "{live} keys on {n} platforms".
+- **The board (M1), cols 1–12:** the DOM board + canvas (§13 M1), 6 rows, in a 10px-radius housing with 1px `--color-board-edge` (the housing sits inside the hall, slightly lighter, so the board reads as an object on a wall).
+- **The kiosk, under the board, cols 1–8:** the primary action is search. A 56px field (`--color-raised` on the board, 6px radius, Overpass 17px, `Search` 20px, placeholder "Search {live} keys") + Go lg "Search" with the arrow cell (board mustard pair). Typing drives the board (M1). Cols 9–12: board controls (Pause/Play, page readout, Next 6).
+- No covers in the first screen. (Both siblings opened with covers; this opens with type and flaps.)
 
-**Left, columns 1–6 (L0):**
-- the engraved eyebrow "GAME KEY STORE";
-- H1 at display-xl, **"Game keys, kept under lock until they're yours."**;
-- the lead (step-1, muted): "Games, DLC, gift cards and subscriptions for Steam, Epic, Xbox, PlayStation, Nintendo and more. Pay on a hosted card page with 3-D Secure; your key is delivered to your account, usually within minutes after payment is confirmed." Each clause comes from config and is dropped if false;
-- **the primary action is search**: a 56px field (Mona 17px, `Search` 20px) with the placeholder "Search {liveCount} keys", plus Key lg "Search";
-- under it, platform plates for the top six platforms by stock as links ("[pip] STEAM 1,940").
+**Mobile (390):** sign label; H1 at its minimum (41px, 3 lines); lead; the kiosk full width; the DOM board with 4 two-line rows; controls; "Board updated" line last.
 
-**The readout** (D4): a plate row of tumbler numbers under the links. Only true values from the database, each shown only when greater than 0:
-- "**4,812** keys in stock" (active, `qty > 0`);
-- "**9** platforms";
-- "**312** on sale" (a valid compare-at price exists, §17);
-- "Catalogue updated **14:20 UTC**" (the last successful `CatalogSyncRun.finishedAt`; if older than 48h, show the date too).
+#### 2. Platforms (M2)
+- H2 "Choose your platform" (cols 1–7) with the lead "Every key leaves from the platform it activates on. Numbers stay the same, so you can find yours by sight." and Link "All platforms" (`ArrowBigRight`, → /catalog).
+- **Cols 1–7, the signs:** platforms 1–4 (when stocked) as **large platform signs** in a 2×2 grid: a sign plate (4px radius, 1.5px ink border) with the lg platform tile, the name in Overpass 800 step-3, "40,737 keys" and "from €0.49" (mono, real), `ArrowBigRight`. Every other stocked platform as a compact row below (md tile, name, count, from-price), two columns, hairline-separated. Each sign/row is one link (`/platform/[slug]`) and the peek trigger.
+- **Cols 9–12, the peek:** a mini-board (board housing) titled with the sign label "NEXT FROM PLATFORM 1 · STEAM": three board rows (price · title · remark) of that platform's top titles by board order, then three 3:4 covers of the same products in a row (real links), then "All Steam keys · 40,737" (`ArrowBigRight`).
+- **Mobile:** the four large signs as a 2×2 grid (signs 160px tall), the rest as rows; the peek below shows platform 1 and follows taps.
 
-Labels are engraved micro-labels; numbers are tumblers (M2).
+#### 3. Timetable (M3)
+Up to three **lines** from `lines` (§18.5), each a timetable row:
+- **Header cell (cols 1–3, sticky inside the row on desktop):** a flap tile with the line letter ("A", "B", "C"), the line name in Overpass 800 step-2, its rule in muted 15px (stated honestly, e.g. "Released in the last eight weeks", "Tagged co-op by the publisher", "Xbox, PlayStation and Nintendo games"), and "All 1,204" with `ArrowBigRight`.
+- **Rail (cols 4–12):** a horizontal scroller of departure cards (232px each, 16px gaps, scroll-snap), up to 12 per line, with the position bar under it and two Sign icon buttons at the header cell's foot.
+- Lines are separated by 40px and a hairline (not by bands). Line A is the tallest (cards 232px); lines B and C use 200px cards — importance differs.
+- Default lines: **A · New arrivals** (released ≤56 days, newest first), **B · Co-op** (genre `co-op`), **C · Console departures** (Xbox, PlayStation, Nintendo games). Each omitted below `MERCH.lineMinimum` (6).
+- **Mobile:** header stacked above its rail (72vw cards), position bar kept.
 
-**Right, columns 7–12:** the door (poster → WebGL), about 620px square, sitting in a recessed circular frame cut into the D0 wall.
+#### 4. Your key departs (M4, §12)
+- **Cols 1–8:** the station monitor with the current scene (desktop preset 1200×720 scaled).
+- **Cols 9–12:** sign label "HOW IT WORKS"; H2 **"Watch your key depart"**; the lead "Five short demos with sample data: checking in a key, paying on the hosted page, your key arriving on your board, redeeming it, and getting help if it doesn't work."; the **tabs board** (§12.5); the step list of the active scene; Link "Read how activation works".
+- **Mobile:** H2 + lead; the tab scroller; the monitor at the phone preset (max 380px, centred); the step list.
 
-**Mobile (390):**
-- eyebrow, H1 at its clamp minimum (40px, three lines), lead, the search field full width, the platform plates as a horizontal scroller;
-- then the poster door (88vw) with the CSS swing revealing six covers;
-- then the readout as a 2×2 grid of tumbler numbers.
+#### 5. Routes (M5)
+- **Cols 1–3:** H2 "Routes", the lead "Each genre is a line. Its stops are the platforms with the most keys in that genre.", Link "All genres".
+- **Cols 4–12:** up to eight **route lines** from `routes` (§18.5), each 72px tall:
+  - the genre name in Overpass 800 step-2 at the left (a link to `/genre/[slug]`), with the count in mono under it;
+  - a horizontal route line (§8.23) with up to four stops — the top platforms for that genre, labelled "Steam 3,104" (sm tile + name + mono count) — each stop a link to `/genre/[slug]?platform=…`;
+  - the line ends at a terminus bar labelled "All 4,212" (link to the genre page).
+  - Hover/focus a route: its terminus bar turns mustard and the marker travels (M5); other routes' lines drop to `--color-rule` (text stays ink).
+- **Mobile:** each route as a block: name + count, then a vertical mini-line with its stops, ending at "All 4,212".
 
-#### 2. Security strip
-A single row of five ruled cells, each 18px icon + one line (Mona 15px) + a Text link to the ledger or policy anchor:
-1. `CreditCard`: "Card details go on a hosted payment page"
-2. `ShieldCheck`: "3-D Secure confirmation by your bank"
-3. `Vault`: "Keys encrypted at rest"
-4. `ReceiptText`: "PDF invoice with every order"
-5. `RotateCcwKey`: "Replacement or refund if a key doesn't work"
+#### 6. Revised fares (M10)
+- **Cols 1–4:** H2 "Revised fares", the lead "Keys whose price came down. The earlier price is the lowest this key cost here in the 30 days before the cut.", "All price cuts · {total}" with `ArrowBigRight`.
+- **Cols 5–12:** a fares board (board housing): heads DESTINATION · PLATFORM · WAS · NOW · REMARKS; up to 10 rows (`fares.rows`), each row a link; WAS in `--color-on-board-faint` with `line-through` (non-flap text), NOW and REMARKS (`NOW −18%`) on flaps. One feature row on top spans two lines with its 3:4 cover at the left (the largest real cut with a cover).
+- Omitted when fewer than `MERCH.dealMinimum` (4) real cuts exist. (The fixture database has none yet — expect this section to be absent until the store's own price history produces cuts.)
+- **Mobile:** the board becomes two-line rows (title / platform · was · now).
 
-- Each cell renders only if its config fact is true (§17).
-- Mobile: a 2-column grid; the fifth cell spans both columns.
+#### 7. Gift cards (M11)
+- **Cols 1–4:** H2 "Gift cards", the lead "Store balance for the platform you play on. A card only works on an account set to the card's region.", then a vertical `role="radiogroup"` of platforms with gift-card stock (`PLATFORM_BOARD` order): sm tile + name + "6 values" (real count). Selected row: `--color-accent-light` + 3px mustard left bar.
+- **Cols 5–9:** the gift card blank (§8.10) of the selected platform's best group (global preferred), value in lg flaps.
+- **Cols 10–12:** the denominations as a ruled list of fare rows ("€10 card ······ €10.79" — value left, our price mono right), each a link to the product; the row matching the card's value is selected (`aria-current`); "Top-ups for {platform}" Link when top-ups exist.
+- **Mobile:** platforms as a horizontal segmented scroller, the card at 88vw, denominations as a list.
 
-#### 3. Platform vault (M3)
-**Desktop:**
-- H2 on the left: "Pick your platform".
-- Lead on the right, columns 7–12: "Each locker shows how many keys are in stock for that platform and today's lowest price."
-- The **locker wall** in `max-w-wide`: a 12-column grid of tall lockers (300px).
-  - Width by stock rank: rank 1 spans 4 columns, ranks 2–3 span 3 columns, all others 2 columns. They wrap; the last row is left-aligned and never stretched.
-- **Each locker** is one link (`/platform/[slug]`):
-  - a plate door with the engraved platform name (Hubot 680 step-2 caps at 125%) and its pip;
-  - the real count in a tumbler ("1,940 keys") and "from €1.49" (real minimum, active currency) in mono;
-  - an unlit lamp at the top right;
-  - behind the door, three real covers of that platform (most ordered, or newest).
-- Platforms with no stock are absent.
+#### 8. Season tickets
+- **Cols 1–4:** H2 "Season tickets", the lead "Subscriptions by length. Prices are for one code; the region is the account region it works with."
+- **Cols 5–12:** a printed **timetable**: rows = services (`timetable.rows`: e.g. Xbox Game Pass Ultimate, PlayStation Plus Essential, Nintendo Switch Online, EA Play, Ubisoft+ when stocked), columns = durations (`timetable.columns`), cells = mono price links or "—", last column = region. Sign-label heads, 1px rules, `--color-raised` table on the floor, 6px radius on the outer frame only. Hover on a cell highlights its row head and column head (`--color-accent-light`) — a timetable lookup.
+- **Mobile:** one block per service with duration links ("1 month · €9.99").
 
-**Mobile:** a 2-column grid; rank 1 full width; the first two lockers permanently ajar.
+#### 9. Arrivals (how to redeem)
+- H2 "Arrivals" (cols 1–6) with the lead "Every key arrives on the platform named on its page. Pick yours to see where to enter it."
+- **Row 1:** platform tiles as a `role="radiogroup"` — md tiles with names under them, in `PLATFORM_BOARD` order for `activationPlatforms`; selected = mustard 3px bar under it.
+- **Row 2, cols 1–8:** "You need {account} and the {app}." then the three steps as three columns, each opening with a md flap numeral (1, 2, 3) and the step text from `src/config/activation.ts` (menu names in bold Overpass 700), the code format when known ("Xbox codes have 25 characters"), Sign sm "{Platform}'s redeem page" with `MoveUpRight`, Link "Full guide for {Platform}".
+- **Row 2, cols 9–12:** `MiniStill` of the Arrives scene for the selected platform.
+- Changing platform flips the step numerals once and cross-fades the text (180ms).
+- **Mobile:** tiles as a horizontal scroller, steps stacked, still below.
 
-#### 4. Price cuts
-**Desktop:**
-- **Columns 1–3:** H2 "Price cuts", the lead "Keys priced below their recent price. The earlier price shown is the lowest price in the 30 days before the cut.", and Text "All deals · 312" with `ArrowRight`.
-- **Columns 4–12:**
-  - one **feature box** (2×2) for the largest real percentage cut that has a screenshot;
-  - then a **rail** of 10 deposit boxes ordered by discount, with scroll-snap, Steel icon buttons `ArrowLeft`/`ArrowRight` at the top right, and a mono position readout "1–4 of 10".
+#### 10. Through the gate (M5)
+Rendered only from facts that are true in config (§17).
+- Sign label "PAYMENT AND KEYS"; H2 **"What passes through us, and what never does"**.
+- **Two sign plates side by side** (cols 1–6 / 7–12):
+  - **"Handled by Keyterminus"** — a board plate (`--color-board`, 10px radius, board text): "Your keys, stored encrypted and decrypted only when you choose Reveal." · "Your orders and invoices, kept for {retention} years as the law requires."
+  - **"Never handled by us"** — a raised plate with a 1.5px ink border (4px radius): "Your card number, expiry date and security code. You enter them on the payment provider's hosted page." · "Your bank's 3-D Secure check, which happens between you and your bank."
+  - Under both, full width: "If a key doesn't work, we replace it, or refund it if no replacement is available. If a payment fails, you aren't charged. We reply within 1 business day." — each clause links to its policy.
+- **Below, cols 1–8:** a horizontal route line with stops **You → Payment provider's page → Your bank → Payment provider → Keyterminus → Your account**. The card-details segment (You → Payment provider) is drawn in ink and **ends in a terminus bar at the payment provider** labelled "Card details end here"; a second line continues from the provider to Keyterminus and Your account labelled "Confirmation only" → "Your key". It is a static diagram drawn once (M5); the geometry itself says card data stops before us.
+- **Cols 9–12:** `MiniStill` of Pay at the challenge state, captioned "The 3-D Secure step, shown with sample data".
+- If the hosted page or 3-D Secure isn't live, those lines and the still are removed, not reworded.
+- **Mobile:** plates stacked, the route line vertical, the still last.
 
-Only products with a valid compare-at price (§17). The section is omitted if fewer than 4 qualify.
-
-**Mobile:** H2 and lead, the feature box full width, then the rail as a native horizontal scroller with 72vw cards.
-
-#### 5. The theater (M4, §12)
-**Desktop (`FeatureSpotlight` layout extended with tabs):**
-- **Columns 1–4:**
-  - the engraved eyebrow "HOW IT WORKS";
-  - H2 **"Watch a key leave the vault"**;
-  - the lead: "Five short demos of the store, played with sample data: choosing a key, paying on the hosted page, revealing the key, redeeming it, and getting help if it doesn't work.";
-  - the synced `TheaterSteps` for the active scene;
-  - a Text link "Read how activation works".
-- **Columns 5–12:** `TheaterTabs` (five scenes), the bezel at 1200:720 plus the controls row.
-
-**Mobile:** H2 and lead, the tab scroller, the stage at the phone preset (max 380px, centred), then the steps list.
-
-#### 6. Genre directory (M12)
-A lobby directory board on the `--color-rig` band.
-
-**Desktop:**
-- H2 "Browse by genre" on the left, with a one-line lead and "All genres".
-- Below: a **3-column ruled directory** of the top 18 genres by real count. Each row (56px) has:
-  - the genre name in Hubot 680 step-1 caps at 125% (navigation);
-  - a hairline;
-  - the count in mono, right-aligned.
-
-  Hover reveals three covers (M12) at the row's right end.
-
-**Mobile:** one column of 48px rows, the top 12, then "All genres".
-
-#### 7. New releases (M9)
-- H2 "New releases" with the lead "Released in the last eight weeks and in stock now."
-- **Desktop:** the pinned release ruler (§13 M9) with up to 16 deposit boxes hung under their release-week ticks.
-- **Mobile:** a snap scroller with the ruler drawn above the boxes.
-- **Data:** `releaseDate` within 56 days of today and not in the future. Pre-orders are not listed at all (QC 18.4).
-- **Fallback:** if fewer than 4 qualify, the section becomes "Recently added" (by `createdAt`) with a plain rail, and the ruler is dropped (it would show a time scale that means something else). If `createdAt` only reflects sync time rather than real catalogue additions, omit the section instead.
-
-#### 8. Gift cards & subscriptions
-**Desktop split:**
-- **Columns 1–5: "Gift cards".** H2 and a lead ("Store credit for the platform you play on. Check the card's region before you buy."), then a 2×2 grid of **gift card blanks** (§8.10), one per platform with gift-card stock.
-  - Each blank lists its real denominations as Steel sm buttons ("€10", "€20", "€50"), each a link to that product.
-  - The blank shows the card's region tag.
-- **Columns 7–12, offset 48px down: "Subscriptions".** H2 and a lead, then a **timetable**: a ruled table with one row per service and one column per duration.
-  - Services come from data (for example Xbox Game Pass Ultimate, PlayStation Plus Essential, Nintendo Switch Online, EA Play, Ubisoft+).
-  - Durations come from data (1, 3, 6, 12 months).
-  - Cells are mono price links, or "—" where we have no stock.
-  - The last column shows the region.
-  - Table heads are engraved labels. It reads like a bank's rate board, not like cards.
-
-**Mobile:** gift card blanks as a horizontal scroller; subscriptions as one block per service with duration buttons ("1 month · €9.99").
-
-**Data:** product kind gift card / subscription, durations parsed from the name or attributes. Either half is omitted without stock.
-
-#### 9. How activation works (selector)
-**Desktop:**
-- **Columns 1–4:** H2 "How activation works", the lead "Every key activates on the platform named on its page. Pick yours to see the steps.", and a vertical `role="radiogroup"` of platform rows (pip + name; the selected row is lit), listing Steam, Epic Games, EA app, Ubisoft Connect, Xbox, PlayStation and Nintendo, plus GOG and Battle.net if stocked.
-- **Columns 5–8:** for the selected platform:
-  - "You need: a Steam account and the Steam app";
-  - the ordered steps from `src/config/activation.ts`, with step numbers in tumbler slots;
-  - code format if known ("Xbox codes have 25 characters");
-  - Steel sm "Steam's redeem page" (the platform's name from config) with `SquareArrowOutUpRight`;
-  - a Text link "Full guide for Steam" (to `/how-activation-works#steam`).
-- **Columns 9–12:** a `MiniStill` of the Redeem scene with `platform` set (static, no engine).
-
-**Mobile:** the platform choice becomes a horizontal segmented scroller; the steps follow; the still sits below at the phone preset.
-
-**`src/config/activation.ts`** (the single source; used here, on the PDP Activation tab, in the KeyPlate disclosure and on the guide page; every entry carries `verifiedAt` and must be re-checked against the platform's own help page before launch):
-
-| Platform | You need | Steps | Platform's own page |
-|---|---|---|---|
-| Steam | a Steam account and the Steam app | Open Steam and sign in → **Games** menu → **Activate a Product on Steam…** → enter the key and follow the prompts → the game appears in your Library | store.steampowered.com/account/registerkey |
-| Epic Games | an Epic Games account | Sign in to the Epic Games Launcher or epicgames.com → open your account menu → **Redeem Code** → enter the key → **Redeem** | Epic's redeem page (URL in config, verify) |
-| EA app | an EA account and the EA app | Open the EA app and sign in → open the menu (☰) → **Redeem code** → enter the key → **Next** | in-app only |
-| Ubisoft Connect | a Ubisoft account and Ubisoft Connect for PC | Open Ubisoft Connect and sign in → open the menu (☰) → **Activate a key** → enter the key → confirm | in-app (or the Ubisoft Store account page, verify) |
-| Xbox | a Microsoft account | Go to redeem.microsoft.com and sign in with the account you play on (or on console: Microsoft Store → **Redeem**) → enter the 25-character code → confirm | redeem.microsoft.com |
-| PlayStation | a PlayStation Network account in the key's region | On PS5: PlayStation Store → **…** (more) → **Redeem Code**; or store.playstation.com → your profile → **Redeem Codes** → enter the 12-character code → confirm | store.playstation.com |
-| Nintendo | a Nintendo Account (Nintendo Switch) | Nintendo eShop → select your user → **Redeem Code** → enter the 16-character code → confirm | Nintendo's redeem page (URL in config, verify) |
-| GOG | a GOG account | Go to gog.com/redeem → sign in → enter the key → confirm | gog.com/redeem |
-| Battle.net | a Battle.net account and the Battle.net app | Open Battle.net → your account menu → **Redeem a Code** → enter the key → confirm | in-app or account.battle.net (verify) |
-
-Menu names are rendered as UI words in bold Mona, never as logos or screenshots.
-
-#### 10. Security ledger (M10)
-**One bolted plate** (`--color-plate`, four bolts) in `max-w-container`, 48px padding:
-- the engraved eyebrow "SECURITY";
-- H2 **"What's in the vault, and what never is"**.
-
-**A three-column ledger** (ruled columns, engraved heads):
-- **KEPT, ENCRYPTED.**
-  - "Your keys. Stored encrypted (AES-256) and decrypted only when you choose Reveal in your account."
-  - "Your orders and PDF invoices, for as long as the law requires ({retention} years)."
-- **NEVER STORED BY US.**
-  - "Your card number, expiry date and security code. You type them on the payment provider's hosted page, not on Keyrook."
-  - "Your bank's 3-D Secure confirmation happens between you and your bank."
-- **IF SOMETHING GOES WRONG.**
-  - "A key that doesn't work is replaced, or refunded if no replacement is available."
-  - "If a payment fails, you aren't charged."
-  - "We reply within 1 business day."
-
-  Each line links to the policy that says it.
-
-**Below, inside the plate:**
-- columns 1–8: the **wire diagram** (M10) with its legend: "Card details (outlined squares) stop at the payment provider. Keyrook receives only the confirmation (filled squares).";
-- columns 9–12: a `MiniStill` of the Pay scene at the challenge state, captioned "The 3-D Secure step, shown with sample data".
-
-Every sentence is rendered only when its fact is true in config (§17). If the hosted page or 3-D Secure is not live, those lines and the Pay still are removed, not reworded.
-
-**Mobile:** the ledger stacks into three blocks, then the diagram turns vertical (nodes top to bottom), then the still.
-
-#### 11. Set a budget (M11)
-**Desktop:**
-- **Columns 1–5:**
-  - H2 "Set a budget";
-  - the lead "Turn the dial to a price band. Bands are in your currency.";
-  - the **rotary dial** (§8.22, 300px) with detents at the active currency's bands (from `src/config/merchandising.ts`: EUR/GBP/USD each 5 / 10 / 20 / 40 and up);
-  - under it, a tumbler count "412 keys" and Text "See all 412 keys from €10 to €20".
-- **Columns 6–12:** a 4×2 grid of deposit boxes from the selected band (mixed platforms, most ordered first, or newest).
-
-All five bands are rendered on the server (40 boxes, hidden bands `hidden`) and swapped on the client, so turning the dial never waits for a request. A band with fewer than 4 products is disabled on the dial (its label faint, not a detent).
-
-**Mobile:** the dial at 232px centred, the count and link, then a 2×2 grid.
-
-#### 12. Questions
-- **Desktop:** columns 1–4 hold H2 "Questions", Steel "All questions" and the line "Can't find it? Contact us" (link). Columns 5–12 hold six accordion items, word for word from the FAQ page:
-  - "How fast do I get my key?"
+#### 11. Information desk
+- **Cols 1–7:** H2 "Information desk" and six accordion items, word for word from the FAQ page:
+  - "When will my key arrive?"
   - "What does the region on a key mean?"
-  - "Where do I redeem my key?"
-  - "My key doesn't work. What now?"
-  - "Is my card information safe?"
+  - "Where do I enter my key?"
+  - "My key doesn't work. What happens now?"
+  - "Do you see my card details?"
   - "Can I cancel or get a refund?"
-- **Mobile:** stacked.
+- **Cols 9–12:** the desk block (no box; hairline left): sign label "STAFFED"; support hours and reply time from config ("Mon–Fri, 09:00–18:00 (GMT) · we reply within 1 business day"); Sign "Contact us"; Links "All questions" and "How activation works".
+- **Mobile:** accordion, then the desk block.
 
-#### 13. The door's open (M13)
-**Desktop:** asymmetric on `--color-bg-tertiary`, min 72vh.
-- **Columns 1–7:** H2 at step-6 "The door's open.", one line "Search the catalogue, or start with your platform.", the same search field as the hero, and the platform plates.
-- **Columns 9–12:** the small door poster ajar at 22° with six covers behind it (real, distinct from the hero's).
-
-**Mobile:** the text and search first, the door below at 72vw.
+#### 12. Terminus
+- A 3px ink track runs the full container width at the top of the section and ends in a 10×64px mustard terminus bar at the right edge (the logo's bar at architectural scale; D1).
+- **Cols 1–8:** H2 at step-5 **"Every line ends here. Every key starts here."**, one line "Search the whole board, or go straight to your platform.", the kiosk (same as the hero, without the board link), then the platform tiles in a row as links.
+- **Cols 9–12:** nothing — negative space under the terminus bar on purpose.
+- **Mobile:** the track ends at the right edge above the H2; text, kiosk, tiles.
 
 ### 14.2 Catalogue (`/catalog`)
-- **Opener:** H1 "All keys" (Hubot step-5) with the tumbler count beside it and one sentence on what's in stock. On the right (desktop), a type index row: "Games 3,920 · DLC 610 · Gift cards 140 · Subscriptions 96 · Software 46", in Hubot 600 caps for names and mono for counts, with a green bar on hover.
-- **Body:** the filter panel (280px) on the left, results on the right, the toolbar (result sentence + chips left, sort right), the deposit-box grid, then pagination or Load more.
-- **Empty results:** the empty state "No keys match these filters", the active chips with "Clear all", and the three broadest real suggestions ("Remove Europe to see 214 more").
-- **Mobile:** the sticky toolbar (Filter, Sort), a 2-up grid with 10px gaps.
+- **Opener:** a graphite **board header** band (`--color-board`, full bleed, 104px): sign label "ALL KEYS"; H1 "All keys" (`--color-on-board`, step-4) with the live count as a `FlapRow`; at the right the type index in `TYPE_ORDER` ("Games 53,446 · Gift cards 497 · Subscriptions 127 · DLC 11,074 · Top-ups 3,339 · Software 1,210", Overpass 700 names + mono counts, each a link).
+- **Body:** filters (272px) left; toolbar (result sentence + chips left, sort right); the departure-card grid; pagination.
+- Empty results per §8.31.
+- **Mobile:** board header shortened to 72px (H1 + count); sticky toolbar; 2-up grid with 12px gaps.
 
-### 14.3 Platform landing (`/platform/[slug]`, e.g. Steam)
-- **Opener:** a full-width **locker plate** band (`--color-plate`, machined edge):
-  - the pip and H1 "Steam keys" (step-5);
-  - the tumbler count, and "from €0.99" (real minimum);
-  - the sentence from the platform table ("Activates on a Steam account. You need the Steam app.");
-  - Text "How to redeem on Steam" with `ArrowRight` (to the guide anchor);
-  - on the right, the type index for this platform with counts.
-- **Then:** one feature box (the most ordered title on this platform) beside the first row of the grid, then the standard filter + grid (Platform group hidden).
-- **Empty platform:** "No Nintendo keys in stock right now" with links to the other platforms' lockers.
+### 14.3 Platform landing (`/platform/[platform]`)
+- **Opener:** a full-width platform sign band on `--color-bg-secondary`: lg platform tile, H1 "Steam keys" (step-4), the count and "from €0.49" (real) in mono, the sentence from the platform table ("Activates on a Steam account. You need the Steam app."), Link "How to redeem on Steam" (`ArrowBigRight`), and at the right the type index for this platform with counts.
+- Then one **feature card** (the top board-order title on this platform with a screenshot) beside the first grid row, then filters + grid (Platform group hidden). Default sort `board`.
+- Empty: "No Nintendo keys in stock right now" with links to the other platforms' signs.
 
-### 14.4 Type landings (`/type/[slug]`)
+### 14.4 Type landings (`/catalog/[category]`)
 | Type | Opener icon | Page |
 |---|---|---|
-| Games | — | the standard catalogue |
-| DLC | `PackagePlus` | the standard catalogue; every card shows "Needs the base game"; a line under the H1: "DLC needs the base game on the same platform and region." |
-| Gift cards | `WalletCards` | gift card blanks grouped by platform (one row per platform: blanks with denominations), then the standard grid with filters |
-| Subscriptions | `CalendarSync` | the timetable (§14.1 section 8) at full width first, then the grid |
-| Software | — | the standard catalogue; system requirements apply on the PDP |
+| Games | — | standard catalogue |
+| Gift cards | `Wallet` | gift card blanks grouped by platform (one row per platform, blanks with denominations), then the grid |
+| Subscriptions | `CalendarRange` | the season tickets timetable full width, then the grid |
+| DLC | `LayersPlus` | standard catalogue; cards show "Needs the base game"; a line under the H1: "DLC needs the base game on the same platform and region." |
+| Top-ups | `Coins` | standard catalogue; a line "Top-ups add in-game currency to the account and region shown." |
+| Software | `AppWindow` | standard catalogue; system requirements apply on the PDP |
 
-### 14.5 Genre (`/genre/[slug]`), Deals (`/deals`), New releases (`/new-releases`)
-- **Genre:** H1 with the tumbler count, then a platform split row ("Steam 412 · Xbox 88 · …"), then filter + grid.
-- **Deals:** H1 "Price cuts" with the count, and one ruled note: "The earlier price is the lowest price this key had in the 30 days before the cut." Default sort is biggest discount. Filter + grid.
-- **New releases:** a static release ruler (the last 8 weeks) as the opener, then the grid sorted by release date, newest first. Only released titles.
+### 14.5 Genre, Price cuts, New arrivals
+- **Genre (`/genre/[slug]`):** opener = the genre's **route line** full width (its platform stops with counts, ending in "All {count}"), H1 "{Genre} games" with the count; then filters + grid. Default sort `board`.
+- **Price cuts (`/deals`):** H1 "Price cuts" with the count; a ruled note: "The earlier price is the lowest this key cost here in the 30 days before the cut."; default sort biggest cut; filters + grid. Nav label "Price cuts"; the home section name "Revised fares" is marketing only.
+- **New arrivals (`/new-releases`):** H1 "New arrivals"; an opener timetable listing the last eight weeks as rows ("Week of 29 Sep · 14 releases", mono counts, each a filter link); grid sorted by release date, newest first; released titles only (no pre-orders).
 
 ### 14.6 Product page (`/product/[slug]`)
 **Desktop, 12 columns:**
-- **Media (columns 1–5):**
-  - the cover at 3:4 inside an 8px plate frame (the drawer face, large);
-  - under it, a strip of 16:9 screenshot thumbnails (4 visible, horizontal scroll) that open a gallery dialog with arrow-key navigation;
-  - if the feed has a trailer ID, Steel sm "Watch trailer" opens a click-to-load facade dialog (nothing third-party loads before the click).
-- **Purchase column (columns 6–12, sticky from 120px while the media column scrolls):**
-  - breadcrumbs ("Catalogue / Steam / Action");
-  - the label row (14px) with the edition tag;
-  - H1 = title (Hubot step-5);
-  - a facts line in muted ("Developer · Publisher · 2024");
-  - the **edition selector** (§8.23, if any);
-  - the **buy box**;
-  - the **requirements panel** "Before you buy".
-- **Below the fold, full width:**
-  - Tabs: **About** (the sanitised description at 68ch, collapsed after 12 lines with "Read more"), **Activation** (the platform steps from config, the verbatim `activationDetails`, the platform's own redeem link), **System requirements** (PC only, §8.23), and **Details**.
-  - The **Details** ruled table lists Platform, Region (with the verbatim note), Type, Edition, Languages, Developer, Publisher, Release date, Genres, and "Keyrook catalogue no." (our own SKU, quoted in support).
-  - "Also on other platforms": compact rows for the same title on other platforms (real only).
-  - "More for Steam": one row of 5 deposit boxes (same genre, same platform, distinct).
-  - Recently viewed.
-- **JSON-LD:** Product + Offer (active currency, availability) and BreadcrumbList. No AggregateRating (there are no reviews).
+- **Media (cols 1–5):** the gate strip (board, 36px, md platform tile + platform name + region) directly above the 3:4 cover (8px radius on the pair as one object — the PDP's departure card); under it 16:9 screenshot thumbnails (4 visible, horizontal scroll) opening a gallery dialog with arrow keys; "Watch trailer" Sign sm opens a click-to-load facade when the feed has a trailer.
+- **Purchase column (cols 6–12, sticky from 120px):** breadcrumbs ("Catalogue › Steam › Racing"); gate line (14px) + edition tag; H1 = title (step-4); facts line in muted ("Developer · Publisher · 2024"); the **edition timetable** (if any); the **buy box**; **Before you buy**.
+- **Below, full width:** Tabs **About** (sanitised description at 66ch, collapsed after 12 lines with "Read more"), **Activation** (platform steps from config, verbatim `activationDetails`, the platform's redeem link), **System requirements** (PC only), **Details** (ruled table: Platform, Region + verbatim note, Type, Edition, Languages, Developer, Publisher, Release date, Genres, "Keyterminus catalogue no." = our SKU `KT-…`). Then "Also on other platforms" as compact rows (real only); "More on Platform 1 · Steam" as one rail of 5 departure cards (same genre, same platform); Recently viewed.
+- JSON-LD: Product + Offer (active currency, availability) and BreadcrumbList. No AggregateRating.
 
-**Mobile:**
-- the top row: the cover at 40% width beside the label row, the H1 (step-4) and the price;
-- then the edition selector, the buy box, "Before you buy", and the tabs as accordions;
-- a sticky bottom bar (64px, `--color-raised`, top hairline) with the price in mono and Key "Add to cart", which appears once the buy box's button leaves the viewport.
+**Mobile:** top row with the cover (40% width, gate strip above it) beside the gate line, H1 (step-3) and price; then edition timetable, buy box, Before you buy, tabs as accordions; a sticky bottom bar (64px, `--color-raised`, top hairline) with the price and Go "Add to cart", appearing once the buy box's button leaves the viewport.
 
 ### 14.7 Search (`/search`)
-- H1 is the query, `“lantern”` (Hubot step-5), with the tumbler count. The large search input is above it, prefilled.
-- Platform and genre matches appear as text links with counts, then the standard filter + grid.
-- **No results:** "Nothing matches “xyz”." with the suggestions: check spelling, search without the edition name, browse by platform (lockers as links).
+H1 = the query in quotes (step-4) with the count; the large kiosk input above it, prefilled; platform and genre matches as rows with counts; then filters + grid (default sort relevance). No results: "Nothing on the board matches “xyz”." + check spelling / search without the edition name / platform signs as links.
 
 ### 14.8 Cart (`/cart`)
-- H1 "Cart" with the count in a tumbler.
-- **Desktop:**
-  - rows in columns 1–8: a 90×120 cover, the label row, title, facts, quantity, price, Remove; hairlines between rows;
-  - the **summary** in columns 9–12: a sticky plate with 24px padding, holding Subtotal, Total (label per the VAT rule) in mono step-2, the line "Keys are delivered to your account after your payment is confirmed.", Key lg "Checkout", Text "Continue shopping", logos at 24px, and the merchant line (legal name + support email) in 14px.
-- **Mobile:** stacked rows, the summary at the end, and a sticky bar "Checkout · €29.99".
-- **Empty:** the drawer's empty state at page scale.
+H1 "Cart" with the `FlapCounter`. **Desktop:** rows in cols 1–8 (90×120 cover, gate line, title, facts, quantity, price, Remove), hairlines between; the **ticket summary** (§8.27) in cols 9–12, sticky, plus Link "Continue shopping" and the merchant line (legal name + support email) in 14px. **Mobile:** rows stacked, the ticket at the end, a sticky bar "Checkout · €29.99". Empty: the empty board at page scale.
 
-### 14.9 Checkout (`/checkout`), three steps (§8.28)
-**Frame:** a minimal header (wordmark, `ShieldCheck` "Secure checkout", Text "Back to cart") and the compact footer, in `max-w-narrow`. The dial ruler progress runs across the top.
-
-**Desktop:** steps in columns 1–7; the **summary** in columns 8–12, sticky, with compact rows, subtotal, total, the charge-currency note, and policy links (Terms, Refunds, Privacy) at 14px.
-
-**Step 1 — Account.**
-- Signed in: a one-line summary ("Signed in as alex@example.com") with Text "Not you? Switch account".
-- Signed out: the sentence "Your keys are kept in your account, so you'll need one to receive them." and two tabs, "Sign in" and "Create account". Create account is a short inline form (email, password, Terms) that completes the full profile later.
-- Continue.
-
-**Step 2 — Billing details.**
-- Full name, email for receipts (prefilled), country (restricted list excluded via config), address line, city and postcode (used on the invoice).
-- Continue.
-
-**Step 3 — Review and pay.**
-- A read-only summary of steps 1–2 with "Change" links.
-- The items as compact rows. Each row carries a **region line** in Mona 14px ("Region: Europe. Activates only on accounts registered in Europe.").
-- **Checkboxes:**
-  - (required unless `STORE_POLICY.checkout.requireRegionCheck` is false) "I've checked the platform and region of each key.";
-  - (required) "I have read and agree to the Terms and Conditions" (link);
-  - (required) the **digital-delivery consent**, word for word from `STORE_POLICY.waiver.text`, rewritten for keys: "I ask for my keys to be delivered straight after payment and I understand I lose my right to cancel once a key is delivered." This links to the Refund policy, and the wording must match the Terms and Refund policy exactly.
-- Key lg "Pay €29.99", enabled only when all required boxes are ticked.
-- Under it: Visa / Mastercard / PCI DSS at 28px, and the line "You'll enter your card details on {provider}'s hosted payment page with 3-D Secure. We never see or store your card number." This is gated by config and matches the Privacy Policy.
-- On submit: the loading state, then the existing provider redirect.
-
-**Mobile:** the summary collapses into a top accordion ("Show summary · €29.99"), the steps follow, and Pay is full width.
-
-**Payment failed on return:** an alert above step 3: "Your payment didn't go through. You haven't been charged." with "Try again".
+### 14.9 Checkout (`/checkout`), three steps
+**Frame:** minimal header (lockup, `Lock` "Secure checkout", Link "Back to cart") and the compact footer, in `max-w-narrow`; the route-line progress (§8.29) across the top.
+**Desktop:** steps in cols 1–7; the ticket summary in cols 8–12 (sticky) with compact rows, subtotal, total, the charge-currency note, policy links (Terms, Refunds, Privacy) at 14px.
+- **Step 1 — Account:** signed in: "Signed in as alex@example.com" + Link "Not you? Switch account". Signed out: "Your keys are kept in your account, so you'll need one to receive them." + segmented "Sign in" / "Create account" (short inline form: email, password, Terms). Continue.
+- **Step 2 — Billing details:** full name, receipt email (prefilled), country (restricted list via config), address line, city, postcode (for the invoice). Continue.
+- **Step 3 — Review and pay:** read-only summary of steps 1–2 with "Change"; items as compact rows each with a **region line** (Overpass 14px: "Region: Europe. Activates only on accounts set to a European country."); checkboxes: (required unless `STORE_POLICY.checkout.requireRegionCheck` is false) "I've checked the platform and region of each key."; (required) "I have read and agree to the Terms and Conditions"; (required) the digital-delivery consent **word for word from `STORE_POLICY.waiver.text`** (must match the Terms and Refund policy). Go lg "Pay €29.99" with the arrow cell, enabled only when all required boxes are ticked. Under it Visa / Mastercard / PCI DSS at 28px and "You'll enter your card details on {provider}'s hosted payment page with 3-D Secure. We never see or store your card number." (config-gated, matches the Privacy Policy).
+- **Mobile:** summary collapses into a top accordion; steps follow; Pay full width.
+- Payment failed on return: an alert above step 3 "Your payment didn't go through. You haven't been charged." + "Try again".
 
 ### 14.10 Order confirmed (`/order/confirmed`)
-- A narrow column. H1 "Payment received" (and "Payment confirmed" once the server confirms it; it never claims the key is delivered before it is).
-- The order number in tumblers (M2) with a `Copy` icon button.
-- The **order timeline**, live (polling, M8).
-- "We've sent a receipt to {email}. Your keys appear in Account → Keys as soon as they're issued."
-- Once issued, the **key plate(s)** render inline, masked; Reveal works here too.
-- Buttons: Key "Go to my keys", Steel "Continue shopping". Text "Download invoice (PDF)" with `FileDown` once the invoice exists.
+Narrow column. H1 "Payment received" (→ "Payment confirmed" once the server confirms; never claims the key is delivered before it is). The order number as a `FlapRow` that flips in once (M9 timing, no randomness) with a `Copy` icon button. The order timeline, live (M8). "We've sent a receipt to {email}. Your keys appear in Account → Keys as soon as they're issued." Once issued, the **key boards** render inline (masked; Reveal works here). Buttons: Go "Go to my keys", Sign "Continue shopping", Link "Download invoice (PDF)" with `ArrowDownToLine` once it exists.
 
 ### 14.11 Auth
-- **Sign in (`/auth/login`):**
-  - Desktop has two columns (max 960px) separated by a 1px vertical hairline.
-  - **Left:** H1 "Sign in"; email; password (show/hide); Text "Forgot your password?"; Key lg "Sign in"; the error summary "Email or password is incorrect."
-  - **Right:** H2 "New to Keyrook?" (step-3) and three true points as a plain list:
-    - "Your keys are kept in your account, encrypted";
-    - "Reveal and copy them when you're ready to play";
-    - "Every order comes with a PDF invoice".
-
-    Then Steel "Create an account".
-  - Mobile: the form first.
-- **Register (`/auth/register`):**
-  - A 560px column with the **dial ruler** progress across four detents: **01 ABOUT YOU · 02 CONTACT · 03 ADDRESS · 04 PASSWORD**.
-  - It keeps the existing required fields and the T&C gate:
-    1. first name, last name, date of birth (minimum age from `STORE_POLICY.minAge`, with the error naming the rule);
-    2. email, phone (with country prefix, optional per config);
-    3. country (restricted list excluded), street, city, postcode;
-    4. password with the strength hint "At least 8 characters, one number", confirm password, the required Terms checkbox, and an **unticked** marketing opt-in. Key lg "Create account" stays disabled until Terms is ticked.
-  - Moving between steps follows §8.28 (focus to heading, live region).
-- **Forgot / reset password:** a single 480px column, restyled.
+- **Sign in (`/auth/login`):** two columns (max 960px) separated by a 1px vertical hairline. Left: H1 "Sign in"; email; password (show/hide); Link "Forgot your password?"; Go lg "Sign in"; error summary "Email or password is incorrect." Right: H2 "New to Keyterminus?" (step-3) and three true points as a plain list ("Your keys are kept in your account, encrypted" · "Reveal and copy them when you're ready to play" · "Every order comes with a PDF invoice"), then Sign "Create an account". Mobile: form first.
+- **Register (`/auth/register`):** a 560px column with a **route line** progress of four stops **About you · Contact · Address · Password**; keep the existing required fields and the T&C gate: (1) first name, last name, date of birth (minimum age from `STORE_POLICY.minAge`, error names the rule); (2) email, phone with country prefix (optional per config); (3) country (restricted list excluded), street, city, postcode; (4) password with the hint "At least 8 characters, one number", confirm, the required Terms checkbox, an **unticked** marketing opt-in; Go lg "Create account" disabled until Terms is ticked. Step changes per §8.29 (focus to heading, live region).
+- **Forgot / reset:** a single 480px column.
 
 ### 14.12 Account (`/account/**`)
-**Layout:**
-- Desktop: a 240px left nav of text rows (Overview, Keys, Orders, Pinned, Profile, then a hairline and Sign out). The active row is ink with a lit lamp; the others are muted.
-- Mobile: a horizontal scroller of the same rows under the H1.
-
-**Overview:**
-- H1 "Hello, {first name}".
-- One line with real counts: "2 keys not revealed yet · 5 orders", with links.
-- The latest order as a compact row with its status tag and "View".
-- No stat tiles.
-
-**Keys (`/account/keys`)**, the account's heart:
-- H1 "Keys" with the count.
-- Tabs: All · Not revealed · Revealed · Reported.
-- KeyPlates, newest first, grouped by order. Each group has a mono header row with the order number and date.
-- Empty: "No keys yet. Keys you buy appear here after your payment is confirmed." with Key "Browse the catalogue".
-
-**Orders:**
-- H1 "Orders". A ruled list, not cards. Each order block has:
-  - a header row: order number (mono), date (mono muted), total (mono) and status tag;
-  - compact rows of the items;
-  - the compact timeline;
-  - Text "Invoice (PDF)" with `FileDown`, and "View order".
-- In-flight orders come first. The page polls while any order is in flight.
-
-**Order detail:**
-- H1 "Order KR-…" with a status tag.
-- The timeline (large).
-- The key plates.
-- The payment summary: amount, currency, card brand and last four digits **only if the provider returns them**.
-- Invoice download.
-- "Need help with this order?", linking to contact with the order number prefilled.
-
-**Pinned:** a deposit-box grid, 3-up (2-up on mobile). Out-of-stock items use the card's out-of-stock state.
-
-**Profile:** accordion groups (Personal details, Address, Password, Delete account), each with its own Save button and a success toast.
+- **Layout:** desktop 240px left nav of text rows (Overview, Keys, Orders, Saved, Profile, hairline, Sign out with `DoorOpen`); active row ink with a 3px mustard left bar; others muted. Mobile: horizontal scroller of the same rows under the H1.
+- **Overview:** H1 "Hello, {first name}"; one line of real counts ("2 keys not revealed yet · 5 orders") with links; the latest order as a compact row with status tag and "View". No stat tiles.
+- **Keys (`/account/keys`)** — the heart: sign label "MY DEPARTURES" (the only metaphor on functional account pages), H1 "Keys" with the count; tabs All · Not revealed · Revealed · Reported; **key boards** newest first, grouped by order with a mono header row (order number, date). Empty: "No keys yet. Keys you buy appear here after your payment is confirmed." + Go "Browse the catalogue".
+- **Orders:** H1 "Orders"; a ruled list (not cards): header row (order number mono, date mono muted, total mono, status tag), compact item rows, the compact route-line timeline, Link "Invoice (PDF)" with `ArrowDownToLine`, and "View order". In-flight orders first; polling while any is in flight.
+- **Order detail:** H1 "Order KT-…" with a status tag; the large timeline; key boards; payment summary (amount, currency, card brand and last four **only if the provider returns them**); invoice; "Need help with this order?" → contact with the order number prefilled.
+- **Saved:** departure-card grid 3-up (2-up mobile); out-of-stock state per §8.10.
+- **Profile:** accordion groups (Personal details, Address, Password, Delete account), each with its own Save and a success toast.
 
 ### 14.13 How activation works (`/how-activation-works`) — landing surface
-1. **Hero:** H1 (Hubot step-6) "How activation works" and the lead "Your key is delivered to your account after payment is confirmed. You redeem it on the platform named on the product page." Then the platform plates as jump links.
-2. **"From payment to key":** a `FeatureSpotlight` with the **Decrypt** scene (the page's only playing theater).
-3. **One section per platform** (`id="steam"` etc.), each holding:
-   - H2 with the pip;
-   - "You need";
-   - the steps;
-   - the code format;
-   - the platform's own redeem link;
-   - "Common problems" as ruled rows: "The key is for another region", "The key says it was already used", "The platform asks for a different account type";
-   - a `MiniStill` of Redeem for that platform beside the steps (desktop, columns 8–12).
-4. **"If a key doesn't work":** ruled rows explaining the report flow and the replacement-or-refund rule, with the reply time.
-5. Key "Browse the catalogue".
-
-Reading blocks are capped at 68ch. No invented guarantees.
+1. Hero: H1 (step-5) "How activation works" and the lead "Your key is delivered to your account after payment is confirmed. You redeem it on the platform named on the product page." Then the platform tiles as jump links.
+2. "From payment to your board": `FeatureSpotlight` with the **Departs** scene (the page's only playing theater).
+3. One section per platform (`id="steam"` …): H2 with the md tile; "You need"; the steps; the code format; the platform's own redeem link; "Common problems" as ruled rows ("The key is for another region", "The key says it was already used", "The platform asks for a different account type"); a `MiniStill` of Arrives beside the steps (desktop, cols 8–12).
+4. "If a key doesn't work": ruled rows explaining the report flow, the replacement-or-refund rule and the reply time.
+5. Go "Browse the catalogue".
+Reading blocks 66ch. No invented guarantees.
 
 ### 14.14 About, FAQ, Contact, Policies
-- **About (`/about`):**
-  - H1 "A store for game keys" with a step-1 lead;
-  - "What we offer": games, DLC, gift cards and subscriptions for the listed platforms; our prices, shown in your currency;
-  - "How an order works": three ruled rows linking to the activation guide;
-  - "How we keep your keys": a link to the home ledger anchor;
-  - the credentials plate;
-  - Key "Browse the catalogue".
+- **About (`/about`):** H1 "About Keyterminus" with a step-1 lead "A store for game keys, gift cards and subscriptions across every major platform, with the platform and region shown before you pay."; "What's on the board" (types and listed platforms; prices in your currency); "How an order travels" (three ruled rows → activation guide); "How we keep your keys" (link to the home "Through the gate" anchor); the Company notice; Go "Browse the catalogue". No founder stories, pull-quotes or numbers that aren't data.
+- **FAQ (`/faq`):** H1 "Questions"; desktop left sticky group index (Buying, Delivery, Activation and regions, Payment and security, Refunds and key problems, Account) with a 3px mustard bar on the active group; accordion groups right; answers match the policies word for word on numbers; "Still need help?" + Sign "Contact us"; FAQPage JSON-LD.
+- **Contact (`/contact`):** left cols 1–5: H1 "Contact us", the real support hours and reply time from config, the Company notice, "Have your order number ready" with links to the activation guide and the Refund policy. Right cols 7–12: the form (name, email, order number optional mono, subject select Order / Key not working / Payment / Account / Other, message); Go "Send message"; success replaces the form.
+- **Policies (`/policies`, `/policies/*`, `/pages/[slug]`), `PolicyLayout`:** index: H1 "Policies" + a ruled list (title Overpass 700 step-2, one-line scope, "Last updated {date}" mono muted). Policy page: desktop left 240px sticky index (active row with the mustard bar) + "On this page" from the H2s; main column at 66ch with H1 (step-4), a neutral "Last updated" tag, numbered H2s at step-3, body 16px at 1.7, ruled tables. Plain legal language, **no metaphor at all**. Cookie table lists cart, theme, saved, currency, `keyterminus-consent`. Mobile: "Jump to policy" select and "On this page" accordion. Print: header and footer hidden, black on white.
 
-  No founder stories, no pull-quotes, no numbers that aren't data.
-- **FAQ (`/faq`):**
-  - H1 "Questions";
-  - desktop: a left sticky group index (Buying, Delivery, Activation & regions, Payment & security, Refunds & key problems, Account) with a lit lamp on the active group, and accordion groups on the right;
-  - answers match the policies word for word on numbers;
-  - "Still need help?" with Steel "Contact us";
-  - FAQPage JSON-LD.
-- **Contact (`/contact`):**
-  - Left, columns 1–5: H1 "Contact us", one line with the real support hours and reply time from config, the credentials plate, and "Have your order number ready", with links to the activation guide and the Refund policy.
-  - Right, columns 7–12: the form, with fields:
-    - name;
-    - email;
-    - order number (optional, mono);
-    - subject select: Order, Key not working, Payment, Account, Other;
-    - message.
-
-    Submit is Key "Send message".
-  - Success replaces the form.
-- **Policies (`/policies`, `/policies/*`, `/pages/[slug]`), `PolicyLayout`:**
-  - The index: H1 "Policies" and a ruled list, each row with the title (Hubot 600 step-2), a one-line scope and "Last updated {date}" in mono muted.
-  - A policy page: a desktop left 240px sticky index (the active row lit) plus "On this page" from the H2s; a main column at 68ch with H1 (step-5), a neutral "Last updated" tag, numbered H2s at step-3, body 16px at 1.7, and ruled tables.
-  - The Cookie table lists the localStorage keys: cart, theme, pinned, currency, `keyrook-consent`.
-  - The shipping policy becomes a **Delivery policy** (digital delivery to the account; no carriers, no addresses).
-  - Mobile: a "Jump to policy" select and an "On this page" accordion.
-  - Print: header and footer hidden, black on white.
-
-### 14.15 404 (`src/app/(store)/not-found.tsx`)
-- A 200px **dial** (SVG) whose index line points at a tumbler readout **4 0 4** beside it. The tumblers roll in once (M2).
-- H1 (step-5) "This door doesn't open", with the line "The page doesn't exist, or the key is no longer listed."
-- The search field, the platform plates as links, and Text "Back to home".
-- A real 404 status.
+### 14.15 404 — "Platform not found" (`src/app/(store)/not-found.tsx`)
+- A board housing with two board rows that flip in once: `PLATFORM 404` / `NOT ON THE BOARD` (remark `CHECK THE BOARD`).
+- H1 (step-4) "Platform not found", the line "This page isn't on our board. It may have moved, or the key is no longer listed."
+- The kiosk search field, the platform tiles as links, Link "Back to the departures board" (→ /).
+- A real 404 status. Reduced motion: rows static.
 
 ### 14.16 Error states
-- Inline form errors per §8.2. Page fetch errors use the Alert.
-- `global-error.tsx`: H1 "Something went wrong", one line, Key "Try again", and the support email.
-- Price unavailable: the card and buy-box states (§8.10, §8.23).
-- Key issuing delayed: the timeline branch "Issuing is taking longer than usual. We'll email you as soon as your key is ready. You can also contact us with your order number."
+Inline form errors per §8.2; page fetch errors use the Alert. `global-error.tsx`: H1 "Something went wrong", one line, Go "Try again", the support email. Price unavailable: card and buy-box states. Issuing delayed: the timeline branch "Issuing is taking longer than usual. We'll email you as soon as your key is ready. You can also contact us with your order number."
 
 ---
 
-## 15. Imagery rules for game covers and screenshots
-
-1. **Covers carry the colour; the UI never competes.** Every cover sits in a recessed stage (`--color-stage`) inside a plate frame. Covers never sit directly on the page colour.
-2. **Ratios are fixed per placement:**
-
-   | Placement | Ratio |
-   |---|---|
-   | cards, rows, PDP, vault map, door interior | 3:4 |
-   | screenshots and the feature box | 16:9 |
-   | gift card blanks | 1.586:1 |
-3. **Fit by real proportions** (§8.9): `object-cover` only for portrait art between 0.68 and 0.82; everything else `object-contain` on the steel-grain stage. Never stretch, never rotate, never mirror.
-4. **No blur, tint, duotone, colour wash, gradient overlay or text overlay on covers.** No badges or stickers on covers. The only things allowed on top of a cover are the hover drawer movement and the out-of-stock opacity.
-5. **Storage:** covers and screenshots are **mirrored to our storage** at sync and served from our domain through `next/image` with correct `sizes` (QC §10, 18.4). No supplier host appears anywhere: not in `remotePatterns`, alt text, structured data or feeds.
-6. **Alt text:**
-
-   | Image | Alt |
-   |---|---|
-   | cover | "{title} cover art" |
-   | screenshot | "{title} screenshot {n}" |
-   | decorative (door interior, locker previews, peeks) | `alt=""`, with the same products available as real links nearby |
-7. **Screenshots:** used on the PDP gallery and the feature box only, never as page backgrounds.
-8. **Trailers:** only behind a click-to-load facade. No autoplay, no third-party embed before consent and a click.
-9. **What the store never shows:**
-   - stock photography, gamer lifestyle photos, controllers, headsets or neon rooms;
-   - AI-generated art, platform logos (names are text), console hardware renders;
-   - mock "key cards" printed with fake codes outside the theater.
-10. **The hero, lockers, door interior and directory peeks** pick covers by real data rules (most ordered, newest, in stock, has a cover). They are never hand-picked files that may go out of stock.
-11. **Inside the theater only:** fictional sample titles with generated flat covers (`SampleCover`), always labelled "Sample data".
+## 15. Imagery rules for covers and screenshots
+1. Covers carry the colour; the UI never competes. Every cover sits on `--color-stage` inside a card or a board object, never directly on the floor.
+2. Ratios: 3:4 cards, rows, PDP, peek covers; 16:9 screenshots and the feature card; 1.586:1 gift card blanks.
+3. Fit by real proportions (§8.9). Never stretch, rotate, mirror.
+4. No blur, tint, duotone, wash, gradient or text overlay on covers; no badges on covers. The only things on top of a cover are hover state (none on the image itself) and the out-of-stock opacity.
+5. Covers and screenshots mirrored at sync, served from our domain via `next/image` with correct `sizes`. No supplier host anywhere (remotePatterns, alt text, structured data, feeds).
+6. Alt: cover "{title} cover art"; screenshot "{title} screenshot {n}"; decorative peek covers `alt=""` when the same products are linked as text nearby.
+7. Screenshots only in the PDP gallery and the feature card.
+8. Trailers only behind a click-to-load facade; nothing third-party loads before consent and a click.
+9. Never: stock photography, gamer lifestyle photos, controllers, headsets, neon rooms, AI art, platform logos, console renders, airport or train photos, mock key cards with fake codes outside the theater.
+10. The hero board shows **text**, not covers. Peeks, rails and the feature card pick covers by data rules (§18.5), never hand-picked files.
+11. Inside the theater only: fictional sample titles with generated flat covers, always labelled "Sample data".
 
 ---
 
-## 16. Copy and content rules
+## 16. Copy voice, glossary and content rules
 
-- **English UI, British spelling** ("catalogue", "licence", "colour" in prose), with the existing currency formatting. Plain, specific, true.
-- **Store model only.** Customers buy keys from Keyrook. Never use these words in UI copy, metadata or emails:
-  - "sell", "seller" (use "offer", "in stock", "available");
-  - "marketplace", "payout", "withdraw", "withdrawal", "deposit" (as money), "balance", "escrow", "P2P", "list your key", "trade".
+### 16.1 Voice
+A good station announcement: short, specific, calm, never hyped. Present tense, active voice, second person. Metaphor (departures, platforms, routes, fares, arrivals, information desk) lives **only on marketing surfaces** — home section titles and leads, the theater, the 404, the about lead, email subject lines' preheaders at most. Everything functional — navigation, filters, product facts, cart, checkout, account (except the one "MY DEPARTURES" sign label), order statuses, errors, emails' body, policies — uses plain words. If a station word and a plain word compete, the plain word wins.
 
-  The legal cancellation wording is "right to cancel" (§14.9).
-- **No authenticity or speed claims that the store cannot prove:**
-  - no "official", "original", "authorised", "legit", "100%", "sold once", "guaranteed", "instant", "within seconds", "no risk";
-  - this includes links: write "Steam's redeem page" or "the platform's own redeem page", never "official redeem page";
-  - delivery wording is exactly "**Delivered to your account, usually within minutes after payment is confirmed.**" (from `POLICY_FACTS`);
-  - the guarantee wording is exactly "**Replacement or refund if a key doesn't work**", with the detail in the Refund policy.
-- **Security claims** appear only when true in config (§17) and match the Privacy Policy:
-  - "Card details are entered on {provider}'s hosted payment page."
-  - "3-D Secure confirmation by your bank."
-  - "Keys are encrypted at rest."
-  - "We never see or store your full card number."
-- **The supplier is invisible.** No supplier name, domain, ID, "marketplace price", "vs retail", price comparisons with other stores, or supplier-related discounts. Prices are our prices.
-- **Honest deals.** A "was" price is the lowest price of that product in the 30 days before the reduction, from our own price history (EU price-indication rules). Without history there is no deal display. No countdowns, no "ends soon", no "hot", no "trending", no "best seller" unless ranked by real order data and labelled "Most ordered this month".
-- **No pressure.** No stock counts on cards, no "only 2 left", no timers.
-- **Region honesty.**
+English UI, **British spelling** ("catalogue", "licence", "cancelled"), existing currency formatting.
 
-  | Region | Sentence |
-  |---|---|
-  | Global | "No regional lock" |
-  | Others | "Activates only on accounts registered in {region}" |
+### 16.2 Glossary
+| Concept | Marketing surfaces may say | Functional and legal wording (always) |
+|---|---|---|
+| Home page board | Departures, the board | — |
+| Product | departure, key | product, key, game, DLC, gift card |
+| Platform | Platform 1 · Steam | Steam (the platform's name); "Platform" as a filter label |
+| Genre | route, line | Genre |
+| Price band | fare zone | price, "€8–€18" |
+| Price reduction | revised fares, now cheaper | price cut, "Was €29.99" |
+| New releases | arrivals, new arrivals | New arrivals (nav), Newest release (sort) |
+| Subscriptions | season tickets | Subscriptions |
+| Cart | your ticket (summary panel label only) | Cart, Add to cart, Checkout |
+| Order | journey (theater only) | Order, order number |
+| Payment | boarding (theater remark only) | Payment, Pay €29.99 |
+| Key issued | departed (theater/home only) | Key issued, Your key is ready |
+| Key revealed / redeemed | arrived (theater only) | Revealed, Redeem on Steam |
+| Account keys page | My departures (sign label) | Keys |
+| Support | information desk, help desk | Contact us, Report a problem |
+| Refund | — (never metaphorical) | Refund, Replacement, Right to cancel |
+| 404 | Platform not found | — |
 
-  The supplier's verbatim limitation note always follows in mono. Items restricted to sanctioned markets, or requiring a VPN, are never listed (QC 16, 18.4).
-- **Key and order status copy** (tightened from keyarcade; one sentence each):
+### 16.3 Content rules
+- **Store model only.** Customers buy keys from Keyterminus. Never: "sell", "seller", "marketplace", "payout", "withdraw", "withdrawal", "deposit" (as money), "balance" (as a stored account balance), "escrow", "P2P", "list your key", "trade". Legal cancellation wording: "right to cancel".
+- **Speed claims come only from config.** Delivery wording is exactly "**Delivered to your account, usually within minutes after payment is confirmed.**" (`STORE_POLICY.delivery.headline`) or its config short forms. The owner's preview line "Your key departs in about a minute after payment" is **not** used — "about a minute" is a promise the config doesn't make. Never "instant", "immediately", "in seconds", "about a minute", "the moment you pay", "on time" as a delivery promise (`ON TIME` is a stock remark meaning "in stock at its regular price", and the board legend says so).
+- **No authenticity or guarantee claims:** no "official", "original", "authorised", "legit", "100%", "sold once", "guaranteed", "no risk". Links say "Steam's redeem page" or "the platform's own redeem page". Guarantee wording is exactly "**Replacement or refund if a key doesn't work**", details in the Refund policy.
+- **Security claims** only when true in config and matching the Privacy Policy: "Card details are entered on {provider}'s hosted payment page." · "3-D Secure confirmation by your bank." · "Keys are encrypted at rest." · "We never see or store your full card number."
+- **The supplier is invisible.** No supplier name, domain, ID, "marketplace price", "vs retail", comparisons with other stores.
+- **Honest deals.** A "was" price is the lowest price of that product in the 30 days before the reduction, from Keyterminus' own price history (EU price-indication rules). Without history, no deal display. No countdowns, "ends soon", "last call", "delayed", "hot", "trending", "best seller" (unless ranked by real order data and labelled "Most ordered this month").
+- **No pressure:** no stock counts on cards, no "only 2 left", no timers.
+- **Board legend** (a single line under the hero board and the fares board, Overpass 14px `--color-on-board-muted`): "ON TIME: in stock at its regular price · NEW: released in the last 8 weeks · NOW −%: price cut against our lowest price of the previous 30 days."
+- **Region honesty:** Global → "No regional lock"; others → "Activates only on accounts set to {region}", followed by the supplier's verbatim note in mono. Sanctioned-market and VPN items are never listed.
+- **Key and order status copy** (one sentence each, phrased for Keyterminus):
 
   | Status | Copy |
   |---|---|
-  | Awaiting payment | "Waiting for your payment to be confirmed." |
-  | Payment confirmed | "Payment received. Your key is being issued." |
+  | Awaiting payment | "We're waiting for your payment to be confirmed." |
+  | Payment confirmed | "Payment confirmed. We're issuing your key." |
   | Key issued | "Your key is ready in your account." |
   | Issuing delayed | "Issuing is taking longer than usual. We'll email you as soon as your key is ready." |
-  | Reported | "We're checking your key. We reply within {replyTime}." |
-  | Replacement issued | "We've issued a replacement key." |
-  | Refund pending | "Your refund is being processed." |
+  | Reported | "We're checking your key and will reply within {replyTime}." |
+  | Replacement issued | "A replacement key is ready in your account." |
+  | Refund pending | "We're processing your refund." |
   | Refunded | "Refunded to your card." |
   | Payment failed | "Your payment didn't go through. You haven't been charged." |
-- **The key email** says "Your key is ready" and links to Account → Keys. **It does not contain the key** (config `KEY_IN_EMAIL=false`, the default), which keeps the security story true. If the lead turns that on, remove "Decrypted only when you choose Reveal" from the ledger and the theater tip.
+
+- **The key email** says "Your key is ready" and links to Account → Keys; it does not contain the key (`STORE_POLICY.security.keyInEmail = false`). If that changes, remove "decrypted only when you choose Reveal" from the home and theater.
 - **Buttons are verbs:** Search, Add to cart, Buy now, Checkout, Continue, Pay €29.99, Reveal key, Copy key, Redeem on Steam, Report it, Send message, Save choices, Create account.
-- **Section titles** may use the vault voice lightly ("Watch a key leave the vault", "What's in the vault, and what never is", "The door's open"). Navigation, filters and labels always use the plain names (Steam, DLC, Gift cards, Region, Europe).
-- **Banned words:** "elevate", "seamless", "effortless", "unleash", "level up", "epic deals", "gamers", "next-level", "premium", "curated", "ultimate" (except in a real product name), "GG", "loot".
+- **Banned words:** "elevate", "seamless", "effortless", "unleash", "level up", "epic deals", "gamers", "next-level", "premium", "curated", "ultimate" (except in a real product name), "GG", "loot", "journey" outside the theater, "fly", "jet", "take off".
+- **No verbatim copy from Keyrook or Fablekeys.** Policy texts keep their legal substance and numbers but are re-phrased in Keyterminus' voice; section names, FAQ questions, status lines and empty states in this brief are already new.
 
 ---
 
 ## 17. Data and config the design depends on (for the lead)
+The design shows only what these provide; missing data means the element is omitted.
 
-The design shows only what these provide. If a field is missing, the UI element is omitted, never faked.
-
-**Product (from the sync, keyarcade's normaliser extended):**
-- `platform` (raw) → platform slug via `src/lib/catalog/platforms.ts`;
-- `region` code plus the verbatim `regionNote`;
-- `kind` (game / dlc / giftcard / subscription / software);
-- `genres[]`, `languages[]`, `releaseDate`;
-- `edition` and a normalised `baseTitle` (for the edition selector and "other platforms");
-- `developers[]`, `publishers[]`, `ageRating?`, `systemRequirements`, `activationDetails`;
-- `coverUrl` (mirrored), `coverWidth`, `coverHeight` (probed once at sync), `screenshots[]` (mirrored), `trailerId?`;
-- `qty`, `price`, `currency`;
-- `sku` (our catalogue number);
-- `createdAt` (first seen in the catalogue, not touched by re-syncs);
-- an order count for rankings.
-
-Pre-orders and sanctioned-region or VPN items are filtered out at sync.
-
-**Price history:** a `PriceHistory` model (`productId`, `price`, `currency`, `recordedAt`) written when a price changes. `compareAtPrice` = the lowest price in the 30 days before the current reduction. A deal exists only when the price is below it by at least `STORE_POLICY.deals.minPercent` (default 5).
-
-**Key storage:** a `KeyDelivery` per issued key holding:
-- `ciphertext`, `iv`, `authTag` (AES-256-GCM, key from `KEY_ENCRYPTION_KEY`, rotated per the security runbook);
-- `format` (text | image), optional `pin`;
-- `issuedAt`, `revealedAt`, `reportedAt`;
-- `status`, `replacedById`.
-
-The reveal endpoint decrypts for the signed-in owner only and logs the first reveal.
-
-**`STORE_POLICY` facts that switch copy on and off:**
-
-| Fact | Effect |
-|---|---|
-| `payment.hostedPage`, `payment.threeDSecure`, `payment.providerName` | security strip cells 1–2, ledger lines, the checkout note, theater S2 |
-| `security.keysEncryptedAtRest` | true only once `KeyDelivery` encryption ships; strip cell 3, ledger, theater S3 tip |
-| `invoices.pdf` | strip cell 4, order pages |
-| `guarantee.faultyKey` | strip cell 5, buy box row, ledger, theater S5 |
-| `delivery.method` = "to your account", `delivery.usualTime` = "usually within minutes after payment is confirmed" | header status line, buy box, cart, FAQ |
-| `support.replyTime` | report flow, ledger, theater S5 caption |
-| `checkout.requireRegionCheck` | step 3 checkbox |
-| `limits.maxQtyPerItem`, `limits.giftCardMaxPerOrder` | quantity stepper |
-| `waiver.text` | the key wording in §14.9 |
-| `deals.compareWindowDays` (30), `deals.minPercent` (5) | deal display |
-| `retention.orderRecordsYears` | ledger |
-
-Remove the CS2 delivery fields (trade offer, trade protection, Steam requirements) from `STORE_POLICY` and `POLICY_FACTS`.
-
-**Home data (`getHomeData`):**
-- live in-stock count;
-- platforms with count, minimum price, top covers and rank;
-- on-sale count; last successful sync time;
-- the deal list, genre counts, recent releases;
-- gift cards grouped by platform with denominations;
-- subscriptions grouped by service and duration;
-- price-band lists for the active currency;
-- the hero door's 12 covers and the final CTA's 6.
-
-All of it is distinct by the claimed set and cached with revalidation.
+- **Product:** platform → `platformInfo()` with `number`/`boardLabel`; region + verbatim note; kind; genres; languages; releaseDate; edition and normalised baseTitle; developers, publishers, ageRating, systemRequirements, activationDetails; mirrored cover with probed width/height; screenshots; trailerId; qty, price, currency; SKU (`KT-`); `createdAt` (first seen); an order count; **`boardScore`** (§18.3).
+- **Price history:** keep Keyrook's `PriceHistory` mechanics; `compareAtPrice` = lowest price in the 30 days before the current reduction; a deal exists only when the price is below it by at least `STORE_POLICY.deals.minPercent` (currently 10). Only rows written by Keyterminus count (SKU prefix `KT-`); history inherited from the Keyrook copy is discarded on the first sync.
+- **Key storage:** unchanged (`KeyDelivery` ciphertext/iv/authTag, format, pin, issuedAt, revealedAt, reportedAt, status, replacedById).
+- **`STORE_POLICY` facts that switch copy:** `payment.hostedPage`, `payment.threeDSecure`, `payment.providerName` (through the gate, checkout note, theater Pay); `security.keysEncryptedAtRest` (through the gate, Departs tip); `invoices.pdf`; `guarantee.faultyKey` (buy box row, through the gate, Help desk scene); `delivery.*` (strip, buy box, cart, FAQ); `support.replyTime`; `checkout.requireRegionCheck`; `limits.*`; `waiver.text`; `deals.compareWindowDays`, `deals.minPercent`; `retention.orderRecordsYears`.
 
 ---
 
-## 18. Accessibility and quality floor
+## 18. Merchandising — make Keyterminus never look like Keyrook's inventory
+Keyterminus and Keyrook draw on the same supplier and fixture (~69,700 live products today: Steam 29,408 games + 10,628 DLC, GOG 9,606, Xbox 6,712, Nintendo 4,297, Epic 3,204, PlayStation 113 games + 731 top-ups; indie 31k, action 13.8k; median price €5.45; **0** live price cuts in the fixture). Some overlap is unavoidable; the goal is different emphasis, order, prices, SKUs, URLs and home picks. Implement in code (no commit) and report numbers against the fixtures the way Fablekeys' §18.7 did.
 
-- **WCAG 2.2 AA:** contrast as measured in §3.2–3.3 in both themes; every control has a visible square focus ring; touch targets ≥44px.
-- **Landmarks:** `header`, `nav` (main, breadcrumb, footer, account), `main`, `footer`. One H1 per page, then H2/H3 in order.
-- **ARIA patterns:**
-  - disclosure (filter groups, vault map, accordions);
-  - tabs (theater, PDP, account keys);
-  - combobox (search, language filter);
-  - dialog (cart, gallery, report, preference centre, mobile sheets);
-  - slider (price, year, rotary dial, checkout ruler when interactive);
-  - radiogroup (segmented controls, edition selector, activation selector);
-  - switch (cookies, on sale);
-  - live regions (cart, steps, order status, key reveal/copy, quantity clamp).
-- **Never colour alone:** platform and type are always named in text; lamps always sit next to a word; deals carry the percentage and "Was" in text.
-- **Keys:**
-  - slashed zero and distinct 1/I/l by font choice;
-  - "Spell it out" for console entry;
-  - copy with a keyboard fallback;
-  - focus to Copy after reveal.
-- **Keyboard:** everything reachable and operable, including lockers, the rotary dial (arrows, Home/End), the theater tabs and the play/pause knob. Esc closes every overlay and returns focus.
-- **`prefers-reduced-motion`:** every moment shows its static state (§13.2). No pin, swing, roll, decrypt animation or WebGL. The theater shows stills plus step lists.
-- **Performance:**
-  - LCP ≤2.5s on mid-tier 4G (the hero LCP is the H1 text); CLS 0; INP ≤200ms;
-  - covers lazy below the fold;
-  - fonts latin + latin-ext only, with one preloaded file;
-  - WebGL only on the home hero, after LCP.
-- **Theme parity:** every screen checked in Strongroom and Counter Hall.
-- **SEO:** unique titles and descriptions; Product (with Offer), BreadcrumbList, FAQPage, Organization and WebSite + SearchAction JSON-LD; OG image per §9.3.
-- **QC items that touch design:**
-  - payment logos in the footer and at checkout; credentials in the footer;
-  - the platform disclaimer; "Cookie settings";
-  - multi-step registration with required fields and the T&C gate;
-  - the digital-delivery consent checkbox at payment;
-  - platform, region, languages, edition, requirements and validity on the product page;
-  - system requirements only for PC titles;
-  - no pre-orders, no supplier traces, no fake stock, ratings or claims.
+### 18.1 Emphasis (what Keyterminus is "about")
+Keyrook leads with most-ordered PC titles; Fablekeys with story games and GOG. Keyterminus is the **multi-platform station**: consoles and value are promoted, every list mixes platforms, and fast genres (racing, sports, fighting, shooter, co-op) lead.
+- `PLATFORM_BOARD` numbering and order (§2.4): Steam, Xbox, PlayStation, Nintendo, Epic, GOG, EA app, Ubisoft Connect, Battle.net, Rockstar. Used for filters, footer line, menu, home signs, sync category `sortOrder`.
+- `TYPE_ORDER`: Games, Gift cards, Subscriptions, DLC, Top-ups, Software. Header nav: Platforms, Games, Gift cards, Price cuts (+ DLC ≥1280, Subscriptions ≥1440, New arrivals ≥1600). `RIG_LINKS` = games, gift-cards, subscriptions, dlc.
+- `ROUTE_ORDER` (genres): racing, sports, fighting, shooter, co-op, action, survival, open-world, simulation, strategy, horror, platformer, rpg, adventure, puzzle, story-rich, casual, indie, vr, mmo.
+- `FARE_ZONES` in `src/config/merchandising.ts` (replaces `PRICE_BAND_EDGES`/`PRICE_BANDS`): edges `[3, 8, 18, 35, 70]` in the active currency → six zones (Keyrook `[5, 10, 20, 40]`, Fablekeys `[4, 12, 25, 50]`). `catalogConfig.pricing.bands` uses the same edges in EUR.
 
----
+### 18.2 Selection (`src/config/catalog.ts`, `src/lib/esa/select.ts`)
+- **Quotas** (target 65,000–75,000; Keyrook's in brackets): games 40,000 (42,000) with per-platform shares of the game cap — Steam ≤ 0.48, GOG ≤ 0.14, Xbox ≤ 0.16, Nintendo ≤ 0.12, Epic ≤ 0.08, PlayStation, EA, Ubisoft, Battle.net, Rockstar uncapped (they are small) — (Keyrook: one flat 0.55); DLC 14,000 (16,500) with Steam ≤ 0.8; gift cards 4,500 (3,500); subscriptions 2,500 (1,500); top-ups 5,000 (3,500); software 2,000 (2,700). Spillover order: game, dlc. Caps above availability are fine (they spill); tune against the fixtures and report the final split.
+- **`maxPerTitle: 3`** (Keyrook 4). Editions per work: 3 per base title and platform.
+- **Selection score** for ordering candidates inside each quota (Keyrook: lexicographic buckets; Fablekeys: story score):
+  `selectionScore = boardScore × regionWeight × zoneWeight × editionWeight × stockFactor × stability × (1 + 0.06 × saltedHash("keyterminus"))`
+  - `regionWeight`: global 1.05, europe 1, uk 0.98, us 0.96, north-america 0.96;
+  - `zoneWeight` by fare zone (under 3, 3–8, 8–18, 18–35, 35–70, 70+): 1.0, 1.1, 1.08, 1.0, 0.94, 0.85 — value is promoted;
+  - `editionWeight`: Standard 1.06, Gold 1.02, Deluxe 1.0, Complete/Definitive 0.98, Ultimate 0.96, Collector's 0.9 (Fablekeys preferred Complete; we prefer the plain edition);
+  - `stockFactor` 0.94–1.0 from log stock; `stability` 1.25 for rows this shop already lists (SKU `KT-`); rows inherited from Keyrook (`KR-`) get no bonus.
+- **Offers:** when several supplier offers exist, keep any within 4% of the cheapest and pick the one with the **most stock**, then the salted hash (Keyrook: cheapest; Fablekeys: 3%).
+- **Prices:** storefront price = `max(cost × 1.125, cost + €0.32)` rounded up to the cent (Keyrook 12% / €0.30; Fablekeys 13% / €0.35). Update `.env.example` (`CATALOG_MARGIN="0.125"`, `CATALOG_MIN_MARGIN_ABS="0.32"`).
+- **SKUs and URLs:** SKU `KT-` + salted SHA-1 (salt "keyterminus"). Slug pattern `{platform}-{title}-{region short, omitted for global}` with the platform first (e.g. `steam-copperline-express-deluxe`, `xbox-forza-horizon-5-eu`) — different from Keyrook (display name) and Fablekeys (`…-steam-key`). Inherited rows are re-slugged once; collisions get a salted 6-character suffix. Keep 301s irrelevant (new store).
 
-## 19. Implementation order
+### 18.3 Default sort: "Board order" (`board`)
+- **`boardScore`** (stored per product at sync, indexed; `src/lib/catalog/board-score.ts`):
+  - genre factor = the highest weight among its genres: racing 1.4, sports 1.35, fighting 1.3, shooter 1.3, co-op 1.3, action 1.2, survival 1.15, open-world 1.12, simulation 1.05, strategy 1.0, horror 1.0, platformer 0.98, rpg 0.95, adventure 0.92, mmo 0.9, puzzle 0.85, story-rich 0.85, casual 0.82, indie 0.8, vr 0.72; untagged 0.9;
+  - recency factor `1 + 0.35 × 0.5^(ageYears / 1.5)` (a new release +35%, a three-year-old title +9%);
+  - console factor 1.12 for Xbox, PlayStation, Nintendo;
+  - multi-platform factor 1.08 when the same base title is live on ≥2 platforms;
+  - never a critic score, rating or popularity number shown to customers.
+- **Board order** = a **weighted platform interleave** of `boardScore`: `ROW_NUMBER() OVER (PARTITION BY platform ORDER BY boardScore DESC, id)` as `rn`, then `ORDER BY rn / share(platform) ASC, boardScore DESC, id` with shares Steam 0.38, Xbox 0.16, Nintendo 0.12, GOG 0.1, PlayStation 0.08, Epic 0.08, others 0.02 each. Regional copies of the same base title on the same platform after the first get `rn × 4` (pushed down), so page one shows 24 different titles from several platforms. Add `board` to `SORT_KEYS`, make it the default on catalogue, category, platform and genre pages (Deals keeps `discount`, New arrivals `release-desc`, Search `relevance`). Sort menu order per §8.15. Verify the query plan stays index-friendly at 70k rows (materialise `boardScore` and `share` as columns or a CTE on the filtered set).
 
-1. **Tokens:**
-   - `variables.css` (dark in `:root`, Counter Hall in `[data-theme="light"]`);
-   - `@theme inline` additions (plate, steel-hi, lamp, deal, platform and type colours, the type scale, `rounded-round`, the machined shadows, the new utilities);
-   - the `tailwind.config.ts` mirror;
-   - fonts (install/uninstall, `fonts.css`, preload);
-   - global base rules;
-   - animations clean-up;
-   - `tokens.ts`;
-   - `theater.css`.
-2. **Sweeps** (§2.5).
-3. **Primitives:** Button, Field, Select, Choice (checkbox, radio, switch, segmented), Plate (tags), Chip, Tabs, Accordion, Dialog, Toasts, Alert, EmptyState (empty deposit box), Breadcrumbs, Pagination, QuantitySelector, PriceDisplay, **Tumbler**, **Dial family**, **Lamp**.
-4. **Key-store components:** `platforms.ts` mapping, label row, Cover, DepositBox (standard, compact, feature, gift card blank), deal plate, buy box, edition selector, requirements panel, system requirements, OrderTimeline, **KeyPlate** (with the reveal endpoint contract), report dialog.
-5. **Layout:** header (two tiers, vault map, mobile sheet, search dialog), footer (vault floor, credentials plate, logo strip), cookie banner and preference centre.
-6. **Pages:** catalogue → platform → type → genre → deals → new releases → product → search → cart drawer and page → checkout → order confirmed → account (keys first) → auth → how activation works → about, FAQ, contact, policies → 404 → home. Build the static end states of every home section first.
-7. **Theater:** the port (§12.2), the bezel and controls, `SampleCover`, the five scenes, `MiniStill`, demo mode on the real components.
-8. **Brand:** logo, favicon, manifest, metadata, invoice fonts and colours.
-9. **Hand-off** to the motion engineer with the hooks from §13 in place (door poster, data attributes, static states).
-10. **Verify:** `npm run build`; check every page at 390 / 768 / 1280 / 1536, in both themes and with reduced motion; run the theater with `?t=` frozen frames for screenshots.
+### 18.4 Navigation and facets
+Facets in `PLATFORM_BOARD` / `TYPE_ORDER` / `ROUTE_ORDER` order (Keyrook sorted by count). `src/lib/catalog/store-index.ts`: platforms with numbers, routes, fare zones. `src/config/navigation.ts`: `RIG_LINKS`, `PLATFORM_LINKS` in board order, help/policy links unchanged in substance.
+
+### 18.5 Home data (`getHomeData`, claimed in this order; no product twice; no title twice)
+One ranked pool: live products with a cover, one row per (base title, platform), best edition by `editionWeight`, sorted by `boardScore`.
+1. **`boardPages`** (hero, 18 rows = 3 pages × 6): walk the pool in board order; at most 5 per platform across 18 and at least one row each for platforms 1–4 when stocked; include up to 3 real price cuts and up to 3 NEW titles when they exist (their remarks make the board honest and varied); games, DLC and one gift card allowed (a gift card row reads "STEAM GIFT CARD €20"). **Exclude the 200 most-ordered products** so Keyterminus' first screen never mirrors Keyrook's most-ordered door.
+2. **`platforms`**: stocked platforms in board order with count, min price, and 3 peek titles each (board order, unclaimed).
+3. **`lines`**: A New arrivals (release ≤56 days, newest first, board order within a week, ≤12); B Co-op (genre `co-op`, board order, ≤12, ≤3 per platform); C Console departures (Xbox/PlayStation/Nintendo games, round-robin across the three, ≤12). Each needs `MERCH.lineMinimum` 6.
+4. **`routes`**: the first 8 genres in `ROUTE_ORDER` with ≥50 live products; for each the top 4 platforms by live count in that genre (counts only, no products claimed).
+5. **`fares`**: real price cuts ranked by `boardScore × cut%` (Keyrook: largest percentage), feature = first with a cover; ≤10; needs 4.
+6. **`giftCards`**: per stocked platform the group with most denominations, global preferred, in board order.
+7. **`timetable`**: services in board order of their platform, then by number of durations.
+8. **`activationPlatforms`**: platforms 1–6 plus Battle.net when stocked.
+
+New `MERCH` keys: `boardRows 18`, `boardPerPlatform 5`, `boardExcludeTopOrdered 200`, `peek 3`, `lineItems 12`, `lineMinimum 6`, `routes 8`, `routeStops 4`, `routeMinimum 50`, `fares 10`, `dealMinimum 4`, `giftCardPlatforms 5`, `timetableRows 8`, `releaseWindowDays 56`. Delete door, locker, budget and release-ruler keys.
+
+### 18.6 Report back (engineer)
+After running the sync on the fixtures (`/home/claude/devtools/kinguin-fixtures`, mock ESA), report: active products by type and platform; distinct titles; median price; identical products vs Keyrook (`/home/claude/keyrook` database copy if available) with same price / same SKU / same slug counts (target: 0 / 0 / 0); home first-screen overlap with Keyrook's door covers (target 0 products); catalogue page-1 overlap at each store's default sort (target ≤2).
 
 ---
 
-## 20. Slop self-audit — the result must pass every line
+## 19. Email look (`src/lib/email.ts`)
+Keyrook's emails: nickel canvas `#E3E7E4`, gunmetal header band, banker's-green plates, Hubot. Keyterminus' are a printed **departure notice**:
+
+```ts
+const C = {
+  canvas: "#EAE5DA",
+  panel: "#FCFBF7",
+  board: "#222426",
+  flap: "#2B2E31",
+  onBoard: "#F2EDE1",
+  onBoardMuted: "#B0ABA0",
+  remark: "#E9BB45",
+  ink: "#1B1C1D",
+  muted: "#4B4842",
+  faint: "#5D5951",
+  line: "#D6D0C3",
+  mustard: "#E2AE2F",
+  mustardEdge: "#9C7612",
+  success: "#2C6A3A",
+  danger: "#B02A1F",
+} as const;
+const SANS = "'Overpass', Arial, Helvetica, sans-serif";
+const MONO = "'Sometype Mono', Menlo, Consolas, monospace";
+```
+
+**Structure** (600px table, `color-scheme: light`):
+1. Canvas `#EAE5DA`, 24px top padding.
+2. **Header:** a `board` cell (20px 24px padding, top corners 8px) with `email-logo.png` (Night-coloured lockup, 143×28 display) left and, right, the email's sign label in `onBoardMuted` 11px uppercase 0.14em ("ORDER CONFIRMED", "KEY READY", "PASSWORD RESET").
+3. A 4px `mustard` rule.
+4. **Departure strip** (order emails only): a `flap` row (12px 24px) in MONO 13px: `ORDER KT-30517` in `onBoard` · `{STATUS}` in `remark` (plain status words: "PAYMENT CONFIRMED", "KEY READY", "REFUNDED") — table cells with 1px `board` gaps imitate flap tiles; no images.
+5. **Content panel:** `panel` with 1px `line` left/right/bottom borders, bottom corners 8px, 32px 28px padding. H1 in SANS 800 26px `ink` sentence case (not a serif); paragraphs SANS 15px/1.6 `muted`; sign labels SANS 700 11px uppercase 0.14em `faint`; details as a ruled two-column table (labels `faint`, values `ink`, identifiers MONO); item rows with a 40×53 cover thumbnail (mirrored URL), title, platform name + region in muted 13px, price MONO right.
+6. **Button:** `mustard` fill, `ink` text, 1px `mustardEdge` border, 6px radius, 14px 26px padding, SANS 700 15px, sentence case ("View your keys", "Reset password").
+7. **Footer** on the canvas (12px, `muted`): "{COMPANY.name}" in ink 600; "Keyterminus is a trading name of {COMPANY.name}. Company number {…}."; registered office + email + phone (if any); policy links (Terms, Refunds, Privacy, Contact) underlined in `muted`; "© {year} Keyterminus."
+- Key-ready email: "Your key is ready" + "View your keys" button; never the key itself.
+- Preheaders are plain ("Your Keyterminus order KT-30517 is confirmed").
+- Rename every helper that referred to the old look (`plate`, `brass`) to `strip`, `mustard`.
+
+---
+
+## 20. Mobile compositions (designed, not stacked)
+- **Header:** 56px bar, lockup → mark only below 400px; menu as a bottom sheet with the delivery line on top; search as a full-screen kiosk.
+- **Hero:** H1 + lead + kiosk first, then the DOM board with four two-line rows (title / platform · price · remark), DOM flaps only, controls under it.
+- **Platforms:** 2×2 large signs, rows below, peek following taps.
+- **Timetable:** each line's header above its rail; 72vw cards; position bar kept.
+- **Theater:** tabs as a horizontal scroller of compact rows; phone-preset monitor; step list below.
+- **Routes:** each route a vertical mini-line with its stops.
+- **Revised fares:** two-line board rows.
+- **Gift cards:** platform segmented scroller → card at 88vw → denominations.
+- **Season tickets:** one block per service.
+- **Arrivals:** tile scroller → stacked steps → still.
+- **Through the gate:** plates stacked, vertical route line.
+- **Catalogue:** 72px board header, sticky Filter/Sort toolbar, bottom filter sheet, 2-up grid.
+- **PDP:** cover + gate strip at 40% width beside title and price; sticky buy bar.
+- **Cart / checkout:** ticket summary at the end of the cart; sticky "Checkout · €29.99"; checkout summary as a top accordion; Pay full width.
+- **Account:** horizontal nav scroller; key boards full width with flaps wrapping by key group.
+- **Footer:** vertical platform line ending in the terminus bar; accordion columns; Company notice one column; logo strip centred.
+- Thumb zone: primary CTAs within the bottom 40% on PDP (sticky bar), cart and checkout.
+
+---
+
+## 21. Reduced motion — the static design
+Under `prefers-reduced-motion: reduce` the site is complete and finished at rest:
+- hero: DOM board page 1, no WebGL, no paging; "Next 6" and search swap instantly; legend visible;
+- peek, gift card, fares: final states; switches are instant;
+- rails: native scroll, no momentum, no rise;
+- route lines: fully drawn, markers parked at the terminus bar;
+- theater: stills of every scene's end state with the full step list; tabs switch stills;
+- key board: key appears at once on reveal; counters show final values;
+- panels, dialogs, toasts: ≤100ms opacity;
+- nothing pins, nothing loops.
+Screenshot every home section and the key board with `page.emulateMedia({ reducedMotion: "reduce" })` before hand-off.
+
+---
+
+## 22. Accessibility and quality floor
+- **WCAG 2.2 AA:** contrast per §3.2 in both themes and on the board; a visible focus ring on every control (board surfaces: mustard ring); touch targets ≥44px.
+- **Landmarks:** `header` (strip + bar), `nav` (main, breadcrumb, footer platform line, footer, account), `main`, `footer`. One H1 per page, H2/H3 in order. Sign labels are `<p>`, not headings.
+- **ARIA patterns:** disclosure (filters, concourse map, accordions); tabs (theater tabs board vertical, PDP, account keys); combobox (kiosk search, language, country); dialog (cart, gallery, report, cookie settings, mobile sheets); radiogroup (segmented controls, edition timetable, Arrivals tiles, gift card platforms); switch (cookies, On sale); live regions (cart count, steps, order status, key reveal/copy, quantity clamp, hero board page/results).
+- **Boards are tables:** the hero and fares boards are real `<table>`s with captions and header cells; flap visuals are `aria-hidden` with plain-text twins. Auto-paging content has a pause control and stops by itself (WCAG 2.2.2).
+- **Never colour alone:** platforms always named; remarks are words; deals carry percentage and "Was" in text; route current stops also carry `aria-current="step"`.
+- **Keys:** Sometype slashed zero and distinct `1 I l`; "Spell it out"; keyboard copy fallback; focus to Copy after reveal.
+- **Keyboard:** everything reachable, including platform signs, rails (arrow buttons + Tab into cards), routes and their stops, theater tabs and the play control, gift card platform radios. Esc closes every overlay and returns focus.
+- **Performance:** LCP ≤2.5s on mid-tier 4G (the H1); CLS 0; INP ≤200ms; covers lazy below the fold; fonts latin + latin-ext with one preload; WebGL only on the hero after LCP.
+- **Theme parity:** every screen in Day and Night, plus the system-preference path with nothing stored.
+- **SEO:** unique titles and descriptions; Product (+Offer), BreadcrumbList, FAQPage, Organization, WebSite + SearchAction JSON-LD; OG images per §9.3.
+- **QC items that touch design:** payment logos in the footer and at checkout; credentials in the footer Company notice; the platform disclaimer; "Cookie settings"; multi-step registration with the T&C gate; the digital-delivery consent at payment; platform, region, languages, edition, requirements and validity on the PDP; system requirements only for PC titles; no pre-orders, no supplier traces, no fake stock, ratings or claims.
+
+---
+
+## 23. Implementation order
+1. **Tokens:** `variables.css` (Day in `:root`, Night in `[data-theme="dark"]`), `@theme inline` additions, `tailwind.config.ts` mirror, fonts (install/uninstall, `fonts.css`, preload), base rules, `ThemeScript` (system fallback), animations clean-up, `tokens.ts`, `theater.css`.
+2. **Sweeps** (§2.5), brand rename.
+3. **Primitives:** Button, Field, Select, Choice (checkbox, radio, switch, segmented), Tag, Chip, Tabs, Accordion, Dialog, toasts, Alert, EmptyState (empty board), Breadcrumbs, Pagination, QuantitySelector, PriceDisplay, **Flap / FlapRow / FlapCounter**, **FlapLoader**, **PlatformTile**, **RouteLine**, **Remark**, `flapFrame()`.
+4. **Key-store components:** gate line, Cover, DepartureCard (standard, compact, feature, gift card blank), deal tile, buy box, edition timetable, Before you buy, system requirements, OrderTimeline (route line), **KeyBoard** (reveal contract unchanged), report dialog, ticket summary.
+5. **Layout:** information strip + concourse bar (with the width assertions), concourse map, mobile sheets, kiosk, footer (platform line, Company notice, logo strip), cookie banner and settings.
+6. **Merchandising** (§18): config, `boardScore`, `board` sort, home data; run on fixtures; record numbers.
+7. **Pages:** catalogue → platform → type → genre → price cuts → new arrivals → product → search → cart drawer and page → checkout → order confirmed → account (keys first) → auth → activation guide → about, FAQ, contact, policies → 404 → home (static end states of all twelve sections first, DOM board included).
+8. **Theater:** new ids, monitor frame, tabs board, controls, sample data and covers, five scene views, `MiniStill`s, demo mode on the new components.
+9. **Brand:** `brand-mark.ts`, `BrandMark.tsx`, favicons via `gen-favicons.mjs`, manifest, metadata, OG images, invoice and email.
+10. **Hand-off** to the motion engineer with every hook from §13 in place (DOM board with cell variables, `data-*` attributes, static states, `flapFrame`).
+11. **Verify:** `npm run build`; every page at 320 / 390 / 768 / 1024 / 1280 / 1440 / 1600 / 1920 in Day, Night and reduced motion; header overlap assertions; theater frozen frames with `?t=`; the board with `?page=2`; re-run the contrast script after any token change.
+
+---
+
+## 24. Slop self-audit — the result must pass every line
 
 **Visual**
-- [ ] Rectangles are 0px everywhere. Circles appear only on hardware (dial, bolts, lamps, radio dots, switch knobs, timeline nodes, the theater knob, avatar initials) and only on square boxes. No pills, bevels, chamfers or rotated elements.
-- [ ] `--steel-grain` is the only gradient, and it appears only on the door poster, the key plate and the credentials plate. No glow, glass, blur (including blurred cover backdrops), blob, mesh, neon or gradient text.
-- [ ] Green appears only on actions, focus, lamps, the index line, active bars and the settling decrypt character. Count the greens in any viewport: no more than four that aren't buttons.
-- [ ] Platform colour appears only as square pips beside platform names; type colour only as type-tag text; deals are an inverted ink plate, never red.
-- [ ] Not everything is a card. The header, filters, directory, timetable, ledger, account nav, orders, FAQ, policies and spec tables are typography plus hairlines. Boxed objects are deposit boxes, plates (buy box, key plate, lockers, bezel, ledger, credentials) and dialogs.
-- [ ] Importance varies: unequal lockers, feature boxes, a lead deal, one hero door. No grid of identical components where importance differs.
-- [ ] Hubot Sans (expanded), Mona Sans and Red Hat Mono are the only families. No Sofia, Source Sans, Martian, Inter, Manrope, Space Grotesk, Anton, Archivo, JetBrains Mono, Silkscreen or system-ui as identity. Mono never sets sentences.
-- [ ] Type-scale tokens everywhere, with no stray sizes. Uppercase only on Hubot labels, buttons and nav.
+- [ ] Radii follow roles (§5.3): 0px bands and tables, 2px flaps and tags, 4px signs and chips, 6px controls, 8px cards and dialogs, 10px board housings. No uniform rounding, no pills, no chamfers, no rotated elements; notches only on the ticket summary.
+- [ ] No gradients anywhere, no glow, glass, blur (including blurred cover backdrops), blobs, mesh, neon or gradient text. Flap halves are flat colours.
+- [ ] Mustard appears only as action fills, checked states, current stops, active bars, the terminus bar, board remarks/deal tiles and selection; ≤4 non-button mustard elements per viewport outside the board. Mustard is never text on the floor (except `--color-accent-ink` labels).
+- [ ] The board is graphite in both themes and is the only dark object on Day pages besides the strip, gate strips and the hero hall.
+- [ ] Not everything is a card: header, filters, routes, timetable, season tickets, fares board, account nav, orders, FAQ, policies and spec tables are typography, rules and boards. Boxed objects are departure cards, the buy box, the ticket, board housings, sign plates, dialogs.
+- [ ] Importance varies: four large platform signs vs compact rows; line A taller than B and C; a feature row on the fares board; one hero board.
+- [ ] Overpass and Sometype Mono are the only families; no Hubot, Mona, Red Hat Mono, Fraunces, Alegreya, Atkinson, Inter, Roboto, Manrope, Space Grotesk, Anton, Archivo, Sofia, Source Sans, Martian, JetBrains, Silkscreen, system-ui as identity. Mono never sets sentences.
+- [ ] Type-scale tokens everywhere; uppercase only on sign labels and board flaps; buttons and nav in sentence case.
 - [ ] Section padding differs per section as in §14.1.
-- [ ] Icons are Lucide only, 1.75 stroke with square caps, never in circles, never decorative. The cart is `Archive`, save is `Pin`, account is `UserKey`. No gamepads, joysticks, sparkles or flames.
-- [ ] Covers are never blurred, tinted, overlaid or rotated, and always sit in a recessed stage.
+- [ ] Icons: Lucide only, round caps, 2 / 1.75 stroke, never in circles, never decorative. Cart is `Ticket`, save is `ListPlus`/`ListCheck`, account is `IdCard`. No planes, trains, clocks as decoration, gamepads, sparkles or flames.
+- [ ] Covers never blurred, tinted, overlaid or rotated, always on a stage; the hero shows text, not covers.
 
 **Content and honesty**
-- [ ] Every number on the home page and in the header is from the database (counts, minimum prices, sync time) or omitted. Tumblers never show invented values outside the theater, and the theater always shows "Sample data".
-- [ ] No "official", "original", "instant", "sold once", "guaranteed" or marketplace words. Delivery and guarantee wording match §16 exactly.
-- [ ] Security statements render only when true in config, and match the Privacy Policy. The key email does not contain the key unless the copy was changed accordingly.
-- [ ] Deals use the 30-day lowest price from our own history. No countdowns or pressure.
+- [ ] Every number on the home page, the strip and the hero board is from the database (counts, prices, sync time) or omitted. Flaps never show invented values outside the theater, and the theater always shows "Sample data". No departure times, no clocks.
+- [ ] Remarks are only `ON TIME`, `NEW`, `NOW −%` (and `NOT IN STOCK` on saved/history), each data-backed, with the legend visible. No `LAST CALL`, `DELAYED`, countdowns or urgency.
+- [ ] Delivery wording comes from config ("usually within minutes after payment is confirmed"); "about a minute", "instant" and similar never appear.
+- [ ] No "official", "original", "guaranteed", "sold once" or marketplace words; guarantee wording matches §16 exactly.
+- [ ] Security statements render only when true in config and match the Privacy Policy; the key email doesn't contain the key.
+- [ ] Deals use Keyterminus' own 30-day lowest price; the fares section is absent until real cuts exist.
 - [ ] No supplier mention anywhere: UI, image URLs, alt text, metadata, feeds.
-- [ ] The footer has credentials from `COMPANY`, the trading-name line, the platform disclaimer, coloured Visa/Mastercard/PCI DSS on the light strip, and "Cookie settings".
-- [ ] No CS2, Patinaskins or Brasmora leftovers (copy, components, metadata, rarity, lamp, float, trade offer).
+- [ ] The footer has the Company notice from `COMPANY`, the trading-name line, the platform disclaimer, coloured Visa / Mastercard / PCI DSS on the white strip, and "Cookie settings".
+- [ ] No Keyrook, Fablekeys, Vault Run or Paper Theatre leftovers: copy, sample titles (Lantern Coast…), `KR-`, components, metadata, storage keys.
 
 **Function and accessibility**
-- [ ] Both themes are designed and verified; no `text-white` on green.
-- [ ] Focus rings are visible on every control, including lockers, dial thumbs and the theater knob.
-- [ ] Filters, sliders, the rotary dial, segmented controls, tabs, dialogs, the theater and the timeline follow their ARIA patterns and work by keyboard.
-- [ ] Reduced motion shows complete static designs; the theater shows stills and step lists.
-- [ ] Mobile is composed, not desktop stacked:
-  - search-first hero with the door below;
-  - the locker grid with rank 1 full width;
-  - the bottom-sheet vault map;
-  - the bottom filter sheet;
-  - sticky buy and checkout bars;
-  - the phone-preset theater;
-  - the accordion footer.
-- [ ] Product pages state platform, region (with note), languages, edition, requirements and validity. System requirements appear only for PC titles.
+- [ ] Day and Night both designed and verified; no `text-white` on mustard; board surfaces use the mustard focus ring.
+- [ ] Header: no overlaps at 1024–1920 and 320–1023 (assertions pass); nav items drop by breakpoint, never wrap.
+- [ ] Focus rings visible on every control, including platform signs, route stops, rail buttons, theater tabs, the play control.
+- [ ] Boards are tables with captions and plain-text twins; the hero board's auto-paging has a pause control and stops on its own.
+- [ ] Filters, tabs, dialogs, radiogroups, comboboxes, the theater and the timeline follow their ARIA patterns by keyboard.
+- [ ] Reduced motion shows complete static designs (§21).
+- [ ] Mobile is composed per §20.
+- [ ] Product pages state platform, region (with note), languages, edition, requirements and validity; system requirements only for PC titles.
 
 **Distinctness**
-- [ ] Side by side with Inspection Bay: two steel tiers vs one dark rig; deposit boxes with covers vs trays with spines; 0px keypad keys with machined edges vs 2px amber buttons; `Archive` vs `ShoppingCart`; vault floor with bolted plate vs ruler band; dial and tumblers vs lamp and ruler; different faces and a different home order.
-- [ ] Nothing reads as Console Deck (ice glass, signal blue, tinted rails), the keyarcade shop-wall (stickers, rotation, warm saturation), Midnight Arcade (violet night, pixel type), Cartridge Club (cream, Anton, bargain-bin outlines), Chipwave (porcelain + lime) or Aurora Signal (gradients, starfield).
-- [ ] Could a stranger mistake this for a generic dark gaming store or a hacker terminal (neon green on black, glowing edges, angled panels, mono paragraphs, matrix rain)? If yes, find the section and bring it back to steel, engraving, the dial, the tumblers and the covers.
+- [ ] Side by side with Keyrook: warm white day hall vs gunmetal vault; strip + one bar vs two steel tiers; departure card with gate strip vs steel deposit box; mustard 6px buttons vs green 0px keypad keys; `Ticket` vs `Archive`; flaps and route lines vs dial and tumblers; light concourse footer vs vault floor; a text board hero vs a cover-filled door; Board order vs Most ordered.
+- [ ] Side by side with Fablekeys: no paper, no chapters, no ribbon, no seal, no serif.
+- [ ] Side by side with Inspection Bay: graphite is an object on warm white, not the page; mustard (≈43°) not amber-orange (≈33°); Overpass + Sometype vs Sofia + Source + Martian.
+- [ ] Could a stranger mistake this for a hacker terminal (mono paragraphs, a caret after the logo, green/amber text on black) or an airline template (planes, boarding-pass barcodes, gate countdowns)? If yes, find the section and bring it back to the hall: warm white floor, one graphite board, signage type, route lines, covers.

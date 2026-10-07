@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { CalendarSync, EarthLock, KeyRound, Languages, PackagePlus, ShieldAlert, Timer, WalletCards } from "lucide-react";
+import { CalendarRange, GlobeLock, Inbox, KeySquare, Languages, LayersPlus, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export interface RequirementRow {
@@ -12,20 +12,20 @@ export interface RequirementRow {
 }
 
 const ICONS = {
-  platform: KeyRound,
-  region: EarthLock,
+  platform: KeySquare,
+  region: GlobeLock,
   languages: Languages,
-  requires: PackagePlus,
-  validity: CalendarSync,
-  card: WalletCards,
-  age: ShieldAlert,
-  delivery: Timer,
+  requires: LayersPlus,
+  validity: CalendarRange,
+  card: Wallet,
+  age: KeySquare,
+  delivery: Inbox,
 };
 
 export function BeforeYouBuy({ rows, className, headingId = "before-you-buy" }: { rows: RequirementRow[]; className?: string; headingId?: string }) {
   return (
     <section aria-labelledby={headingId} data-requirements="" className={className}>
-      <h2 id={headingId} className="m-0 text-step-2 leading-[1.15] text-ink">
+      <h2 id={headingId} className="m-0 text-step-2 font-bold leading-[1.15] text-ink">
         Before you buy
       </h2>
       <dl className="m-0 mt-4 border-t border-rule">
@@ -33,11 +33,11 @@ export function BeforeYouBuy({ rows, className, headingId = "before-you-buy" }: 
           const Icon = ICONS[row.icon];
           return (
             <div key={row.key} className="grid grid-cols-[24px_minmax(0,1fr)] gap-x-3 border-b border-line py-3.5 sm:grid-cols-[24px_128px_minmax(0,1fr)]">
-              {row.icon === "age" ? <span aria-hidden="true" /> : <Icon size={18} aria-hidden="true" className="mt-0.5 text-ink-muted" />}
+              {row.icon === "age" ? <span aria-hidden="true" /> : <Icon size={18} aria-hidden="true" className="mt-0.5 text-ink" />}
               <dt className="eyebrow pt-[3px]">{row.label}</dt>
               <dd className="col-start-2 m-0 text-ui-md leading-[1.5] text-ink sm:col-start-3">
                 {row.value}
-                {row.note ? <span className="mt-1 block font-mono text-[0.75rem] uppercase tracking-[0.02em] text-ink-muted">{row.note}</span> : null}
+                {row.note ? <span className="mt-1 block font-mono text-[0.75rem] text-ink-muted">{row.note}</span> : null}
               </dd>
             </div>
           );
@@ -68,13 +68,13 @@ export function SystemRequirements({ blocks, className }: { blocks: RequirementB
       <table className={cn("w-full max-w-[860px] border-collapse text-left", className)}>
         <thead>
           <tr className="border-b border-rule">
-            <th scope="col" className="eyebrow w-[140px] py-3 pr-4 font-semibold">
+            <th scope="col" className="eyebrow w-[140px] py-3 pr-4">
               <span className="sr-only">Component</span>
             </th>
-            <th scope="col" className="eyebrow py-3 pr-4 font-semibold">
+            <th scope="col" className="eyebrow py-3 pr-4">
               {min.system}
             </th>
-            <th scope="col" className="eyebrow py-3 font-semibold">
+            <th scope="col" className="eyebrow py-3">
               {rec.system}
             </th>
           </tr>
@@ -82,7 +82,7 @@ export function SystemRequirements({ blocks, className }: { blocks: RequirementB
         <tbody>
           {keys.map((k) => (
             <tr key={k} className="border-b border-line align-top">
-              <th scope="row" className="eyebrow py-3 pr-4 font-semibold">
+              <th scope="row" className="eyebrow py-3 pr-4">
                 {k}
               </th>
               <td className="py-3 pr-4 text-ui-md text-ink">{valueOf(min, k)}</td>
@@ -117,7 +117,7 @@ export function SystemRequirements({ blocks, className }: { blocks: RequirementB
 
 export function RequiresLink({ href, title }: { href: string; title: string }) {
   return (
-    <Link href={href} className="font-[560] underline decoration-line-hover underline-offset-4 hover-device:hover:decoration-ink">
+    <Link href={href} className="font-semibold underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
       {title}
     </Link>
   );

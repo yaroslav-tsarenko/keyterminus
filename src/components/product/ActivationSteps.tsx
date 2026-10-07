@@ -1,5 +1,6 @@
 import { Fragment } from "react";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { MoveUpRight } from "lucide-react";
+import { Flap } from "@/components/ui/Flap";
 import { cn } from "@/lib/utils/cn";
 import type { ActivationGuide } from "@/config/activation";
 
@@ -9,7 +10,7 @@ export function RichStep({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         part.startsWith("**") ? (
-          <strong key={i} className="font-[640] text-ink">
+          <strong key={i} className="font-bold text-ink">
             {part.slice(2, -2)}
           </strong>
         ) : (
@@ -25,9 +26,7 @@ export function ActivationStepList({ guide, className, size = "md" }: { guide: A
     <ol className={cn("m-0 flex list-none flex-col p-0", className)}>
       {guide.steps.map((step, i) => (
         <li key={step} className={cn("grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 border-b border-line", size === "sm" ? "py-2" : "py-3")}>
-          <span aria-hidden="true" className="tumbler-slot mt-px text-[0.8125rem]">
-            {i + 1}
-          </span>
+          <Flap char={String(i + 1)} size={size === "sm" ? "xs" : "sm"} className="mt-px" />
           <span className={cn("text-ink", size === "sm" ? "text-ui-sm" : "text-ui-md")}>
             <span className="sr-only">Step {i + 1}: </span>
             <RichStep text={step} />
@@ -45,10 +44,10 @@ export function RedeemLink({ guide, className }: { guide: ActivationGuide; class
       href={guide.redeemUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={cn("label-caps inline-flex h-9 items-center gap-2 border border-control bg-plate px-3.5 text-[0.8125rem] text-ink shadow-machined hover-device:hover:border-ink hover-device:hover:bg-raised", className)}
+      className={cn("inline-flex h-9 items-center gap-2 rounded-control border-[1.5px] border-ink px-3.5 font-display text-ui-sm font-bold text-ink transition-colors duration-[120ms] hover-device:hover:bg-surface-1 in-data-[surface=board]:border-on-board in-data-[surface=board]:text-on-board", className)}
     >
-      {guide.redeemLabel}
-      <SquareArrowOutUpRight size={16} aria-hidden="true" />
+      <span className="pt-0.5">{guide.redeemLabel}</span>
+      <MoveUpRight size={16} aria-hidden="true" />
       <span className="sr-only">(opens in a new tab)</span>
     </a>
   );

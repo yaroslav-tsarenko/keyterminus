@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowBigRight } from "lucide-react";
 import { Tabs, type TabItem } from "@/components/ui/Tabs";
 import { cn } from "@/lib/utils/cn";
 import type { ActivationGuide } from "@/config/activation";
@@ -43,7 +43,7 @@ function About({ blocks }: { blocks: string[] }) {
         ))}
       </div>
       {long ? (
-        <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="btn-text mt-4 min-h-10 cursor-pointer text-ui-md font-[560] text-ink">
+        <button type="button" aria-expanded={open} onClick={() => setOpen((v) => !v)} className="btn-text mt-4 min-h-10 cursor-pointer text-ui-md font-semibold text-ink">
           <span data-label="">{open ? "Show less" : "Read more"}</span>
         </button>
       ) : null}
@@ -84,9 +84,9 @@ export function ProductDetailTabs({ description, guide, guideAnchor, account, fa
               <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
                 {guide ? <RedeemLink guide={guide} /> : null}
                 {guideAnchor ? (
-                  <Link href={`/how-activation-works#${guideAnchor}`} className="inline-flex min-h-10 items-center gap-1.5 text-ui-md font-[560] text-ink underline-offset-4 hover-device:hover:underline">
+                  <Link href={`/how-activation-works#${guideAnchor}`} className="inline-flex min-h-10 items-center gap-1.5 text-ui-md font-semibold text-ink underline-offset-4 hover-device:hover:underline">
                     Full guide{guide ? ` for ${guide.name}` : ""}
-                    <ArrowRight size={16} aria-hidden="true" />
+                    <ArrowBigRight size={16} aria-hidden="true" />
                   </Link>
                 ) : null}
               </div>

@@ -9,14 +9,15 @@ import { PaymentLogos } from "@/components/shared/PaymentLogos/PaymentLogos";
 import { TotalsList } from "@/components/checkout/TotalsList";
 import { MerchantInfo } from "@/components/checkout/MerchantInfo";
 import { Button } from "@/components/ui/Button";
-import { SkeletonBar } from "@/components/ui/ReadoutLoader";
-import { Tumbler } from "@/components/ui/Tumbler";
+import { SkeletonBar } from "@/components/ui/Flap";
+import { FlapCounter } from "@/components/ui/Flap";
 import { useCart } from "@/providers/CartProvider";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { useWishlist } from "@/providers/WishlistProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { formatPrice } from "@/lib/utils/format-price";
 import { STORE_POLICY } from "@/config/store-policy";
+import { TicketSummary } from "@/components/cart/TicketSummary";
 
 const EMPTY_LINKS = [
   { href: "/catalog/games", key: "games" },
@@ -42,8 +43,8 @@ export function CartView() {
     <div className="mx-auto max-w-container px-gutter pb-28 lg:pb-24">
       <Breadcrumbs items={[{ label: nav("home"), href: "/" }, { label: t("title") }]} withJsonLd={false} />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pb-8 pt-1">
-        <h1 className="m-0 text-step-5 leading-[1.04] text-ink">Cart</h1>
-        {isHydrated && count > 0 ? <Tumbler value={count} size="sm" label={t("itemCount", { count })} /> : null}
+        <h1 className="m-0 pt-1 text-step-4 leading-[1.04] text-ink">Cart</h1>
+        {isHydrated && count > 0 ? <FlapCounter value={count} size="sm" label={t("itemCount", { count })} /> : null}
       </div>
 
       {!isHydrated ? (
@@ -73,7 +74,7 @@ export function CartView() {
           <ul className="m-0 flex list-none gap-5 p-0">
             {EMPTY_LINKS.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="text-ui-md font-[560] text-ink decoration-1 underline-offset-4 hover-device:hover:underline">
+                <Link href={link.href} className="text-ui-md font-semibold text-ink underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
                   {t(`empty.links.${link.key}`)}
                 </Link>
               </li>
@@ -95,10 +96,12 @@ export function CartView() {
                         type="button"
                         onClick={() => saveForLater(item.productId, item.variantId)}
                         disabled={wishlist.pending(item.productId)}
-                        className="relative z-[3] inline-flex min-h-9 cursor-pointer items-center text-ui-sm font-[560] text-ink-muted decoration-1 underline-offset-4 hover-device:hover:text-ink hover-device:hover:underline"
+                        className="btn-text relative z-[3] inline-flex min-h-9 cursor-pointer items-center text-ui-sm font-semibold text-ink-muted hover-device:hover:text-ink"
                       >
-                        {t("saveForLater")}
-                        <span className="sr-only"> {item.name}</span>
+                        <span data-label="">
+                          {t("saveForLater")}
+                          <span className="sr-only"> {item.name}</span>
+                        </span>
                       </button>
                     ) : null
                   }
@@ -110,13 +113,13 @@ export function CartView() {
           </section>
 
           <aside aria-labelledby="cart-counter-title" className="lg:sticky lg:top-[calc(var(--header-height-compact)+24px)] lg:col-span-4">
-            <div className="plate p-6">
-              <h2 id="cart-counter-title" className="m-0 mb-5 text-step-2 leading-none text-ink">
+            <TicketSummary count={count}>
+              <h2 id="cart-counter-title" className="m-0 mb-4 text-step-1 font-bold leading-none text-ink">
                 {t("summary")}
               </h2>
               <TotalsList totals={displayTotals} currency={currency} />
               <p className="m-0 mt-4 text-ui-sm text-ink-muted">Keys are delivered to your account after your payment is confirmed.</p>
-              <Button as={Link} href="/checkout" size="lg" fullWidth className="mt-6">
+              <Button as={Link} href="/checkout" size="lg" fullWidth className="mt-6" arrow>
                 {t("checkout")}
               </Button>
               <div className="mt-3 flex justify-center">
@@ -128,7 +131,7 @@ export function CartView() {
                 <PaymentLogos height={24} />
                 <MerchantInfo variant="line" />
               </div>
-            </div>
+            </TicketSummary>
           </aside>
 
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-raised px-gutter py-3 lg:hidden">

@@ -1,53 +1,49 @@
 {
   "metaTitle": "About {brand}",
-  "metaDescription": "What {brand} offers, what it doesn't, and how payment, key delivery, refunds and the key guarantee work.",
+  "metaDescription": "Who runs {brand}, what is on the board, how an order travels from payment to your account, and how your keys are kept.",
   "breadcrumbHome": "Home",
   "breadcrumb": "About",
   "hero": {
-    "title": "A store for game keys, codes and gift cards",
-    "lead": "{brand} offers activation keys for games and DLC, subscription codes, gift cards, top-ups and software to customers in the {countries}. You buy each key from us, at the price shown, and we issue it to your account after your payment is confirmed."
+    "title": "About {brand}",
+    "lead": "A store for game keys, gift cards and subscriptions across every major platform, with the platform and region shown before you pay."
   },
   "range": {
-    "title": "What we offer",
-    "body": "Six kinds of product, each with its own page and filters for platform, region, genre and language:"
-  },
-  "listing": {
-    "title": "What every product page shows",
-    "platform": "The platform the key is redeemed on and the account you need for it.",
-    "region": "The activation region, and the languages the publisher lists.",
-    "edition": "The edition, a subscription's duration or a gift card's value and currency.",
-    "prices": "A price you can view in {currencies}, checked again before you pay."
-  },
-  "notSold": {
-    "title": "What we don't do",
-    "items": {
-      "marketplace": "Buy keys from users or let users exchange keys with each other. {brand} is a store: every key comes from us.",
-      "cases": "Offer random or mystery keys, loot boxes or anything with a random outcome.",
-      "accounts": "Offer game or platform accounts, or ask for your platform password.",
-      "other": "Offer keys that need a VPN, or keys for regions we don't serve."
-    }
+    "title": "What’s on the board",
+    "body": "{brand} serves customers in the {countries}. You buy every key from us, at the price shown. Prices can be shown in {currencies}.",
+    "types": "Types",
+    "platforms": "Platforms"
   },
   "ordering": {
-    "title": "How ordering works",
-    "order": {
+    "title": "How an order travels",
+    "pay": {
       "label": "Payment",
-      "body": "Pay by card ({cardMethods}) on our payment provider's secure page. Prices can be shown in {currencies}.",
+      "body": "You pay by card ({cardMethods}) on the payment provider’s hosted page. We receive the confirmation, never your card number.",
       "link": "Payment policy"
     },
-    "delivery": {
+    "deliver": {
       "label": "Delivery",
-      "body": "Your key appears on your order page, {usual}. We email you when it is ready.",
+      "body": "Once payment is confirmed, the key is issued to Account → Keys, {usual}. We email you when it is there.",
       "link": "Delivery policy"
     },
-    "guarantee": {
-      "label": "Key guarantee",
-      "body": "If a key does not activate, tell us within {claimDays} days of delivery and we replace it or refund it within {refundDays} days.",
-      "link": "Key guarantee"
-    },
-    "withdrawal": {
-      "label": "Cancelling",
-      "body": "You can cancel for free until your key is issued. The {days}-day right to cancel ends once delivery has begun at your request.",
-      "link": "Refund policy"
+    "redeem": {
+      "label": "Redeem",
+      "body": "You reveal the key when you’re ready and enter it on the platform named on the product page.",
+      "link": "How activation works"
+    }
+  },
+  "keeping": {
+    "title": "How we keep your keys",
+    "body": "Keys are stored encrypted and shown only to you, when you choose Reveal. If a key doesn’t work, tell us within {claimDays} days of delivery: we replace it, or refund it if no replacement is available. You can cancel for free until a key is issued; after that, the {days}-day right to cancel ends for that key.",
+    "gate": "What passes through us, and what never does",
+    "refunds": "Refund policy"
+  },
+  "notSold": {
+    "title": "What you won’t find here",
+    "items": {
+      "marketplace": "Keys from other customers. {brand} is a store, not a marketplace: every key comes from us.",
+      "cases": "Mystery keys, loot boxes or anything with a random outcome.",
+      "accounts": "Game or platform accounts. We never ask for your platform password.",
+      "other": "Keys that need a VPN, or keys for regions we don’t serve."
     }
   },
   "company": {

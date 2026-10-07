@@ -1,7 +1,7 @@
 export const BRAND = {
-  name: "Keyrook",
-  domain: "keyrook.com",
-  tagline: "Game keys, DLC, subscriptions and gift cards, delivered to your account",
+  name: "Keyterminus",
+  domain: "keyterminus.com",
+  tagline: "Game keys for every platform, delivered to your account",
 } as const;
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || `https://${BRAND.domain}`).replace(/\/+$/, "");

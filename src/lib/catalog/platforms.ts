@@ -1,22 +1,6 @@
 import { platformDef, productTypeDef, regionDef, type PlatformKey, type ProductTypeKey } from "@/lib/keys/taxonomy";
 import { activationFor } from "@/config/activation";
-
-export type PlatformTone = "steam" | "epic" | "ea" | "ubisoft" | "gog" | "battlenet" | "xbox" | "playstation" | "nintendo" | "rockstar" | "other";
-export type TypeTone = "game" | "dlc" | "giftcard" | "subscription" | "software";
-
-const TONE: Record<PlatformKey, PlatformTone> = {
-  steam: "steam",
-  epic: "epic",
-  "ea-app": "ea",
-  "ubisoft-connect": "ubisoft",
-  gog: "gog",
-  "battle-net": "battlenet",
-  xbox: "xbox",
-  playstation: "playstation",
-  nintendo: "nintendo",
-  rockstar: "rockstar",
-  other: "other",
-};
+import { platformBoard } from "@/config/merchandising";
 
 const SHORT: Record<PlatformKey, string> = {
   steam: "Steam",
@@ -30,15 +14,6 @@ const SHORT: Record<PlatformKey, string> = {
   nintendo: "Nintendo",
   rockstar: "Rockstar",
   other: "Other",
-};
-
-const TYPE_TONE: Record<ProductTypeKey, TypeTone> = {
-  game: "game",
-  dlc: "dlc",
-  "gift-card": "giftcard",
-  "top-up": "giftcard",
-  subscription: "subscription",
-  software: "software",
 };
 
 const TYPE_TAG: Record<ProductTypeKey, string | null> = {
@@ -64,7 +39,9 @@ export const PC_LAUNCHERS = new Set<string>(["steam", "epic", "ea-app", "ubisoft
 export interface PlatformInfo {
   key: string;
   slug: string;
-  tone: PlatformTone;
+  number: number | null;
+  boardLabel: string;
+  shortLabel: string;
   label: string;
   short: string;
   launcher: boolean;
@@ -74,10 +51,13 @@ export interface PlatformInfo {
 export function platformInfo(raw: string | null | undefined): PlatformInfo {
   const def = platformDef(raw);
   const key = (def?.key ?? "other") as PlatformKey;
+  const board = platformBoard(key);
   return {
     key,
     slug: def?.slug ?? "other",
-    tone: TONE[key],
+    number: board.number,
+    boardLabel: board.boardLabel,
+    shortLabel: board.shortLabel,
     label: def?.label ?? (raw || "Other"),
     short: def ? SHORT[key] : raw || "Other",
     launcher: PC_LAUNCHERS.has(key),
@@ -85,8 +65,8 @@ export function platformInfo(raw: string | null | undefined): PlatformInfo {
   };
 }
 
-export function typeTone(kind: string | null | undefined): TypeTone {
-  return TYPE_TONE[(kind ?? "game") as ProductTypeKey] ?? "game";
+export function isGiftCardKind(kind: string | null | undefined): boolean {
+  return kind === "gift-card" || kind === "top-up";
 }
 
 export function typeTag(kind: string | null | undefined): string | null {

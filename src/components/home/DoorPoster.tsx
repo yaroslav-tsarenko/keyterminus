@@ -97,7 +97,7 @@ function Leaf({ lit = false, uid }: { lit?: boolean; uid: string }) {
       </g>
       <rect x={C - 62} y={C + DOOR_R - 76} width="124" height="24" fill="var(--color-raised)" stroke="var(--color-border)" />
       <text x={C} y={C + DOOR_R - 64} textAnchor="middle" dominantBaseline="central" fill="var(--color-text-secondary)" style={{ fontFamily: "var(--font-display)", fontStretch: "125%", fontWeight: 600, fontSize: 11, letterSpacing: "0.22em" }}>
-        KEYROOK
+        KEYTERMINUS
       </text>
     </svg>
   );

@@ -1,3 +1,4 @@
+import { refreshBoardScores } from "@/lib/catalog/board-score";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { env } from "@/lib/env";
@@ -132,6 +133,7 @@ export async function refreshCatalog(options: { budgetMs?: number | null; log?: 
     }
   };
   await Promise.all(Array.from({ length: Math.max(1, catalogConfig.sync.refreshConcurrency) }, worker));
+  if (result.restocked > 0 || result.soldOut > 0) await refreshBoardScores().catch((err) => console.error(`[catalog-refresh] board order: ${String(err)}`));
   if (result.checked > 0) await refreshPlannerStats().catch((err) => console.error(`[catalog-refresh] planner stats: ${String(err)}`));
   result.durationMs = Date.now() - t0;
   console.log(`[catalog-refresh] checked=${result.checked}/${rows.length} repriced=${result.repriced} soldOut=${result.soldOut} restocked=${result.restocked} missing=${result.missing} in ${result.durationMs}ms${result.checked < rows.length ? " (time budget reached; the next run continues with the stalest products)" : ""}`);

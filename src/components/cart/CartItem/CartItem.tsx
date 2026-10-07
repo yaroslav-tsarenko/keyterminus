@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Trash } from "lucide-react";
+import { TicketX } from "lucide-react";
 import { QuantitySelector } from "@/components/shared/QuantitySelector/QuantitySelector";
 import { ProductRow } from "@/components/product/ProductCard";
 import { cartItemCap, useCart } from "@/providers/CartProvider";
@@ -33,7 +33,7 @@ export function CartItem({ item, size = "compact", onNavigate, actions }: CartIt
   };
 
   return (
-    <li data-cart-row="" className={cn("grid transition-[grid-template-rows,opacity] duration-[180ms] ease-[var(--ease-latch)]", removing ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr]")}>
+    <li data-cart-row="" className={cn("grid transition-[grid-template-rows,opacity] duration-[180ms] ease-[var(--ease-sign)]", removing ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr]")}>
       <div className="relative min-h-0 overflow-hidden" onClickCapture={(e) => (e.target as HTMLElement).closest("a") && onNavigate?.()}>
         <ProductRow
           name={item.name}
@@ -52,8 +52,8 @@ export function CartItem({ item, size = "compact", onNavigate, actions }: CartIt
             )}
             <span className="flex flex-wrap items-center gap-x-5 gap-y-1">
               {actions}
-              <button type="button" onClick={remove} disabled={removing} className="btn-text relative z-[3] inline-flex min-h-9 cursor-pointer items-center gap-1.5 text-ui-sm font-[560] text-ink-muted hover-device:hover:text-ink">
-                <Trash size={16} aria-hidden="true" />
+              <button type="button" onClick={remove} disabled={removing} className="btn-text relative z-[3] inline-flex min-h-9 cursor-pointer items-center gap-1.5 text-ui-sm font-semibold text-ink-muted hover-device:hover:text-ink">
+                <TicketX size={16} aria-hidden="true" />
                 <span data-label="">
                   Remove<span className="sr-only"> {item.name}</span>
                 </span>

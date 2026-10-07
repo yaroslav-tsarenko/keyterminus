@@ -16,7 +16,7 @@ function Blank({ group, cardLabel, valuesLabel }: { group: GiftCardGroup; cardLa
   const low = values[0] ? faceLabel(values[0].value, values[0].currency) : null;
   const high = values.length > 1 ? faceLabel(values[values.length - 1]!.value, values[values.length - 1]!.currency) : null;
   return (
-    <article data-giftcard="" data-platform={p.tone} data-type="giftcard" className="plate relative flex aspect-[1.586/1] w-[78vw] max-w-[340px] shrink-0 snap-start flex-col justify-between overflow-hidden p-4 sm:w-auto sm:max-w-none">
+    <article data-giftcard="" data-platform={p.key} data-type="giftcard" className="plate relative flex aspect-[1.586/1] w-[78vw] max-w-[340px] shrink-0 snap-start flex-col justify-between overflow-hidden p-4 sm:w-auto sm:max-w-none">
       <div className="relative flex flex-col gap-1">
         <h3 className="m-0 flex min-w-0 items-center gap-2 font-sans text-[length:inherit] font-normal tracking-normal">
           <span aria-hidden="true" className="size-1.5 bg-platform" />

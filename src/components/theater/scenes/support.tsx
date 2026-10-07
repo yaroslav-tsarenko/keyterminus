@@ -1,12 +1,12 @@
 "use client";
 
 import { ChevronDown, X } from "lucide-react";
-import { KeyPlate } from "@/components/account/KeyPlate";
+import { KeyPlate } from "@/components/account/KeyBoard";
 import { Button } from "@/components/ui/Button";
 import { Textarea, controlClass } from "@/components/ui/Field";
-import { DialLoader } from "@/components/ui/Dial";
+import { FlapLoader } from "@/components/ui/Flap";
 import { Lamp } from "@/components/ui/Lamp";
-import { Plate } from "@/components/ui/Plate";
+import { Tag } from "@/components/ui/Tag";
 import { STORE_POLICY } from "@/config/store-policy";
 import { cn } from "@/lib/utils/cn";
 import { defineScene } from "../define";
@@ -78,9 +78,9 @@ function View({ s, device, focus }: SceneViewProps<S>) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-3">
             <p className="m-0 font-display text-step-5 font-[700] leading-none text-ink [font-stretch:112.5%]">Order {SAMPLE_ORDER.number}</p>
-            <Plate variant={replaced ? "info" : s.sent ? "warning" : "success"} size="sm">
+            <Tag variant={replaced ? "info" : s.sent ? "warning" : "success"} size="sm">
               {replaced ? "Replaced" : s.sent ? "Reported" : "Delivered"}
-            </Plate>
+            </Tag>
           </div>
           {s.sent && !replaced ? (
             <div data-demo="status" className="th-pop mt-5 flex max-w-[760px] flex-wrap items-center gap-x-6 gap-y-2 border-y border-line py-3 text-ui-md text-ink">
@@ -89,7 +89,7 @@ function View({ s, device, focus }: SceneViewProps<S>) {
                 {copy.received}
               </span>
               <span className={cn("flex items-center gap-2", s.review < 0.5 && "text-ink-subtle")}>
-                {s.review >= 0.5 ? <DialLoader label={copy.checking} /> : <Lamp on={false} />}
+                {s.review >= 0.5 ? <FlapLoader label={copy.checking} /> : <Lamp on={false} />}
                 {copy.checking}
               </span>
               <span className="text-ui-sm text-ink-muted">We reply {STORE_POLICY.support.replyTime}.</span>

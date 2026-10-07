@@ -1,7 +1,6 @@
 "use client";
 
-import "@fontsource-variable/mona-sans/wght.css";
-import "@fontsource-variable/red-hat-mono/wght.css";
+import "@fontsource-variable/sometype-mono/wght.css";
 import "./fonts.css";
 import "@/styles/globals.css";
 import { useEffect } from "react";
@@ -9,10 +8,10 @@ import { Button } from "@/components/ui/Button";
 import { BRAND } from "@/lib/brand";
 import { Wordmark } from "@/components/layout/BrandMark";
 import { COMPANY } from "@/lib/company";
+import { THEME_INIT } from "@/components/layout/ThemeScript/ThemeScript";
 import messages from "../../messages/en/errors.json";
 import common from "../../messages/en/common.json";
 
-const THEME_INIT = `(function(){try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark"){t="dark"}var d=document.documentElement;d.setAttribute("data-theme",t);d.classList.toggle("dark",t==="dark")}catch(e){}})();`;
 
 export default function GlobalError({
   error,

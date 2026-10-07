@@ -2,7 +2,7 @@ import type { KeyOrderStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { catalogConfig } from "@/config/catalog";
 import { sendAlert } from "@/lib/alerts/telegram";
-import { encryptKey, keyFingerprint } from "@/lib/keys/vault";
+import { encryptKey, keyFingerprint } from "@/lib/keys/cipher";
 import { esaClient, ordersAreLive } from "./client";
 import { EsaError, type EsaErrorCode } from "./errors";
 import { logKeyEvent, type KeyEventSource } from "./events";

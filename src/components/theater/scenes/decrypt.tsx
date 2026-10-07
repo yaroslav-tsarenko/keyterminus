@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyPlate } from "@/components/account/KeyPlate";
+import { KeyPlate } from "@/components/account/KeyBoard";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
 import { Lamp } from "@/components/ui/Lamp";
 import { STORE_POLICY } from "@/config/store-policy";

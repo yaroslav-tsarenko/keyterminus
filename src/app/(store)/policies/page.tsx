@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ArrowRight } from "lucide-react";
+import { ArrowBigRight } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 import { POLICY_SLUGS, policyHref } from "@/components/layout/PolicyLayout/policies";
 import { POLICY_FACTS as F } from "@/lib/policy-facts";
@@ -22,7 +22,7 @@ export default async function PoliciesIndexPage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
         <header className="lg:sticky lg:top-[calc(var(--header-height-compact)+2rem)] lg:self-start">
-          <h1 className="m-0 text-step-5 leading-[1.04] text-ink">{t("indexTitle")}</h1>
+          <h1 className="m-0 pt-1 text-step-4 leading-[1.04] text-ink">{t("indexTitle")}</h1>
           <p className="measure mt-5 text-step-1 leading-[1.5] text-ink-muted">{t("indexLead", values)}</p>
           <p className="mt-6 font-mono text-data text-ink-muted">{t("lastUpdated", { date: F.lastUpdated })}</p>
         </header>
@@ -37,7 +37,7 @@ export default async function PoliciesIndexPage() {
                 <span className="font-display text-step-2 font-semibold leading-[1.15] text-ink underline-offset-[6px] decoration-1 hover-device:group-hover:underline">
                   {t(`items.${slug}.title`)}
                 </span>
-                <ArrowRight
+                <ArrowBigRight
                   size={20}
                   aria-hidden="true"
                   className="row-span-3 text-ink-muted transition-colors duration-[120ms] hover-device:group-hover:text-ink"

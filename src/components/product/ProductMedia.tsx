@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Play } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, Play } from "lucide-react";
 import { Modal } from "@/components/ui/Dialog";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils/cn";
@@ -13,7 +13,7 @@ export interface GalleryImage {
   alt: string | null;
 }
 
-export function ProductMedia({ images, title, videoId, platformLabel, aspect = "3/4", parts = "all", className }: { images: GalleryImage[]; title: string; videoId: string | null; platformLabel?: string | null; aspect?: CoverAspect; parts?: "all" | "cover" | "strip"; className?: string }) {
+export function ProductMedia({ images, title, videoId, platformLabel, platformNumber, gate, aspect = "3/4", parts = "all", className }: { images: GalleryImage[]; title: string; videoId: string | null; platformLabel?: string | null; platformNumber?: number | null; gate?: ReactNode; aspect?: CoverAspect; parts?: "all" | "cover" | "strip"; className?: string }) {
   const cover = images[0] ?? null;
   const shots = images.slice(1);
   const [open, setOpen] = useState<number | null>(null);
@@ -33,8 +33,9 @@ export function ProductMedia({ images, title, videoId, platformLabel, aspect = "
   return (
     <div data-gallery={parts} className={cn("flex flex-col gap-4", className)}>
       {parts !== "strip" ? (
-        <div data-drawer-face="" data-depth="D3" className="plate p-2">
-          <Cover src={cover?.url ?? null} alt={`${title} cover art`} aspect={aspect} priority sizes={COVER_SIZES.pdp} platformLabel={platformLabel} />
+        <div data-pdp-cover="" className="overflow-hidden rounded-card border border-line">
+          {gate}
+          <Cover src={cover?.url ?? null} alt={`${title} cover art`} aspect={aspect} priority sizes={COVER_SIZES.pdp} platformLabel={platformLabel} platformNumber={platformNumber} />
         </div>
       ) : null}
       {parts !== "cover" && (shots.length > 0 || videoId) ? (
@@ -43,7 +44,7 @@ export function ProductMedia({ images, title, videoId, platformLabel, aspect = "
             <ul aria-label="Screenshots" className="no-scrollbar m-0 grid list-none auto-cols-[calc((100%-24px)/4)] grid-flow-col gap-2 overflow-x-auto p-0">
               {shots.map((shot, i) => (
                 <li key={shot.url}>
-                  <button type="button" onClick={() => setOpen(i)} aria-label={`Open screenshot ${i + 1} of ${shots.length}`} className="block w-full cursor-pointer bg-plate p-1 shadow-machined hover-device:hover:outline hover-device:hover:outline-1 hover-device:hover:outline-control">
+                  <button type="button" onClick={() => setOpen(i)} aria-label={`Open screenshot ${i + 1} of ${shots.length}`} className="block w-full cursor-pointer overflow-hidden rounded-sign border border-line hover-device:hover:border-ink">
                     <span className="cover relative block aspect-video">
                       <Image src={shot.url} alt="" fill unoptimized sizes="140px" className="object-cover" />
                     </span>
@@ -67,13 +68,13 @@ export function ProductMedia({ images, title, videoId, platformLabel, aspect = "
               <Image src={shots[open].url} alt={`${title} screenshot ${open + 1}`} fill unoptimized sizes="720px" className="object-contain" />
             </div>
             <div className="flex items-center justify-between gap-4">
-              <Button variant="ghost" onPress={() => setOpen((i) => (i === null ? i : (i - 1 + shots.length) % shots.length))} startContent={<ArrowLeft size={16} aria-hidden="true" />}>
+              <Button variant="ghost" onPress={() => setOpen((i) => (i === null ? i : (i - 1 + shots.length) % shots.length))} startContent={<ArrowBigLeft size={16} aria-hidden="true" />}>
                 Previous
               </Button>
               <span className="font-mono text-data text-ink-muted">
                 {open + 1} / {shots.length}
               </span>
-              <Button variant="ghost" onPress={() => setOpen((i) => (i === null ? i : (i + 1) % shots.length))} endContent={<ArrowRight size={16} aria-hidden="true" />}>
+              <Button variant="ghost" onPress={() => setOpen((i) => (i === null ? i : (i + 1) % shots.length))} endContent={<ArrowBigRight size={16} aria-hidden="true" />}>
                 Next
               </Button>
             </div>

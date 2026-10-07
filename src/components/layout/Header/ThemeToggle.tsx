@@ -1,13 +1,12 @@
 "use client";
 
-import { SunMoon } from "lucide-react";
+import { Sunrise, Sunset } from "lucide-react";
 import { useTheme } from "@/providers/ThemeProvider";
 import { Segmented } from "@/components/ui/Choice";
 import { cn } from "@/lib/utils/cn";
 
-export function ThemeToggle({ variant = "icon", className }: { variant?: "icon" | "row"; className?: string }) {
+export function ThemeToggle({ variant = "strip", className }: { variant?: "strip" | "row"; className?: string }) {
   const { theme, toggleTheme, setTheme } = useTheme();
-  const label = theme === "light" ? "Switch to Strongroom" : "Switch to Counter Hall";
 
   if (variant === "row") {
     return (
@@ -18,23 +17,25 @@ export function ThemeToggle({ variant = "icon", className }: { variant?: "icon" 
           value={theme}
           onChange={setTheme}
           options={[
-            { value: "dark", label: "Strongroom" },
-            { value: "light", label: "Counter Hall" },
+            { value: "light", label: "Day" },
+            { value: "dark", label: "Night" },
           ]}
         />
       </div>
     );
   }
 
+  const night = theme === "dark";
+  const Icon = night ? Sunset : Sunrise;
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      aria-label={label}
-      title={label}
-      className={cn("flex size-8 cursor-pointer items-center justify-center text-ink-muted transition-colors duration-[120ms] hover-device:hover:bg-raised hover-device:hover:text-ink", className)}
+      aria-label={night ? "Switch to Day" : "Switch to Night"}
+      className={cn("flex h-8 cursor-pointer items-center gap-1.5 rounded-sign px-2 text-[0.8125rem] font-semibold text-on-board transition-colors duration-[120ms] hover-device:hover:bg-flap", className)}
     >
-      <SunMoon size={18} aria-hidden="true" />
+      <Icon size={16} aria-hidden="true" />
+      <span className="pt-px">{night ? "Night" : "Day"}</span>
     </button>
   );
 }

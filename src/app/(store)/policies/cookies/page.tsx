@@ -25,7 +25,7 @@ function CookieTable({ rows }: { rows: CookieRecord[] }) {
         <tbody>
           {rows.map((row) => (
             <tr key={row.name}>
-              <td className="font-mono text-ui-xs text-ink [overflow-wrap:anywhere]">{row.name}</td>
+              <td className="font-mono text-ui-sm text-ink [overflow-wrap:anywhere]">{row.name}</td>
               <td className="whitespace-nowrap text-ink-muted">{row.kind}</td>
               <td className="text-ink-muted">{row.provider}</td>
               <td>{row.purpose}</td>
@@ -37,7 +37,7 @@ function CookieTable({ rows }: { rows: CookieRecord[] }) {
       <div role="list" className="mt-5 border-t border-line md:hidden">
         {rows.map((row) => (
           <div role="listitem" key={row.name} className="border-b border-line py-4">
-            <div className="font-mono text-ui-xs text-ink [overflow-wrap:anywhere]">{row.name}</div>
+            <div className="font-mono text-ui-sm text-ink [overflow-wrap:anywhere]">{row.name}</div>
             <div className="mt-1 text-ui-sm">{row.purpose}</div>
             <div className="meta mt-2 text-ink-muted">
               {row.kind} · {row.provider} · {row.expiry}
@@ -59,12 +59,12 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Cookies are small text files a website stores in your browser. Local storage and session storage are similar browser features
-          that keep data on your device only. This policy lists every cookie and storage key {F.brand} uses on {F.domain}.
+          A cookie is a small text file a website stores in your browser. Local storage and session storage are browser features that keep
+          data on your device only. This page lists every cookie and storage key {F.brand} uses on {F.domain}.
         </p>
         <p>
-          The list is the same one shown under “Show cookies” in Cookie settings. Your saved items are kept in your account on
-          our server, not in your browser.
+          It is the same list you see under “Show cookies” in Cookie settings. Keys you save for later are kept in your account on our server,
+          not in your browser.
         </p>
       </>
     ),
@@ -74,7 +74,7 @@ const sections: PolicySection[] = [
     title: "Necessary cookies and storage",
     body: (
       <>
-        <p>{necessary?.purpose} These are always on, because the store cannot work without them. They are not used for advertising.</p>
+        <p>{necessary?.purpose} They are always on because the store doesn’t work without them, and they are never used for advertising.</p>
         <CookieTable rows={COOKIE_TABLE.necessary} />
       </>
     ),
@@ -85,9 +85,9 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          {F.brand} does not currently set any analytics or marketing cookies. Both categories are in Cookie settings and are off until you
-          switch them on. If we add an analytics or marketing tool, we will list each of its cookies in this policy first, and it will only
-          load after you allow that category.
+          {F.brand} sets no analytics or marketing cookies at the moment. Both categories appear in Cookie settings and stay off until you
+          turn them on. If we ever add such a tool, each of its cookies will be listed here first, and it will load only after you allow that
+          category.
         </p>
         {COOKIE_TABLE.analytics.length ? <CookieTable rows={COOKIE_TABLE.analytics} /> : null}
         {COOKIE_TABLE.marketing.length ? <CookieTable rows={COOKIE_TABLE.marketing} /> : null}
@@ -96,25 +96,22 @@ const sections: PolicySection[] = [
   },
   {
     id: "choice",
-    title: "Changing or withdrawing your consent",
+    title: "Changing or withdrawing consent",
     body: (
       <>
         <p>
-          On your first visit, the cookie banner offers Accept all, Reject all and Customise. You can change your choice at any time from
-          the <strong>Cookie settings</strong> link at the bottom of every page, or with the button below. Withdrawing consent is as easy
-          as giving it and takes effect straight away.
+          On your first visit the cookie banner offers Accept all, Reject all and Choose cookies. You can change your mind whenever you like
+          through <strong>Cookie settings</strong> at the foot of every page, or with the button below. Withdrawing consent is as easy as
+          giving it, and it applies immediately.
         </p>
         <p>
-          Your choice is stored in local storage under <code className="font-mono text-ui-xs">{consentKey}</code> for 12 months. After that
-          we ask again.
+          Your choice is kept in local storage under <code className="font-mono text-ui-sm">{consentKey}</code> for 12 months, after which we
+          ask again.
         </p>
         <div className="mt-6">
           <CookieSettingsButton />
         </div>
-        <p>
-          You can also delete cookies and site data in your browser settings. If you delete the necessary ones, your bag empties and you
-          are signed out.
-        </p>
+        <p>You can also clear cookies and site data in your browser. If you clear the necessary ones, your cart empties and you are signed out.</p>
       </>
     ),
   },
@@ -123,9 +120,8 @@ const sections: PolicySection[] = [
     title: "The payment page",
     body: (
       <p>
-        When you pay, you are taken to our payment provider’s hosted page. That page is run by the provider on its own domain and may
-        set its own cookies for security and fraud prevention, under the provider’s own cookie policy. See our{" "}
-        <Link href="/policies/payment">Payment policy</Link>.
+        When you pay, you move to the payment provider’s hosted page. The provider runs it on its own domain and may set its own cookies for
+        security and fraud prevention, under its own cookie policy. See the <Link href="/policies/payment">Payment policy</Link>.
       </p>
     ),
   },
@@ -134,8 +130,8 @@ const sections: PolicySection[] = [
     title: "Changes to this policy",
     body: (
       <p>
-        We update this list whenever we add or remove a cookie or storage key. Questions go to {F.email}. How we handle personal data is set
-        out in our <Link href="/policies/privacy">Privacy policy</Link>.
+        We update this list whenever a cookie or storage key is added or removed. Send questions to {F.email}. How we handle personal data is
+        explained in the <Link href="/policies/privacy">Privacy policy</Link>.
       </p>
     ),
   },

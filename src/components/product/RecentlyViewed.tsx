@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { MERCH } from "@/config/merchandising";
 import { ProductCard, type CatalogProduct } from "./ProductCard";
 
-const KEY = "keyrook-viewed";
+const KEY = "keyterminus-viewed";
 
 function readIds(): string[] {
   try {

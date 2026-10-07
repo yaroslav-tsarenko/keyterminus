@@ -1,11 +1,11 @@
 /* Admin Panel — Premium Dashboard Theme (Light / Dark) */
 
 [data-admin-theme] {
-  --admin-accent: #2E5E4E;
-  --admin-accent-light: #3E7A66;
-  --admin-accent-dark: #234A3D;
-  --admin-accent-bg: rgba(46, 94, 78, 0.10);
-  --admin-accent-bg-hover: rgba(46, 94, 78, 0.18);
+  --admin-accent: #8A6512;
+  --admin-accent-light: #A57A1A;
+  --admin-accent-dark: #6B4E0E;
+  --admin-accent-bg: rgba(138, 101, 18, 0.10);
+  --admin-accent-bg-hover: rgba(138, 101, 18, 0.18);
   --admin-radius: 14px;
   --admin-radius-lg: 22px;
   --admin-radius-xl: 26px;
@@ -47,12 +47,13 @@
   --color-text-tertiary: #71717a;
   --color-border: rgba(255, 255, 255, 0.08);
   --color-border-hover: rgba(255, 255, 255, 0.14);
-  --color-accent: #6FA28D;
-  --color-success: #6FA28D;
+  --color-accent: #E6B84A;
+  --color-on-accent: #1B1C1D;
+  --color-success: #7FB08F;
   --color-warning: #D08A55;
   --color-danger: #E07A65;
-  --color-accent-light: rgba(111, 162, 141, 0.16);
-  --shadow-accent: 0 8px 30px rgba(46, 94, 78, 0.3);
+  --color-accent-light: rgba(230, 184, 74, 0.16);
+  --shadow-accent: 0 8px 30px rgba(138, 101, 18, 0.3);
 }
 
 /* ─── Light Theme ─── */
@@ -66,7 +67,7 @@
   --admin-border-hover: rgba(0, 0, 0, 0.15);
   --admin-text: #1a1a1a;
   --admin-text-secondary: #52525b;
-  --admin-text-muted: #a1a1aa;
+  --admin-text-muted: #6b6b73;
   --admin-text-tertiary: #a1a1aa;
   --admin-sidebar-bg: #ffffff;
   --admin-topbar-bg: rgba(255, 255, 255, 0.85);
@@ -83,15 +84,16 @@
   --color-bg-tertiary: #e0e0e2;
   --color-text: #1a1a1a;
   --color-text-secondary: #52525b;
-  --color-text-tertiary: #a1a1aa;
+  --color-text-tertiary: #6b6b73;
   --color-border: rgba(0, 0, 0, 0.08);
   --color-border-hover: rgba(0, 0, 0, 0.15);
-  --color-accent: #2E5E4E;
+  --color-accent: #8A6512;
+  --color-on-accent: #ffffff;
   --color-success: #3F7A54;
   --color-warning: #9A6B15;
   --color-danger: #A8402F;
-  --color-accent-light: rgba(46, 94, 78, 0.08);
-  --shadow-accent: 0 8px 30px rgba(46, 94, 78, 0.22);
+  --color-accent-light: rgba(138, 101, 18, 0.08);
+  --shadow-accent: 0 8px 30px rgba(138, 101, 18, 0.22);
 }
 
 /* ─── Admin Layout ─── */
@@ -324,7 +326,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(46, 94, 78, 0.2), rgba(46, 94, 78, 0.1));
+  background: linear-gradient(135deg, rgba(138, 101, 18, 0.2), rgba(138, 101, 18, 0.1));
   color: var(--admin-accent);
   display: flex;
   align-items: center;
@@ -332,7 +334,7 @@
   font-size: 0.6875rem;
   font-weight: 700;
   flex-shrink: 0;
-  border: 1px solid rgba(46, 94, 78, 0.2);
+  border: 1px solid rgba(138, 101, 18, 0.2);
 }
 
 .admin-sidebar-footer-info {
@@ -533,7 +535,7 @@
 }
 
 .admin-badge-accent {
-  background: rgba(46, 94, 78, 0.12);
+  background: rgba(138, 101, 18, 0.12);
   color: var(--admin-accent);
 }
 
@@ -622,7 +624,7 @@
   font-weight: 700;
 }
 
-.rank-1 { background: rgba(46, 94, 78, 0.18); color: #3F7A54; }
+.rank-1 { background: rgba(138, 101, 18, 0.18); color: #3F7A54; }
 .rank-2 { background: rgba(156, 163, 175, 0.2); color: #9ca3af; }
 .rank-3 { background: rgba(165, 86, 31, 0.18); color: #A5561F; }
 .rank-default { background: var(--admin-row-hover); color: var(--admin-text-muted); }
@@ -734,8 +736,8 @@
 }
 
 .admin-input:focus {
-  border-color: rgba(46, 94, 78, 0.5);
-  box-shadow: 0 0 0 3px rgba(46, 94, 78, 0.14);
+  border-color: rgba(138, 101, 18, 0.5);
+  box-shadow: 0 0 0 3px rgba(138, 101, 18, 0.14);
 }
 
 .admin-input::placeholder {
@@ -758,8 +760,8 @@
 }
 
 .admin-textarea:focus {
-  border-color: rgba(46, 94, 78, 0.5);
-  box-shadow: 0 0 0 3px rgba(46, 94, 78, 0.14);
+  border-color: rgba(138, 101, 18, 0.5);
+  box-shadow: 0 0 0 3px rgba(138, 101, 18, 0.14);
 }
 
 .admin-select {
@@ -779,8 +781,8 @@
 }
 
 .admin-select:focus {
-  border-color: rgba(46, 94, 78, 0.5);
-  box-shadow: 0 0 0 3px rgba(46, 94, 78, 0.14);
+  border-color: rgba(138, 101, 18, 0.5);
+  box-shadow: 0 0 0 3px rgba(138, 101, 18, 0.14);
 }
 
 .admin-label {

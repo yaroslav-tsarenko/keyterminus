@@ -8,11 +8,11 @@ import { HomeHeading } from "./parts";
 
 const ITEMS = [
   ["delivery", "time"],
-  ["delivery", "region"],
-  ["delivery", "redeem"],
-  ["returns", "notWorking"],
+  ["activation", "region"],
+  ["activation", "redeem"],
+  ["problems", "notWorking"],
   ["payment", "safe"],
-  ["returns", "refund"],
+  ["problems", "cancel"],
 ] as const;
 
 export async function HomeQuestions() {

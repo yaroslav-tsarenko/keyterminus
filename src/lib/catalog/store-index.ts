@@ -3,23 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { GENRES, PLATFORMS, PRODUCT_TYPES, genreDef } from "@/lib/keys/taxonomy";
 import { getExchangeRates } from "@/lib/exchange-rates";
 import { STORE_POLICY } from "@/config/store-policy";
+import { FARE_ZONE_EDGES, MERCH, PLATFORM_ORDER, ROUTE_ORDER, TYPE_ORDER, orderIndex } from "@/config/merchandising";
 import { platformInfo } from "./platforms";
 
 const LIVE = Prisma.sql`p."status" = 'ACTIVE'::"ProductStatus" AND p."quantity" > 0`;
 
-export const BAND_EDGES = [5, 10, 20, 40] as const;
+export const BAND_EDGES = FARE_ZONE_EDGES;
 
 export interface IndexCover {
   slug: string;
   title: string;
   price: number;
+  comparePrice: number | null;
+  isNew: boolean;
   imageUrl: string;
 }
 
 export interface IndexPlatform {
   key: string;
   slug: string;
-  tone: string;
+  number: number | null;
   short: string;
   count: number;
   minPrice: number | null;
@@ -72,38 +75,43 @@ export async function getStoreIndex(): Promise<StoreIndex> {
     prisma.$queryRaw<{ total: number; sale: number }[]>`
       SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE p."comparePrice" IS NOT NULL AND p."comparePrice" > p."price")::int AS sale FROM "Product" p WHERE ${LIVE}`,
     prisma.$queryRaw<{ price: number }[]>`SELECT p."price"::float AS price FROM "Product" p WHERE ${LIVE}`,
-    prisma.$queryRaw<{ platform: string; slug: string; title: string; price: number; url: string; rank: number }[]>`
-      SELECT x."platform", x."slug", x."title", x."price", i."url", x.rank FROM (
-        SELECT k."platform", p."id", p."slug", k."title", p."price"::float AS price,
-          ROW_NUMBER() OVER (PARTITION BY k."platform" ORDER BY COALESCE(oc.n, 0) DESC, k."releaseDate" DESC NULLS LAST, p."createdAt" DESC) AS rank
+    prisma.$queryRaw<{ platform: string; slug: string; title: string; price: number; compare: number | null; fresh: boolean; url: string; rank: number }[]>`
+      SELECT x."platform", x."slug", x."title", x."price", x."compare", x."fresh", i."url", x.rank FROM (
+        SELECT k."platform", p."id", p."slug", k."title", p."price"::float AS price, p."comparePrice"::float AS compare, (k."releaseDate" IS NOT NULL AND k."releaseDate" <= now() AND k."releaseDate" > now() - make_interval(days => ${MERCH.releaseWindowDays})) AS fresh,
+          ROW_NUMBER() OVER (PARTITION BY k."platform" ORDER BY k."boardRank" ASC NULLS LAST, p."id") AS rank
         FROM "Product" p JOIN "KeyItem" k ON k."productId" = p."id"
-        LEFT JOIN (SELECT "productId", COUNT(*)::int AS n FROM "OrderItem" GROUP BY "productId") oc ON oc."productId" = p."id"
         WHERE ${LIVE} AND k."productType" IN ('game', 'dlc') AND k."edition" IS NULL
       ) x
       JOIN LATERAL (SELECT "url" FROM "ProductImage" WHERE "productId" = x."id" ORDER BY "sortOrder" ASC LIMIT 1) i ON true
-      WHERE x.rank <= 3`,
+      WHERE x.rank <= ${MERCH.peek}
+      ORDER BY x."platform", x.rank`,
     prisma.catalogSyncRun.findFirst({ where: { status: "ok", finishedAt: { not: null } }, orderBy: { finishedAt: "desc" }, select: { finishedAt: true } }).catch(() => null),
     getExchangeRates(),
   ]);
 
   const covers = new Map<string, IndexCover[]>();
-  for (const r of coverRows) covers.set(r.platform, [...(covers.get(r.platform) ?? []), { slug: r.slug, title: r.title, price: r.price, imageUrl: r.url }]);
+  for (const r of coverRows) {
+    const cover = { slug: r.slug, title: r.title, price: r.price, comparePrice: r.compare, isNew: r.fresh, imageUrl: r.url };
+    covers.set(r.platform, [...(covers.get(r.platform) ?? []), cover]);
+  }
 
   const platforms = platformRows
     .filter((r) => r.count > 0 && PLATFORMS.some((p) => p.key === r.platform) && r.platform !== "other")
     .map((r) => {
       const info = platformInfo(r.platform);
-      return { key: info.key, slug: info.slug, tone: info.tone, short: info.short, count: r.count, minPrice: r.min, covers: covers.get(r.platform) ?? [] };
+      return { key: info.key, slug: info.slug, number: info.number, short: info.short, count: r.count, minPrice: r.min, covers: covers.get(r.platform) ?? [] };
     })
-    .sort((a, b) => b.count - a.count);
+    .sort((a, b) => orderIndex(PLATFORM_ORDER, a.key) - orderIndex(PLATFORM_ORDER, b.key));
 
   const typeCounts = new Map(typeRows.map((r) => [r.productType, r.count]));
-  const types = PRODUCT_TYPES.filter((t) => (typeCounts.get(t.key) ?? 0) > 0).map((t) => ({ key: t.key, slug: t.slug, label: t.key === "dlc" ? "DLC" : t.label, count: typeCounts.get(t.key) ?? 0 }));
+  const types = PRODUCT_TYPES.filter((t) => (typeCounts.get(t.key) ?? 0) > 0)
+    .sort((a, b) => orderIndex(TYPE_ORDER, a.key) - orderIndex(TYPE_ORDER, b.key))
+    .map((t) => ({ key: t.key, slug: t.slug, label: t.key === "dlc" ? "DLC" : t.label, count: typeCounts.get(t.key) ?? 0 }));
 
   const genres = genreRows
     .filter((g) => genreDef(g.genre))
     .map((g) => ({ key: g.genre, label: genreDef(g.genre)?.label ?? g.genre, count: g.count }))
-    .sort((a, b) => b.count - a.count || GENRES.findIndex((x) => x.key === a.key) - GENRES.findIndex((x) => x.key === b.key));
+    .sort((a, b) => orderIndex(ROUTE_ORDER, a.key) - orderIndex(ROUTE_ORDER, b.key) || b.count - a.count || GENRES.findIndex((x) => x.key === a.key) - GENRES.findIndex((x) => x.key === b.key));
 
   const bands: Record<string, IndexBand[]> = {};
   for (const currency of STORE_POLICY.supportedCurrencies) {

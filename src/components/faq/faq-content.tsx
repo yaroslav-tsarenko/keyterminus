@@ -3,11 +3,11 @@ import type { ReactNode } from "react";
 import { POLICY_FACTS as F } from "@/lib/policy-facts";
 
 export const FAQ_GROUPS: { id: string; items: string[] }[] = [
-  { id: "orders", items: ["place", "account", "limits", "change", "noEmail"] },
-  { id: "delivery", items: ["how", "time", "region", "language", "redeem", "safety"] },
-  { id: "returns", items: ["when", "notWorking", "withdrawal", "refund"] },
-  { id: "payment", items: ["methods", "safe", "currencies", F.vatRegistered ? "vatYes" : "vatNo", "when"] },
-  { id: "products", items: ["what", "subscriptions", "giftCards", "affiliation"] },
+  { id: "buying", items: ["place", "account", "limits", "subscriptions", "affiliation"] },
+  { id: "delivery", items: ["time", "how", "noEmail", "safety"] },
+  { id: "activation", items: ["region", "redeem", "language", "giftCards"] },
+  { id: "payment", items: ["safe", "methods", "currencies", F.vatRegistered ? "vatYes" : "vatNo", "when"] },
+  { id: "problems", items: ["notWorking", "cancel", "unwanted"] },
   { id: "account", items: ["who", "password", "delete"] },
 ];
 

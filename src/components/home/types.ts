@@ -1,6 +1,9 @@
 import type { CatalogProduct } from "@/components/product/product-face";
 import type { GiftCardGroup, Timetable } from "@/lib/catalog/prepaid";
-import type { ReleaseWeek } from "@/components/catalog/ReleaseRuler";
+export interface ReleaseWeek {
+  start: string;
+  count: number;
+}
 
 export interface CoverRef {
   id: string;

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { SearchForm } from "@/components/search/SearchResults/SearchResults";
 import { Cover } from "@/components/product/Cover";
-import { Tumbler } from "@/components/ui/Tumbler";
+import { FlapCounter } from "@/components/ui/Flap";
 import { STORE_POLICY } from "@/config/store-policy";
 import { cn } from "@/lib/utils/cn";
 import { DoorPoster } from "./DoorPoster";
@@ -36,7 +36,7 @@ function Readout({ value, label, text }: { value: string | number; label: string
     <div className="flex min-w-0 flex-col gap-2 border-line px-4 py-3 max-sm:[&:nth-child(odd)]:border-r max-sm:[&:nth-child(n+3)]:border-t sm:border-l sm:first:border-l-0">
       <dt className="eyebrow order-2 text-[0.6875rem] sm:text-[0.75rem]">{label}</dt>
       <dd className="m-0 order-1">
-        <Tumbler value={value} label={text} size="md" motion />
+        <FlapCounter value={value} label={text} size="md" />
       </dd>
     </div>
   );

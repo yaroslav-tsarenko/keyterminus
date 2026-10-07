@@ -5,8 +5,8 @@ import { BRAND } from "@/lib/brand";
 import { STORE_POLICY } from "@/config/store-policy";
 import { defaultLocale } from "@/i18n/config";
 import { formatPrice } from "@/lib/utils/format-price";
-import { OG_PALETTE as P, OG_PLATFORM, OG_SIZE } from "@/lib/og/assets";
-import { Dial, DialRuler, Engraved, Wordmark, ogResponse, titleSize } from "@/lib/og/parts";
+import { OG_PALETTE as P, OG_SIZE } from "@/lib/og/assets";
+import { BoardPanel, Flap, SignLabel, TerminusRule, Wordmark, ogResponse, titleSize } from "@/lib/og/parts";
 import { platformInfo, regionTag, typeTag } from "@/lib/catalog/platforms";
 import { stripSupplierMentions } from "@/lib/utils/supplier";
 
@@ -21,6 +21,8 @@ const loadProduct = cache(async (slug: string) =>
       name: true,
       status: true,
       price: true,
+      quantity: true,
+      comparePrice: true,
       item: { select: { title: true, platform: true, region: true, productType: true } },
     },
   }),
@@ -44,31 +46,38 @@ export default async function Image({ params }: { params: SlugParams }) {
   const platform = active && product.item ? platformInfo(product.item.platform) : null;
   const region = active && product.item ? regionTag(product.item.region) : null;
   const type = active && product.item ? typeTag(product.item.productType) : null;
-  const nameSize = titleSize(name, [[24, 64], [44, 54], [72, 46], [110, 40]]);
+  const nameSize = titleSize(name, [[24, 58], [44, 48], [72, 40], [110, 34]]);
+
+  const rows = platform
+    ? [
+        { text: platform.boardLabel, remark: product && product.quantity > 0 && !product.comparePrice ? "ON TIME" : "" },
+        ...(region ? [{ text: region.toUpperCase(), remark: "" }] : []),
+        ...(type ? [{ text: type.toUpperCase(), remark: "" }] : []),
+      ]
+    : [{ text: "GAME KEYS", remark: "ON TIME" }];
 
   return ogResponse(
-    <div style={{ display: "flex", width: "100%", height: "100%", background: P.room, color: P.ink, padding: "64px 72px", justifyContent: "space-between" }}>
-      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: 700 }}>
-        <Wordmark size={44} />
+    <div style={{ display: "flex", width: "100%", height: "100%", background: P.floor, color: P.ink, padding: "64px 56px 64px 72px", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: 600 }}>
+        <Wordmark height={40} />
         <div style={{ display: "flex", flexDirection: "column" }}>
           {platform ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ display: "flex", width: 12, height: 12, background: OG_PLATFORM[platform.tone] }} />
-              <Engraved color={P.ink}>{platform.short}</Engraved>
-              {region ? <div style={{ display: "flex", fontFamily: "Red Hat Mono", fontSize: 18, color: P.ink }}>{`·  ${region.toUpperCase()}`}</div> : null}
-              {type ? <div style={{ display: "flex", fontFamily: "Hubot Sans Wide", fontSize: 18, letterSpacing: 2, color: P.inkMuted }}>{`·  ${type.toUpperCase()}`}</div> : null}
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <Flap char={platform.number ? String(platform.number) : "–"} size={18} />
+              <SignLabel color={P.ink}>{platform.short}</SignLabel>
+              {region ? <div style={{ display: "flex", fontFamily: "Sometype Mono", fontWeight: 600, fontSize: 18, color: P.ink }}>{`·  ${region.toUpperCase()}`}</div> : null}
             </div>
           ) : null}
-          <div style={{ display: "block", marginTop: 20, fontFamily: "Hubot Sans", fontWeight: 700, fontSize: nameSize, lineHeight: 1.02, color: P.ink, lineClamp: 4, overflow: "hidden", maxHeight: nameSize * 1.02 * 4 + 4 }}>{name}</div>
-          {price != null && price > 0 ? <div style={{ display: "flex", marginTop: 28, fontFamily: "Red Hat Mono", fontSize: 40, color: P.ink }}>{formatPrice(price, STORE_POLICY.currency)}</div> : null}
+          <div style={{ display: "block", marginTop: 20, fontFamily: "Overpass", fontWeight: 800, fontSize: nameSize, lineHeight: 1.02, letterSpacing: -1, color: P.ink, lineClamp: 4, overflow: "hidden", maxHeight: nameSize * 1.02 * 4 + 4 }}>{name}</div>
+          {price != null && price > 0 ? <div style={{ display: "flex", marginTop: 28, fontFamily: "Sometype Mono", fontWeight: 600, fontSize: 40, color: P.ink }}>{formatPrice(price, STORE_POLICY.currency)}</div> : null}
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <DialRuler width={640} detents={3} active={1} />
-          <div style={{ display: "flex", marginTop: 14, fontFamily: "Red Hat Mono", fontSize: 18, color: P.inkMuted }}>{BRAND.domain}</div>
+          <TerminusRule width={540} />
+          <div style={{ display: "flex", marginTop: 14, fontFamily: "Sometype Mono", fontWeight: 500, fontSize: 18, color: P.inkMuted }}>{BRAND.domain}</div>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center" }}>
-        <Dial size={340} />
+        <BoardPanel rows={rows} cells={11} remarkCells={7} size={18} heads={["Platform", "Remarks"]} />
       </div>
     </div>,
     3600,

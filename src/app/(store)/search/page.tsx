@@ -7,27 +7,30 @@ import { CatalogBrowser } from "@/components/catalog/CatalogBrowser";
 import { queryCatalog } from "@/components/catalog/catalog-query";
 import { hasActiveFilters, parseCatalogParams, type RawSearchParams, type SortKey } from "@/components/catalog/catalog-url";
 import { SearchForm, SearchNoResults } from "@/components/search/SearchResults/SearchResults";
-import { Tumbler } from "@/components/ui/Tumbler";
+import { FlapCounter } from "@/components/ui/Flap";
 import { platformInfo } from "@/lib/catalog/platforms";
+import { PlatformTile } from "@/components/ui/PlatformTile";
+import { PLATFORM_ORDER, orderIndex } from "@/config/merchandising";
 import { noindexMetadata } from "@/lib/seo/metadata";
 
 interface SearchPageProps {
   searchParams: Promise<RawSearchParams>;
 }
 
-const SEARCH_SORTS: SortKey[] = ["relevance", "price-asc", "price-desc", "discount", "release-desc", "newest", "name-asc"];
+const SEARCH_SORTS: SortKey[] = ["relevance", "board", "price-asc", "price-desc", "release-desc", "discount", "popular", "name-asc"];
 
 function readQuery(raw: RawSearchParams): string {
   const q = Array.isArray(raw.q) ? raw.q[0] : raw.q;
   return (q ?? "").trim().slice(0, 100);
 }
 
-async function platformLockers() {
+async function platformSigns() {
   return (await stockedPlatformCounts())
     .filter((r) => r.platform !== "other")
+    .sort((a, b) => orderIndex(PLATFORM_ORDER, a.platform) - orderIndex(PLATFORM_ORDER, b.platform))
     .map((r) => {
       const info = platformInfo(r.platform);
-      return { name: info.short, href: `/platform/${info.slug}`, count: r.count, tone: info.tone };
+      return { key: r.platform, name: info.short, href: `/platform/${info.slug}`, count: r.count };
     });
 }
 
@@ -42,7 +45,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = readQuery(raw);
   const params = parseCatalogParams(raw, "relevance");
   const t = await getTranslations("catalog");
-  const lockers = await platformLockers();
+  const signs = await platformSigns();
 
   const searchable = query.length >= 2;
   const result = searchable ? await queryCatalog({ kind: "search", query }, params, { basePath: "/search", fixed: { q: query }, defaultSort: "relevance" }) : null;
@@ -58,8 +61,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       <header className="pb-8">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <h1 className="m-0 text-step-5 leading-[1.04] text-ink [overflow-wrap:anywhere]">{searchable ? t("queryHeading", { query }) : t("searchTitle")}</h1>
-          {result ? <Tumbler value={result.scopeTotal} size="sm" label={`${result.scopeTotal.toLocaleString("en-GB")} results`} /> : null}
+          <h1 className="m-0 pt-1 text-step-4 leading-[1.04] text-ink [overflow-wrap:anywhere]">{searchable ? t("queryHeading", { query }) : t("searchTitle")}</h1>
+          {result ? <FlapCounter value={result.scopeTotal} size="sm" label={`${result.scopeTotal.toLocaleString("en-GB")} results`} /> : null}
         </div>
         {result && (result.facets.platforms.length > 1 || genreMatches.length) ? (
           <div className="mt-5 flex flex-col gap-2">
@@ -70,11 +73,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   .filter((w) => w.count > 0)
                   .slice(0, 8)
                   .map((w) => (
-                    <li key={w.key} data-platform={platformInfo(w.key).tone}>
-                      <Link href={`/search?q=${encodeURIComponent(query)}&platform=${w.key}`} className="inline-flex min-h-9 items-center gap-2 text-ui-md text-ink underline-offset-4 hover-device:hover:underline">
-                        <span aria-hidden="true" className="size-1.5 bg-platform" />
-                        {platformInfo(w.key).short}
-                        <span className="font-mono text-[0.75rem] text-ink-muted">· {w.count.toLocaleString("en-GB")}</span>
+                    <li key={w.key}>
+                      <Link href={`/search?q=${encodeURIComponent(query)}&platform=${w.key}`} className="group/pl inline-flex min-h-10 items-center gap-2 text-ui-md text-ink">
+                        <PlatformTile platform={w.key} size="xs" />
+                        <span className="pt-0.5 font-semibold decoration-link decoration-2 underline-offset-[3px] group-hover/pl:underline">{platformInfo(w.key).short}</span>
+                        <span className="pt-0.5 font-mono text-[0.75rem] text-ink-muted">{w.count.toLocaleString("en-GB")}</span>
                       </Link>
                     </li>
                   ))}
@@ -85,9 +88,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 <li className="eyebrow mr-1">Genres</li>
                 {genreMatches.map((g) => (
                   <li key={g.key}>
-                    <Link href={`/search?q=${encodeURIComponent(query)}&genre=${g.key}`} className="inline-flex min-h-9 items-center gap-2 text-ui-md text-ink underline-offset-4 hover-device:hover:underline">
-                      {g.label}
-                      <span className="font-mono text-[0.75rem] text-ink-muted">· {g.count.toLocaleString("en-GB")}</span>
+                    <Link href={`/search?q=${encodeURIComponent(query)}&genre=${g.key}`} className="inline-flex min-h-10 items-center gap-2 text-ui-md text-ink">
+                      <span className="font-semibold underline decoration-link decoration-2 underline-offset-[3px]">{g.label}</span>
+                      <span className="font-mono text-[0.75rem] text-ink-muted">{g.count.toLocaleString("en-GB")}</span>
                     </Link>
                   </li>
                 ))}
@@ -110,12 +113,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           totalPages={result.totalPages}
           facets={result.facets}
           activeCategoryName={result.activeCategoryName}
-          related={lockers.slice(0, 3).map((l) => ({ name: l.name, href: l.href }))}
+          related={signs.slice(0, 3).map((l) => ({ name: l.name, href: l.href }))}
           headingId="search-results"
           heading={t("resultsHeading")}
         />
       ) : (
-        <SearchNoResults query={searchable ? query : ""} platforms={lockers.slice(0, 9)} />
+        <SearchNoResults query={searchable ? query : ""} platforms={signs.slice(0, 10)} />
       )}
     </div>
   );

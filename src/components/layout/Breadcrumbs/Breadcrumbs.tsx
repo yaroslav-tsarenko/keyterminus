@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowBigLeft } from "lucide-react";
 import { JsonLd } from "@/components/shared/SEO/JsonLd";
 import { SITE_URL } from "@/lib/brand";
 import { cn } from "@/lib/utils/cn";
@@ -38,11 +38,11 @@ export function Breadcrumbs({ items, className, withJsonLd = true }: Breadcrumbs
             <li key={`${item.label}-${index}`} className="flex min-w-0 items-center gap-2">
               {index > 0 ? (
                 <span aria-hidden="true" className="font-mono text-ink-subtle">
-                  /
+                  ›
                 </span>
               ) : null}
               {item.href && !last ? (
-                <Link href={item.href} className="text-ink-muted underline-offset-4 hover-device:hover:text-ink hover-device:hover:underline">
+                <Link href={item.href} className="text-ink-muted decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-ink hover-device:hover:underline">
                   {item.label}
                 </Link>
               ) : (
@@ -56,8 +56,8 @@ export function Breadcrumbs({ items, className, withJsonLd = true }: Breadcrumbs
       </ol>
       {parent?.href ? (
         <Link href={parent.href} className="inline-flex min-h-11 items-center gap-1.5 text-ink-muted hover:text-ink sm:hidden">
-          <ArrowLeft size={16} aria-hidden="true" />
-          {parent.label}
+          <ArrowBigLeft size={16} aria-hidden="true" />
+          <span className="pt-0.5">{parent.label}</span>
         </Link>
       ) : null}
     </nav>

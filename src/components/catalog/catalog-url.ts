@@ -1,6 +1,6 @@
 import { GENRES, PLATFORMS, PRODUCT_TYPES, REGIONS } from "@/lib/keys/taxonomy";
 
-export const SORT_KEYS = ["newest", "price-asc", "price-desc", "popular", "name-asc", "relevance", "release-desc", "discount"] as const;
+export const SORT_KEYS = ["board", "price-asc", "price-desc", "release-desc", "discount", "popular", "name-asc", "relevance", "newest"] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
 export const CATALOG_PAGE_SIZE = 24;
@@ -101,7 +101,9 @@ function list(raw: RawSearchParams, filter: ListFilter): string[] {
   return [...new Set(clean)].sort().slice(0, 30);
 }
 
-export function parseCatalogParams(raw: RawSearchParams, defaultSort: SortKey = "newest"): CatalogParams {
+export const DEFAULT_SORT: SortKey = "board";
+
+export function parseCatalogParams(raw: RawSearchParams, defaultSort: SortKey = DEFAULT_SORT): CatalogParams {
   const sortRaw = first(raw.sort) as SortKey;
   const page = parseInt(first(raw.page), 10);
   let minPrice = price(first(raw.minPrice));
@@ -160,7 +162,7 @@ export function buildCatalogHref(
   if (next.maxPrice !== null) qs.set("maxPrice", String(next.maxPrice));
   if (next.inStock) qs.set("inStock", "true");
   if (next.onSale) qs.set("onSale", "true");
-  if (next.sort !== (options.defaultSort ?? "newest")) qs.set("sort", next.sort);
+  if (next.sort !== (options.defaultSort ?? DEFAULT_SORT)) qs.set("sort", next.sort);
   if (next.page > 1) qs.set("page", String(next.page));
   const query = qs.toString().replace(/%2C/g, ",");
   return query ? `${basePath}?${query}` : basePath;

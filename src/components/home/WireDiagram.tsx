@@ -10,7 +10,7 @@ export interface WireLabels {
   bank: string;
   bankSub: string;
   provider: string;
-  keyrook: string;
+  keyterminus: string;
   account: string;
   boundary: string;
 }
@@ -56,7 +56,7 @@ function Diagram({ labels, orientation }: { labels: WireLabels; orientation: Ori
     { key: "hosted", label: labels.hosted },
     { key: "bank", label: labels.bank, sub: labels.bankSub },
     { key: "provider", label: labels.provider },
-    { key: "keyrook", label: labels.keyrook, own: true },
+    { key: "store", label: labels.keyterminus, own: true },
     { key: "account", label: labels.account, own: true },
   ];
   const length = row ? 720 : 470;

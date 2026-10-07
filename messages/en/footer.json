@@ -2,10 +2,10 @@
   "about": "About",
   "contact": "Contact us",
   "shipping": "Delivery",
-  "returns": "Refunds",
-  "warranty": "Key guarantee",
+  "returns": "Refund policy",
+  "warranty": "Key not working?",
   "payment": "Payment",
-  "faq": "Questions",
+  "faq": "FAQ",
   "privacy": "Privacy policy",
   "terms": "Terms and conditions",
   "cookies": "Cookie policy",
@@ -14,6 +14,6 @@
   "allPolicies": "All policies",
   "cookieSettings": "Cookie settings",
   "tradingName": "{brand} is a trading name of {company}.",
-  "copyright": "© {year} {storeName}. All rights reserved.",
-  "followUs": "Follow us"
+  "copyright": "© {year} {storeName}",
+  "followUs": "Elsewhere"
 }

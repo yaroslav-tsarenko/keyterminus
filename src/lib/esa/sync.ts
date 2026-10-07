@@ -1,3 +1,4 @@
+import { refreshBoardScores } from "@/lib/catalog/board-score";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { env } from "@/lib/env";
@@ -5,6 +6,7 @@ import { catalogConfig, quotaTotal } from "@/config/catalog";
 import { STORE_POLICY } from "@/config/store-policy";
 import { slugify } from "@/lib/utils/slugify";
 import { PLATFORMS, PRODUCT_TYPES, categorySlugFor, platformDef, productTypeDef, regionDef } from "@/lib/keys/taxonomy";
+import { PLATFORM_ORDER, TYPE_ORDER, orderIndex } from "@/config/merchandising";
 import { esaClient } from "./client";
 import { classifyProduct, stableHash, type Classified, type RejectReason } from "./classify";
 import { buildCandidates, liteOf, selectCatalog, type CandidateStats, type LiteItem } from "./select";
@@ -53,8 +55,10 @@ export function productIdFor(dedupeKey: string): string {
   return `kp_${stableHash(dedupeKey).slice(0, 24)}`;
 }
 
+export const SKU_PREFIX = "KT-";
+
 export function skuFor(dedupeKey: string): string {
-  return `KR-${stableHash(dedupeKey).slice(0, 10).toUpperCase()}`;
+  return `${SKU_PREFIX}${stableHash(`${catalogConfig.selection.weights.salt}|${dedupeKey}`).slice(0, 10).toUpperCase()}`;
 }
 
 function firstSentence(text: string): string | null {
@@ -97,19 +101,21 @@ export function liveSource(options: { maxPages?: number | null } = {}): CatalogS
 async function ensureCategories(): Promise<Map<string, string>> {
   const ids = new Map<string, string>();
   for (const [typeIndex, type] of PRODUCT_TYPES.entries()) {
+    const typeOrder = orderIndex(TYPE_ORDER, type.key) * 100 + typeIndex;
     const root = await prisma.category.upsert({
       where: { slug: type.slug },
-      create: { id: `cat_${type.slug}`, name: type.label, slug: type.slug, description: type.lead, sortOrder: typeIndex, isActive: true },
-      update: { name: type.label, description: type.lead, parentId: null, sortOrder: typeIndex },
+      create: { id: `cat_${type.slug}`, name: type.label, slug: type.slug, description: type.lead, sortOrder: typeOrder, isActive: true },
+      update: { name: type.label, description: type.lead, parentId: null, sortOrder: typeOrder },
       select: { id: true },
     });
     ids.set(type.key, root.id);
     for (const [platformIndex, platform] of PLATFORMS.entries()) {
       const slug = categorySlugFor(type.key, platform.key);
+      const platformOrder = orderIndex(PLATFORM_ORDER, platform.key) * 100 + platformIndex;
       const child = await prisma.category.upsert({
         where: { slug },
-        create: { id: `cat_${slug}`, name: platform.label, slug, description: `${type.label} for ${platform.label}.`, parentId: root.id, sortOrder: platformIndex, isActive: true },
-        update: { name: platform.label, description: `${type.label} for ${platform.label}.`, parentId: root.id, sortOrder: platformIndex },
+        create: { id: `cat_${slug}`, name: platform.label, slug, description: `${type.label} for ${platform.label}.`, parentId: root.id, sortOrder: platformOrder, isActive: true },
+        update: { name: platform.label, description: `${type.label} for ${platform.label}.`, parentId: root.id, sortOrder: platformOrder },
         select: { id: true },
       });
       ids.set(`${type.key}/${platform.key}`, child.id);
@@ -120,6 +126,7 @@ async function ensureCategories(): Promise<Map<string, string>> {
 
 interface Existing {
   slug: string;
+  sku: string;
   priceLog: PricePoint[];
 }
 
@@ -139,18 +146,20 @@ function nextPriceLog(previous: PricePoint[], price: number, now: Date): { log: 
 }
 
 async function existingFor(keys: string[]): Promise<Map<string, Existing>> {
-  const rows = await prisma.$queryRaw<{ dedupeKey: string; slug: string; priceLog: unknown }[]>`
-    SELECT k."dedupeKey", p."slug", s."priceLog"
+  const rows = await prisma.$queryRaw<{ dedupeKey: string; slug: string; sku: string; priceLog: unknown }[]>`
+    SELECT k."dedupeKey", p."slug", p."sku", s."priceLog"
     FROM "KeyItem" k JOIN "Product" p ON p."id" = k."productId" LEFT JOIN "SupplyItem" s ON s."productId" = p."id"
     WHERE k."dedupeKey" = ANY(${keys})`;
-  return new Map(rows.map((r) => [r.dedupeKey, { slug: r.slug, priceLog: Array.isArray(r.priceLog) ? (r.priceLog as PricePoint[]) : [] }]));
+  return new Map(rows.map((r) => [r.dedupeKey, { slug: r.slug, sku: r.sku, priceLog: r.sku.startsWith(SKU_PREFIX) && Array.isArray(r.priceLog) ? (r.priceLog as PricePoint[]) : [] }]));
 }
 
 function slugFor(c: WriteRow, existing: Existing | undefined, taken: Set<string>): string {
-  if (existing) return existing.slug;
-  const base = slugify(c.displayName.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[™®©]/g, "").replace(/&/g, " and ")).replace(/-{2,}/g, "-").slice(0, 90).replace(/-+$/, "");
+  if (existing && existing.sku.startsWith(SKU_PREFIX)) return existing.slug;
+  const region = c.region === "global" ? "" : (regionDef(c.region)?.short ?? c.region);
+  const title = c.title.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[™®©]/g, "").replace(/&/g, " and ");
+  const base = slugify(`${platformDef(c.platform)?.slug ?? c.platform} ${title} ${region}`).replace(/-{2,}/g, "-").slice(0, 90).replace(/-+$/, "");
   let slug = base || productIdFor(c.dedupeKey);
-  if (taken.has(slug)) slug = `${slug}-${stableHash(c.dedupeKey).slice(0, 6)}`;
+  if (taken.has(slug)) slug = `${slug}-${stableHash(`${catalogConfig.selection.weights.salt}|${c.dedupeKey}`).slice(0, 6)}`;
   taken.add(slug);
   return slug;
 }
@@ -177,6 +186,8 @@ async function writeChunk(tx: Tx, chunk: WriteRow[], categories: Map<string, str
     VALUES ${Prisma.join(products)}
     ON CONFLICT ("id") DO UPDATE SET
       "name" = EXCLUDED."name",
+      "slug" = EXCLUDED."slug",
+      "sku" = EXCLUDED."sku",
       "description" = EXCLUDED."description",
       "shortDescription" = EXCLUDED."shortDescription",
       "price" = EXCLUDED."price",
@@ -407,7 +418,7 @@ async function runSync(source: CatalogSource, staging: Staging, options: SyncOpt
     let selection = staging.readSelection();
     if (!selection) {
       const activeRows = await prisma.$queryRaw<{ dedupeKey: string }[]>`
-        SELECT k."dedupeKey" FROM "KeyItem" k JOIN "Product" p ON p."id" = k."productId" WHERE p."status" = 'ACTIVE'::"ProductStatus"`;
+        SELECT k."dedupeKey" FROM "KeyItem" k JOIN "Product" p ON p."id" = k."productId" WHERE p."status" = 'ACTIVE'::"ProductStatus" AND p."sku" LIKE ${`${SKU_PREFIX}%`}`;
       const knownRows = await prisma.$queryRaw<{ dedupeKey: string }[]>`SELECT "dedupeKey" FROM "KeyItem"`;
       const known = new Set(knownRows.map((r) => r.dedupeKey));
       const picked = selectCatalog(candidates, new Set(activeRows.map((r) => r.dedupeKey)));
@@ -488,6 +499,8 @@ async function runSync(source: CatalogSource, staging: Staging, options: SyncOpt
         WHERE pc."categoryId" = c."id" AND p."status" = 'ACTIVE'::"ProductStatus"
       ), "updatedAt" = now()
       WHERE c."id" LIKE 'cat\\_%'`;
+    const board = await refreshBoardScores();
+    log(`[catalog-sync] board order: scored=${board.scored} ranked=${board.ranked}`);
     await refreshPlannerStats();
     const finalizeMs = Date.now() - tFinal;
 

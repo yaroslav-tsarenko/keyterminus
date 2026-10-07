@@ -49,7 +49,7 @@ export async function SecurityLedger() {
     { key: "hosted", who: t("nodeHosted"), what: t("receivesHosted"), show: hosted },
     { key: "bank", who: t("nodeBank"), what: t("receivesBank"), show: p.payment.threeDSecure },
     { key: "provider", who: provider, what: t("receivesProvider"), show: hosted },
-    { key: "keyrook", who: t("nodeKeyrook"), what: t("receivesKeyrook"), show: hosted },
+    { key: "store", who: t("nodeStore"), what: t("receivesStore"), show: hosted },
     { key: "account", who: t("nodeAccount"), what: p.security.keysEncryptedAtRest && !p.security.keyInEmail ? t("receivesAccount") : t("receivesAccountPlain"), show: true },
   ].filter((r) => r.show);
 
@@ -84,7 +84,7 @@ export async function SecurityLedger() {
               <div className={payStill ? "min-w-0 lg:col-span-8" : "min-w-0 lg:col-span-12"}>
                 <h3 className="m-0 mb-6 text-step-2 leading-[1.15] text-ink">{t("diagramTitle")}</h3>
                 <WireDiagram
-                  labels={{ title: t("legend"), you: t("nodeYou"), hosted: t("nodeHosted"), bank: t("nodeBank"), bankSub: t("nodeBankSub"), provider: p.payment.providerName ?? t("nodeProvider"), keyrook: t("nodeKeyrook"), account: t("nodeAccount"), boundary: t("boundary") }}
+                  labels={{ title: t("legend"), you: t("nodeYou"), hosted: t("nodeHosted"), bank: t("nodeBank"), bankSub: t("nodeBankSub"), provider: p.payment.providerName ?? t("nodeProvider"), keyterminus: t("nodeStore"), account: t("nodeAccount"), boundary: t("boundary") }}
                   legend={{ text: t("legend"), card: t("legendCard"), confirm: t("legendConfirm"), key: t("legendKey") }}
                 />
                 <h4 className="eyebrow m-0 mt-10 pb-3 text-ink">{t("receivesTitle")}</h4>

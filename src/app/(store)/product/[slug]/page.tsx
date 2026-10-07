@@ -13,7 +13,7 @@ import { BuyBox, type PlatformAlternative } from "@/components/product/BuyBox";
 import { EditionSelector, type EditionOption } from "@/components/product/EditionSelector";
 import { BeforeYouBuy, RequiresLink, type RequirementRow } from "@/components/product/BeforeYouBuy";
 import { ProductDetailTabs, type DetailRow, type RequirementBlock } from "@/components/product/ProductDetailTabs";
-import { LabelRow, ProductRow } from "@/components/product/ProductCard";
+import { GateLine, GateStrip, ProductRow } from "@/components/product/ProductCard";
 import { productFace } from "@/components/product/product-face";
 import { ProductRail } from "@/components/product/ProductRail";
 import { productJsonLd } from "@/components/product/product-structured-data";
@@ -163,7 +163,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const otherPlatforms = new Map<string, SiblingRow>();
   for (const s of siblings) if (s.platform !== item.platform && !otherPlatforms.has(s.platform) && (s.edition ?? null) === (item.edition ?? null)) otherPlatforms.set(s.platform, s);
   const otherIds = [...otherPlatforms.values()].slice(0, 5).map((s) => s.id);
-  const alternatives: PlatformAlternative[] = [...otherPlatforms.values()].map((s) => ({ label: platformInfo(s.platform).short, href: `/product/${s.slug}`, tone: platformInfo(s.platform).tone }));
+  const alternatives: PlatformAlternative[] = [...otherPlatforms.values()].map((s) => ({ label: platformInfo(s.platform).short, href: `/product/${s.slug}`, number: platformInfo(s.platform).number }));
 
   let baseGame: { slug: string; title: string } | null = null;
   if (kind === "dlc") {
@@ -185,7 +185,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       WHERE ${LIVE} AND k."productType" = ${kind} AND k."platform" = ${item.platform}
         ${genre ? Prisma.sql`AND k."genres" @> ARRAY[${genre}]::text[]` : Prisma.empty}
         AND p."id" NOT IN (${Prisma.join(exclude)})
-      ORDER BY abs(p."price" - ${price}) ASC LIMIT 5`
+      ORDER BY k."boardRank" ASC NULLS LAST, p."id" ASC LIMIT 5`
   ).map((r) => r.id);
   const [more, others] = await Promise.all([loadKeyProducts(moreIds), loadKeyProducts(otherIds)]);
 
@@ -234,7 +234,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (gameFacts && item.releaseDate) details.push({ label: "Release date", value: longDate(item.releaseDate) });
   if (item.genres.length) details.push({ label: "Genres", value: item.genres.map((g) => genreDef(g)?.label ?? g).join(", ") });
   if (item.ageRating) details.push({ label: "Age rating", value: item.ageRating });
-  details.push({ label: "Keyrook catalogue no.", value: product.sku, mono: true });
+  details.push({ label: "Keyterminus catalogue no.", value: product.sku, mono: true });
 
   const showsRequirements = PC_LAUNCHERS.has(item.platform) && (kind === "game" || kind === "dlc" || kind === "software") && Array.isArray(item.systemRequirements) && (item.systemRequirements as unknown[]).length > 0;
   const requirements = showsRequirements ? (item.systemRequirements as unknown as RequirementBlock[]) : null;
@@ -277,7 +277,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   };
 
   return (
-    <div data-product="" data-platform={platform.tone} className="mx-auto max-w-container px-gutter pb-28 lg:pb-24">
+    <div data-product="" className="mx-auto max-w-container px-gutter pb-28 lg:pb-24">
       <JsonLd data={jsonLd} />
       <RecordView id={product.id} />
       <Breadcrumbs items={crumbs} className="lg:hidden" withJsonLd={false} />
@@ -285,18 +285,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="grid grid-cols-[40%_minmax(0,1fr)] gap-x-4 gap-y-6 pt-1 lg:grid-cols-12 lg:gap-x-10 lg:pt-8">
         <div className="min-w-0 lg:col-span-5 lg:row-span-2">
           <div className="lg:sticky lg:top-[calc(var(--header-height-compact)+24px)]">
-            <ProductMedia images={product.images.map((i) => ({ url: i.url, alt: i.alt }))} title={item.title} videoId={item.videoId} platformLabel={platform.short} aspect={kind === "gift-card" || kind === "top-up" ? "card" : "3/4"} parts="cover" className="lg:hidden" />
-            <ProductMedia images={product.images.map((i) => ({ url: i.url, alt: i.alt }))} title={item.title} videoId={item.videoId} platformLabel={platform.short} aspect={kind === "gift-card" || kind === "top-up" ? "card" : "3/4"} className="max-lg:hidden" />
+            <ProductMedia images={product.images.map((i) => ({ url: i.url, alt: i.alt }))} title={item.title} videoId={item.videoId} platformLabel={platform.short} platformNumber={platform.number} gate={<GateStrip face={face} />} aspect={kind === "gift-card" || kind === "top-up" ? "card" : "3/4"} parts="cover" className="lg:hidden" />
+            <ProductMedia images={product.images.map((i) => ({ url: i.url, alt: i.alt }))} title={item.title} videoId={item.videoId} platformLabel={platform.short} platformNumber={platform.number} gate={<GateStrip face={face} size="md" />} aspect={kind === "gift-card" || kind === "top-up" ? "card" : "3/4"} className="max-lg:hidden" />
           </div>
         </div>
 
         <div className="min-w-0 lg:col-span-7">
           <Breadcrumbs items={crumbs} className="hidden pt-0 lg:block" />
-          <LabelRow face={face} size="md" edition className="flex-wrap gap-y-2" />
-          <h1 className="m-0 mt-3 text-step-4 leading-[1.04] text-ink [overflow-wrap:anywhere] lg:text-step-5">{item.title}</h1>
+          <GateLine face={face} size="md" edition className="flex-wrap gap-y-2" />
+          <h1 className="m-0 mt-3 text-step-3 leading-[1.04] text-ink [overflow-wrap:anywhere] lg:text-step-4">{item.title}</h1>
           {factsLine ? <p className="m-0 mt-2 text-ui-md text-ink-muted">{factsLine}</p> : null}
           <div className="mt-4 lg:hidden">
-            {available ? <PriceDisplay price={price} comparePrice={listing.comparePrice} size="md" /> : <span className="text-ui-md text-ink-muted">Out of stock</span>}
+            {available ? <PriceDisplay price={price} comparePrice={listing.comparePrice} size="md" /> : <span className="text-ui-md text-ink-muted">Not in stock</span>}
           </div>
         </div>
 
@@ -323,7 +323,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="mt-20 flex flex-col gap-20">
         {others.length ? (
           <section aria-labelledby="other-platforms-title">
-            <h2 id="other-platforms-title" className="m-0 text-step-4 leading-[1.06] text-ink">
+            <h2 id="other-platforms-title" className="m-0 text-step-3 leading-[1.06] text-ink">
               Also on other platforms
             </h2>
             <ul className="m-0 mt-6 grid list-none border-t border-rule p-0 md:grid-cols-2 md:gap-x-10">
@@ -335,7 +335,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </ul>
           </section>
         ) : null}
-        <ProductRail id="more" title={`More for ${platform.short}`} lead={genreCrumb ? `${genreCrumb.label}, close to this price.` : "Close to this price."} products={more} link={{ href: `/platform/${platform.slug}`, label: `All ${platform.short} keys` }} />
+        <ProductRail
+          id="more"
+          title={platform.number ? `More on platform ${platform.number} · ${platform.short}` : `More on ${platform.short}`}
+          lead={genreCrumb ? `More ${genreCrumb.label.toLowerCase()} on ${platform.short}, in board order.` : `More on ${platform.short}, in board order.`}
+          products={more}
+          link={{ href: `/platform/${platform.slug}`, label: `All ${platform.short} keys` }}
+        />
         <RecentlyViewed excludeId={product.id} />
       </div>
     </div>

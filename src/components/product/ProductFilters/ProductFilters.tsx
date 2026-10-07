@@ -1,17 +1,18 @@
 "use client";
 
-import { useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import { useId, useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { Check, ChevronDown, X } from "lucide-react";
+import { Check, SquareChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { Checkbox, Switch } from "@/components/ui/Choice";
 import { Input } from "@/components/ui/Field";
+import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/Dialog";
-import { TickBand } from "@/components/ui/Dial";
+import { PlatformTile } from "@/components/ui/PlatformTile";
 import { FilterChip, FilterChipRow } from "@/components/ui/Chip";
-import { platformInfo, typeTone } from "@/lib/catalog/platforms";
+import { FARE_ZONES } from "@/config/merchandising";
 import { toggleValue, type CatalogFacets, type FacetOption, type ListFilter } from "@/components/catalog/catalog-url";
 
 export interface FilterSelection {
@@ -34,20 +35,31 @@ export function FilterGroup({ title, selectedCount = 0, defaultOpen = false, chi
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div data-open={open || undefined} data-filter-group="" className="border-b border-line">
-      <h3 className="m-0 font-sans font-normal tracking-normal [font-stretch:100%]">
-        <button type="button" aria-expanded={open} aria-controls={`${id}-panel`} id={`${id}-trigger`} onClick={() => setOpen((v) => !v)} className="flex h-12 w-full cursor-pointer items-center gap-3 text-left text-ink">
-          <span className="eyebrow flex-1">{title}</span>
+      <h3 className="m-0 font-sans font-normal tracking-normal">
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={`${id}-panel`}
+          id={`${id}-trigger`}
+          onClick={() => setOpen((v) => !v)}
+          className={cn(
+            "relative flex h-12 w-full cursor-pointer items-center gap-3 text-left text-ink",
+            "after:absolute after:bottom-[-1px] after:left-0 after:h-[3px] after:w-full after:bg-brand after:transition-opacity after:duration-[120ms]",
+            selectedCount > 0 ? "after:opacity-100" : "after:opacity-0",
+          )}
+        >
+          <span className="label-caps flex-1 pt-0.5 text-ink">{title}</span>
           {selectedCount > 0 ? (
-            <span className="font-mono text-data-sm font-medium text-ink" aria-label={t("selectedCount", { count: selectedCount })}>
+            <span className="font-mono text-data-sm text-ink" aria-label={t("selectedCount", { count: selectedCount })}>
               {selectedCount}
             </span>
           ) : null}
-          <ChevronDown size={16} aria-hidden="true" className={cn("text-ink-muted transition-transform duration-[180ms] ease-[var(--ease-latch)]", open && "rotate-180")} />
+          <SquareChevronDown size={18} aria-hidden="true" className={cn("text-ink-muted transition-transform duration-[180ms] ease-[var(--ease-sign)]", open && "rotate-180")} />
         </button>
       </h3>
-      <div id={`${id}-panel`} role="region" aria-labelledby={`${id}-trigger`} inert={!open} className={cn("grid transition-[grid-template-rows] duration-[180ms] ease-[var(--ease-latch)]", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
+      <div id={`${id}-panel`} role="region" aria-labelledby={`${id}-trigger`} inert={!open} className={cn("grid transition-[grid-template-rows] duration-[180ms] ease-[var(--ease-sign)]", open ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
         <div className="relative min-h-0 overflow-hidden">
-          <div className="pb-4">{children}</div>
+          <div className="pb-5 pt-1">{children}</div>
         </div>
       </div>
     </div>
@@ -73,121 +85,10 @@ export function useDisplayPrice() {
   };
 }
 
-const PRICE_DETENTS = [5, 10, 20, 40];
-
-export interface RangeRulerProps {
-  bounds: { min: number; max: number };
-  value: { min: number; max: number };
-  onCommit: (value: { min: number; max: number }) => void;
-  format: (n: number) => string;
-  labels: { min: string; max: string };
-  detents?: number[];
-  step?: number;
-  scale?: "linear" | "sqrt";
-  children?: ReactNode;
-}
-
-export function RangeRuler({ bounds, value, onCommit, format, labels, detents = [], step = 1, scale = "linear", children }: RangeRulerProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const signature = `${value.min}|${value.max}`;
-  const [state, setState] = useState({ signature, min: value.min, max: value.max });
-  if (state.signature !== signature) setState({ signature, min: value.min, max: value.max });
-  const local = { min: state.min, max: state.max };
-  const setLocal = (fn: (cur: { min: number; max: number }) => { min: number; max: number }) => setState((s) => ({ ...s, ...fn({ min: s.min, max: s.max }) }));
-  const dragging = useRef<"min" | "max" | null>(null);
-  const span = Math.max(step, bounds.max - bounds.min);
-  const toT = (n: number) => {
-    const t = (n - bounds.min) / span;
-    return scale === "sqrt" ? Math.sqrt(Math.max(0, t)) : t;
-  };
-  const fromT = (t: number) => bounds.min + (scale === "sqrt" ? t * t : t) * span;
-  const pct = (n: number) => toT(n) * 100;
-  const clampStep = (n: number) => Math.round(Math.min(bounds.max, Math.max(bounds.min, n)) / step) * step;
-
-  const fromPointer = (clientX: number) => {
-    const rect = trackRef.current?.getBoundingClientRect();
-    if (!rect) return bounds.min;
-    return clampStep(fromT(Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))));
-  };
-
-  const update = (thumb: "min" | "max", next: number) => {
-    setLocal((cur) => (thumb === "min" ? { min: Math.min(next, cur.max), max: cur.max } : { min: cur.min, max: Math.max(next, cur.min) }));
-  };
-
-  const commit = () => {
-    if (local.min !== value.min || local.max !== value.max) onCommit(local);
-  };
-
-  const stops = [bounds.min, ...detents.filter((d) => d > bounds.min && d < bounds.max), bounds.max];
-  const onKey = (thumb: "min" | "max") => (e: KeyboardEvent<HTMLSpanElement>) => {
-    const current = local[thumb];
-    let next: number | null = null;
-    if (e.key === "ArrowRight" || e.key === "ArrowUp") next = current + step;
-    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = current - step;
-    else if (e.key === "PageUp") next = stops.find((s) => s > current) ?? bounds.max;
-    else if (e.key === "PageDown") next = [...stops].reverse().find((s) => s < current) ?? bounds.min;
-    else if (e.key === "Home") next = bounds.min;
-    else if (e.key === "End") next = bounds.max;
-    if (next === null) return;
-    e.preventDefault();
-    update(thumb, clampStep(next));
-  };
-
-  const thumb = (which: "min" | "max") => (
-    <span
-      role="slider"
-      tabIndex={0}
-      aria-label={which === "min" ? labels.min : labels.max}
-      aria-valuemin={which === "min" ? bounds.min : local.min}
-      aria-valuemax={which === "min" ? local.max : bounds.max}
-      aria-valuenow={local[which]}
-      aria-valuetext={format(local[which])}
-      onKeyDown={onKey(which)}
-      onKeyUp={commit}
-      onBlur={commit}
-      onPointerDown={(e: PointerEvent<HTMLSpanElement>) => {
-        dragging.current = which;
-        e.currentTarget.setPointerCapture(e.pointerId);
-      }}
-      onPointerMove={(e: PointerEvent<HTMLSpanElement>) => {
-        if (dragging.current === which) update(which, fromPointer(e.clientX));
-      }}
-      onPointerUp={() => {
-        dragging.current = null;
-        commit();
-      }}
-      data-thumb={which}
-      style={{ left: `${pct(local[which])}%` }}
-      className="absolute bottom-0 z-[2] flex h-8 w-6 -translate-x-1/2 cursor-grab touch-none items-end justify-center active:cursor-grabbing"
-    >
-      <span aria-hidden="true" className="block h-3.5 w-0.5 bg-brand" />
-    </span>
-  );
-
-  return (
-    <div className="px-3 pb-1 pt-2" data-range-ruler="">
-      <div ref={trackRef} className="relative">
-        {children}
-        <div className="relative h-8">
-          <TickBand className="absolute inset-x-0 bottom-px" major={false} />
-          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-rule" />
-          <span aria-hidden="true" className="absolute bottom-0 h-0.5 bg-ink" style={{ left: `${pct(local.min)}%`, right: `${100 - pct(local.max)}%` }} />
-          {stops.map((d) => (
-            <span key={d} aria-hidden="true" className="absolute bottom-0 h-3 w-px -translate-x-1/2 bg-ink-subtle" style={{ left: `${pct(d)}%` }} />
-          ))}
-          {thumb("min")}
-          {thumb("max")}
-        </div>
-      </div>
-      <div className="relative mt-1.5 h-4 font-mono text-[0.75rem] text-ink-muted" aria-hidden="true">
-        {stops.map((d, i) => (
-          <span key={d} className={cn("absolute top-0 whitespace-nowrap", i === 0 ? "" : i === stops.length - 1 ? "-translate-x-full" : "-translate-x-1/2")} style={{ left: `${pct(d)}%` }}>
-            {format(d)}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
+export function fareZoneLabel(zone: { min: number | null; max: number | null }, format: (n: number) => string) {
+  if (zone.min === null && zone.max !== null) return `Under ${format(zone.max)}`;
+  if (zone.max === null && zone.min !== null) return `${format(zone.min)} and up`;
+  return `${format(zone.min ?? 0)}–${format(zone.max ?? 0)}`;
 }
 
 function PriceGroup({
@@ -218,11 +119,36 @@ function PriceGroup({
 
   const lo = bounds ? Math.floor(bounds.min * rate) : 0;
   const hi = bounds ? Math.ceil(bounds.max * rate) : 0;
+  const zones = FARE_ZONES.filter((z) => !bounds || ((z.max === null || z.max > lo) && (z.min === null || z.min < hi)));
+  const zoneBase = (z: { min: number | null; max: number | null }) => ({ minPrice: z.min === null ? null : toBase(z.min), maxPrice: z.max === null ? null : toBase(z.max) });
 
   return (
     <>
+      {zones.length > 1 ? (
+        <ul className="m-0 mb-4 flex list-none flex-wrap gap-1.5 p-0" aria-label="Price ranges">
+          {zones.map((z) => {
+            const target = zoneBase(z);
+            const on = target.minPrice === minPrice && target.maxPrice === maxPrice;
+            return (
+              <li key={z.key}>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => onChange(on ? { minPrice: null, maxPrice: null } : target)}
+                  className={cn(
+                    "inline-flex h-8 cursor-pointer items-center rounded-sign border px-2.5 font-mono text-[0.8125rem] transition-colors duration-[120ms]",
+                    on ? "border-ink bg-ink text-surface" : "border-control bg-raised text-ink hover-device:hover:border-ink",
+                  )}
+                >
+                  {fareZoneLabel(z, (n) => format(n))}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
       <form
-        className="grid grid-cols-2 gap-3 pt-1"
+        className="grid grid-cols-2 gap-3"
         onSubmit={(e) => {
           e.preventDefault();
           commit(draft.min, draft.max);
@@ -234,55 +160,32 @@ function PriceGroup({
           {t("applyPrice")}
         </button>
       </form>
-      {bounds && hi > lo ? (
-        <div className="mt-3">
-          <RangeRuler
-            bounds={{ min: lo, max: hi }}
-            value={{ min: minPrice !== null ? Math.max(lo, Math.floor(toDisplay(minPrice))) : lo, max: maxPrice !== null ? Math.min(hi, Math.ceil(toDisplay(maxPrice))) : hi }}
-            format={(n) => format(n)}
-            labels={{ min: t("minPrice"), max: t("maxPrice") }}
-            detents={PRICE_DETENTS}
-            scale="sqrt"
-            onCommit={(v) => onChange({ minPrice: v.min > lo ? toBase(v.min) : null, maxPrice: v.max < hi ? toBase(v.max) : null })}
-          />
-        </div>
-      ) : null}
     </>
   );
 }
 
-function YearHistogram({ options, selected, onChange }: { options: FacetOption[]; selected: string[]; onChange: (years: string[]) => void }) {
-  const years = options.map((o) => Number(o.key)).filter(Number.isFinite);
-  const min = Math.min(...years);
-  const max = Math.max(...years);
-  const counts = new Map(options.map((o) => [Number(o.key), o.count]));
-  const peak = Math.max(1, ...options.map((o) => o.count));
+function YearRange({ options, selected, onChange }: { options: FacetOption[]; selected: string[]; onChange: (years: string[]) => void }) {
+  const years = options
+    .map((o) => Number(o.key))
+    .filter(Number.isFinite)
+    .sort((a, b) => b - a);
+  if (years.length < 2) return null;
+  const newest = years[0];
+  const oldest = years[years.length - 1];
   const chosen = selected.map(Number).filter(Number.isFinite);
-  const value = { min: chosen.length ? Math.min(...chosen) : min, max: chosen.length ? Math.max(...chosen) : max };
-  const all = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-  const span = Math.max(1, max - min);
-  if (!Number.isFinite(min) || max <= min) return null;
+  const from = chosen.length ? Math.min(...chosen) : oldest;
+  const to = chosen.length ? Math.max(...chosen) : newest;
+  const apply = (a: number, b: number) => {
+    const lo = Math.min(a, b);
+    const hi = Math.max(a, b);
+    if (lo === oldest && hi === newest) onChange([]);
+    else onChange(years.filter((y) => y >= lo && y <= hi).map(String));
+  };
+  const opts = years.map((y) => ({ value: String(y), label: String(y) }));
   return (
-    <div data-year-histogram="">
-      <RangeRuler
-        bounds={{ min, max }}
-        value={value}
-        format={(n) => String(n)}
-        labels={{ min: "From year", max: "To year" }}
-        detents={all.filter((y) => y % 5 === 0)}
-        onCommit={(v) => {
-          if (v.min === min && v.max === max) onChange([]);
-          else onChange(all.filter((y) => y >= v.min && y <= v.max && counts.has(y)).map(String));
-        }}
-      >
-        <div aria-hidden="true" className="relative h-12">
-          {all.map((y) => {
-            const c = counts.get(y) ?? 0;
-            const inRange = y >= value.min && y <= value.max;
-            return <span key={y} className={cn("absolute bottom-0 w-1.5 -translate-x-1/2", inRange ? "bg-ink-muted" : "bg-line-hover")} style={{ left: `${((y - min) / span) * 100}%`, height: `${c ? Math.max(6, (c / peak) * 100) : 0}%` }} />;
-          })}
-        </div>
-      </RangeRuler>
+    <div className="grid grid-cols-2 gap-3">
+      <Select label="From" size="sm" value={String(from)} options={opts} onChange={(e) => apply(Number(e.target.value), to)} className="font-mono" />
+      <Select label="To" size="sm" value={String(to)} options={opts} onChange={(e) => apply(from, Number(e.target.value))} className="font-mono" />
     </div>
   );
 }
@@ -290,27 +193,26 @@ function YearHistogram({ options, selected, onChange }: { options: FacetOption[]
 function OptionRows({ filter, options, selected, onToggle }: { filter: ListFilter; options: FacetOption[]; selected: string[]; onToggle: (key: string) => void }) {
   return (
     <div>
-      {options.map((option) => {
-        const tone = filter === "platforms" ? platformInfo(option.key).tone : null;
-        const type = filter === "types" ? typeTone(option.key) : null;
-        return (
-          <div key={option.key} data-platform={tone ?? undefined} data-type={type ?? undefined} className={cn(type && "[&_label:hover_.opt-label]:underline [&_label:hover_.opt-label]:decoration-type [&_label:hover_.opt-label]:decoration-2 [&_label:hover_.opt-label]:underline-offset-4")}>
-            <Checkbox
-              dense
-              label={
-                <span className="opt-label inline-flex items-center gap-2">
-                  {tone ? <span aria-hidden="true" className="size-1.5 shrink-0 bg-platform" /> : null}
-                  {option.label}
-                </span>
-              }
-              count={option.count}
-              checked={selected.includes(option.key)}
-              disabled={option.count === 0 && !selected.includes(option.key)}
-              onChange={() => onToggle(option.key)}
-            />
-          </div>
-        );
-      })}
+      {options.map((option) => (
+        <Checkbox
+          key={option.key}
+          dense
+          label={
+            filter === "platforms" ? (
+              <span className="inline-flex items-center gap-2.5">
+                <PlatformTile platform={option.key} size="xs" className="h-[22px]" />
+                <span className="pt-px">{option.label}</span>
+              </span>
+            ) : (
+              option.label
+            )
+          }
+          count={option.count}
+          checked={selected.includes(option.key)}
+          disabled={option.count === 0 && !selected.includes(option.key)}
+          onChange={() => onToggle(option.key)}
+        />
+      ))}
     </div>
   );
 }
@@ -375,10 +277,10 @@ function LanguageCombobox({ options, selected, onToggle }: { options: FacetOptio
         onFocus={() => setOpen(true)}
         onBlur={() => window.setTimeout(() => setOpen(false), 120)}
         onKeyDown={onKey}
-        className="block h-10 w-full border border-control bg-raised px-3 text-ui-sm text-ink shadow-machined-pressed placeholder:text-ink-subtle hover-device:hover:border-ink-muted"
+        className="block h-9 w-full rounded-control border border-control bg-raised px-3 text-ui-sm text-ink placeholder:text-ink-subtle hover-device:hover:border-ink-muted"
       />
       {open ? (
-        <ul id={listId} role="listbox" aria-multiselectable="true" aria-label="Languages" className="absolute inset-x-0 top-full z-10 m-0 mt-1 max-h-[260px] list-none overflow-y-auto border border-control bg-raised p-0 shadow-lg">
+        <ul id={listId} role="listbox" aria-multiselectable="true" aria-label="Languages" className="absolute inset-x-0 top-full z-10 m-0 mt-1 max-h-[260px] list-none overflow-y-auto rounded-card bg-raised p-1 shadow-overlay">
           {visible.length === 0 ? <li className="px-3 py-2 text-ui-sm text-ink-muted">Nothing matches “{query}”.</li> : null}
           {visible.map((o, i) => {
             const isSelected = selected.includes(o.key);
@@ -391,10 +293,10 @@ function LanguageCombobox({ options, selected, onToggle }: { options: FacetOptio
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => onToggle(o.key)}
                 onPointerEnter={() => setActive(i)}
-                className={cn("flex min-h-10 cursor-pointer items-center gap-2.5 px-3 text-ui-sm text-ink", i === active && "bg-brand-soft")}
+                className={cn("flex min-h-10 cursor-pointer items-center gap-2.5 rounded-sign px-2.5 text-ui-sm text-ink", i === active && "bg-brand-soft")}
               >
-                <span className={cn("grid size-4 shrink-0 place-items-center border", isSelected ? "border-brand bg-brand text-on-brand" : "border-control")}>{isSelected ? <Check size={12} aria-hidden="true" /> : null}</span>
-                <span className="flex-1">{o.label}</span>
+                <span className={cn("grid size-[18px] shrink-0 place-items-center rounded-sign border-[1.5px]", isSelected ? "border-accent-edge bg-brand text-on-brand" : "border-control")}>{isSelected ? <Check size={12} aria-hidden="true" /> : null}</span>
+                <span className="flex-1 pt-px">{o.label}</span>
                 <span className="font-mono text-data-sm text-ink-muted">{o.count.toLocaleString("en-GB")}</span>
               </li>
             );
@@ -425,37 +327,37 @@ export interface ProductFiltersProps {
 
 export function ProductFilters({ facets, selection, onChange, hide = [], lockOnSale = false, className }: ProductFiltersProps) {
   const t = useTranslations("catalog");
-  const priceCount = (selection.minPrice !== null ? 1 : 0) + (selection.maxPrice !== null ? 1 : 0);
+  const priceCount = selection.minPrice !== null || selection.maxPrice !== null ? 1 : 0;
   const list = (filter: ListFilter) => facets[filter].filter((o) => o.count > 0 || o.selected);
   const toggle = (filter: ListFilter) => (key: string) => onChange({ [filter]: toggleValue(selection[filter], key) } as Partial<FilterSelection>);
   const show = (filter: ListFilter) => !hide.includes(filter) && (list(filter).length > 1 || selection[filter].length > 0);
 
   return (
-    <div className={cn("border-t border-rule", className)} data-vault-index="">
-      {show("types") ? (
-        <FilterGroup title="Type" selectedCount={selection.types.length} defaultOpen>
-          <OptionRows filter="types" options={list("types")} selected={selection.types} onToggle={toggle("types")} />
-        </FilterGroup>
-      ) : null}
+    <div className={cn("border-t border-rule", className)} data-information-panel="">
       {show("platforms") ? (
         <FilterGroup title="Platform" selectedCount={selection.platforms.length} defaultOpen>
           <OptionRows filter="platforms" options={list("platforms")} selected={selection.platforms} onToggle={toggle("platforms")} />
         </FilterGroup>
       ) : null}
-      {show("regions") ? (
-        <FilterGroup title="Region" selectedCount={selection.regions.length} defaultOpen={selection.regions.length > 0}>
-          <OptionRows filter="regions" options={list("regions")} selected={selection.regions} onToggle={toggle("regions")} />
-          <p className="m-0 mt-2 text-ui-sm text-ink-muted">A region-locked key activates only on accounts in that region.</p>
-        </FilterGroup>
-      ) : null}
-      {show("genres") ? (
-        <FilterGroup title="Genre" selectedCount={selection.genres.length} defaultOpen={selection.genres.length > 0}>
-          <SearchableRows filter="genres" options={list("genres")} selected={selection.genres} onToggle={toggle("genres")} placeholder="Find a genre" />
+      {show("types") ? (
+        <FilterGroup title="Type" selectedCount={selection.types.length} defaultOpen>
+          <OptionRows filter="types" options={list("types")} selected={selection.types} onToggle={toggle("types")} />
         </FilterGroup>
       ) : null}
       {facets.price ? (
         <FilterGroup title={t("groupPrice")} selectedCount={priceCount} defaultOpen>
           <PriceGroup bounds={facets.price} minPrice={selection.minPrice} maxPrice={selection.maxPrice} onChange={onChange} />
+        </FilterGroup>
+      ) : null}
+      {show("regions") ? (
+        <FilterGroup title="Region" selectedCount={selection.regions.length} defaultOpen={selection.regions.length > 0}>
+          <OptionRows filter="regions" options={list("regions")} selected={selection.regions} onToggle={toggle("regions")} />
+          <p className="m-0 mt-2 text-ui-sm text-ink-muted">A region-locked key activates only on accounts set to that region.</p>
+        </FilterGroup>
+      ) : null}
+      {show("genres") ? (
+        <FilterGroup title="Genre" selectedCount={selection.genres.length} defaultOpen={selection.genres.length > 0}>
+          <SearchableRows filter="genres" options={list("genres")} selected={selection.genres} onToggle={toggle("genres")} placeholder="Find a genre" />
         </FilterGroup>
       ) : null}
       {show("languages") ? (
@@ -465,12 +367,12 @@ export function ProductFilters({ facets, selection, onChange, hide = [], lockOnS
       ) : null}
       {show("years") ? (
         <FilterGroup title="Release year" selectedCount={selection.years.length ? 1 : 0} defaultOpen={selection.years.length > 0}>
-          <YearHistogram options={list("years")} selected={selection.years} onChange={(years) => onChange({ years })} />
+          <YearRange options={list("years")} selected={selection.years} onChange={(years) => onChange({ years })} />
         </FilterGroup>
       ) : null}
       {!lockOnSale && (facets.onSaleCount > 0 || selection.onSale) ? (
         <FilterGroup title="On sale" selectedCount={selection.onSale ? 1 : 0} defaultOpen>
-          <Switch checked={selection.onSale} onChange={(v) => onChange({ onSale: v })} label="Only show discounted keys" description={`${facets.onSaleCount.toLocaleString("en-GB")} ${facets.onSaleCount === 1 ? "key" : "keys"}`} className="py-1" />
+          <Switch checked={selection.onSale} onChange={(v) => onChange({ onSale: v })} label={t("reduced")} description={`${facets.onSaleCount.toLocaleString("en-GB")} ${facets.onSaleCount === 1 ? "key" : "keys"}`} className="py-1" />
         </FilterGroup>
       ) : null}
     </div>
@@ -487,8 +389,16 @@ export interface SummaryChip {
 export function FilterSummary({ total, parts = [], chips = [], onClearAll, className }: { total: number; parts?: string[]; chips?: SummaryChip[]; onClearAll?: () => void; className?: string }) {
   return (
     <div className={cn("flex min-w-0 flex-col gap-3", className)}>
-      <p className="m-0 font-mono text-data text-ink" aria-live="polite">
-        {[`${total.toLocaleString("en-GB")} ${total === 1 ? "key" : "keys"}`, ...parts].join(" · ")}
+      <p className="m-0 text-ui-md text-ink" aria-live="polite">
+        <span className="font-mono">{total.toLocaleString("en-GB")}</span> {total === 1 ? "key" : "keys"}
+        {parts.map((part) => (
+          <span key={part}>
+            <span aria-hidden="true" className="px-1.5 text-ink-subtle">
+              ·
+            </span>
+            {part}
+          </span>
+        ))}
       </p>
       {chips.length > 0 ? (
         <FilterChipRow onClearAll={onClearAll}>
@@ -508,20 +418,20 @@ export function ProductFiltersSheet({ open, onClose, total, onClearAll, children
     <Sheet open={open} onClose={onClose} side="bottom" labelledBy={titleId}>
       <div className="flex h-full flex-col">
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-line pl-4 pr-2">
-          <h2 id={titleId} className="text-step-2 font-semibold leading-none">
+          <h2 id={titleId} className="m-0 text-step-2 font-bold leading-none">
             {t("filtersTitle")}
           </h2>
-          <button type="button" onClick={onClose} aria-label={t("closeFilters")} className="flex size-11 cursor-pointer items-center justify-center text-ink">
+          <button type="button" onClick={onClose} aria-label={t("closeFilters")} className="flex size-11 cursor-pointer items-center justify-center rounded-control text-ink hover-device:hover:bg-surface-1">
             <X size={20} aria-hidden="true" />
           </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4">{children}</div>
         <div className="flex shrink-0 items-center justify-between gap-4 border-t border-line bg-raised px-4 py-3">
           <Button variant="ghost" onPress={onClearAll}>
-            Clear all
+            {t("clearAll")}
           </Button>
           <Button onPress={onClose} className="flex-1">
-            Show {total.toLocaleString("en-GB")} {total === 1 ? "key" : "keys"}
+            {t("showProducts", { count: total })}
           </Button>
         </div>
       </div>

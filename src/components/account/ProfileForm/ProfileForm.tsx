@@ -9,7 +9,7 @@ import { Accordion, AccordionItem } from "@/components/ui/Accordion";
 import { Input, PasswordInput } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
-import { ReadoutLoader } from "@/components/ui/ReadoutLoader";
+import { PageLoader } from "@/components/ui/Flap";
 import { PhoneField } from "@/components/account/fields/PhoneField";
 import { DateOfBirthField } from "@/components/account/fields/DateOfBirthField";
 import { useFieldError } from "@/lib/hooks/useFieldError";
@@ -124,7 +124,7 @@ export function ProfileForm() {
     <div>
       <AccountPageHeader title={t("title")} />
       {loading ? (
-        <ReadoutLoader block label={t("loading")} />
+        <PageLoader block label={t("loading")} />
       ) : error || !data ? (
         <LoadError onRetry={reload} />
       ) : (

@@ -33,18 +33,19 @@ function hex(value: string): RGB {
   return rgb(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
 }
 
-const INK = hex("#0F1513");
-const MUTED = hex("#3E4945");
-const SUBTLE = hex("#505B57");
-const PAINT = hex("#0F1513");
-const INDEX = hex("#0F7A50");
-const LINE = hex("#A3ADA9");
+const INK = hex("#1B1C1D");
+const MUTED = hex("#4B4842");
+const SUBTLE = hex("#5D5951");
+const PAINT = hex("#1B1C1D");
+const MUSTARD = hex("#E2AE2F");
+const TERMINUS = hex("#D29D1A");
+const LINE = hex("#B5AE9F");
 
 const FONT_FILES = {
-  display: "hubot-sans-latin-125-600-normal.woff",
-  body: "mona-sans-latin-400-normal.woff",
-  strong: "mona-sans-latin-600-normal.woff",
-  mono: "red-hat-mono-latin-500-normal.woff",
+  display: "overpass-latin-800-normal.woff",
+  body: "overpass-latin-400-normal.woff",
+  strong: "overpass-latin-700-normal.woff",
+  mono: "sometype-mono-latin-500-normal.woff",
 } as const;
 
 const FALLBACK_LETTERS: Record<string, string> = {
@@ -217,24 +218,23 @@ function tableHeader(w: Writer) {
   w.y -= 16;
 }
 
-function wordmark(w: Writer, x: number, y: number, size: number) {
-  const scale = size / 1000;
-  const top = y + WORDMARK.cap * scale;
-  const mark = LOCKUP.markToCap * WORDMARK.cap;
-  const markScale = (mark / MARK.size) * scale;
-  const markTop = top - ((WORDMARK.cap - mark) / 2) * scale;
-  const { lamp } = MARK.full;
-  w.page.drawSvgPath(MARK.full.path, { x, y: markTop, scale: markScale, color: PAINT });
-  w.page.drawCircle({ x: x + lamp.cx * markScale, y: markTop - lamp.cy * markScale, size: lamp.r * markScale, color: INDEX });
-  w.page.drawSvgPath(WORDMARK.letters, { x: x + (mark + LOCKUP.gapToCap * WORDMARK.cap) * scale, y: top, scale, color: PAINT });
+function wordmark(w: Writer, x: number, baseline: number, capHeight: number) {
+  const s = capHeight / WORDMARK.cap;
+  const { mark, lettersX } = LOCKUP;
+  const { key, bar } = MARK.full;
+  w.page.drawSvgPath(key, { x: x + mark.translateX * s, y: baseline - mark.translateY * s, scale: mark.scale * s, color: PAINT });
+  const barLeft = mark.translateX + bar.x * mark.scale;
+  const barBottom = mark.translateY + (bar.y + bar.height) * mark.scale;
+  w.page.drawRectangle({ x: x + barLeft * s, y: baseline - barBottom * s, width: bar.width * mark.scale * s, height: bar.height * mark.scale * s, color: TERMINUS });
+  w.page.drawSvgPath(WORDMARK.letters, { x: x + lettersX * s, y: baseline, scale: s, color: PAINT });
 }
 
 function masthead(w: Writer, number: string, compact: boolean) {
   const top = PAGE.height - PAGE.margin;
-  wordmark(w, PAGE.margin, top - 22, compact ? 20 : 28);
+  wordmark(w, PAGE.margin, top - 26, compact ? 11 : 14);
   w.label("Invoice", PAGE.width - PAGE.margin, top - 8, "right");
   w.text(number, PAGE.width - PAGE.margin, top - 24, { font: w.fonts.mono, size: 11, align: "right" });
-  w.rule(top - 36, 2, PAINT);
+  w.rule(top - 36, 3, MUSTARD);
   w.y = top - 36 - 28;
 }
 
@@ -320,12 +320,13 @@ export async function renderInvoicePdf(order: InvoiceSource): Promise<Uint8Array
   const deliveredBottom = addressColumn(w, "Delivery", ["Digital activation keys", `Issued to the ${BRAND.name} account`, order.customerEmail], rightX, w.y);
   w.y = Math.min(billedBottom, deliveredBottom) - 22;
 
+  const deliveredLine = order.paidAt ? `Key delivered to your account, ${longDate(order.paidAt)}. Key codes are not printed on invoices.` : "Key delivered to your account. Key codes are not printed on invoices.";
   tableHeader(w);
   order.items.forEach((item, index) => {
     const line = totals.lines[index];
     const nameLines = wrap(fonts.body, item.productName, 9.5, DESCRIPTION_WIDTH);
     const variantLines = item.variantName ? wrap(fonts.body, item.variantName, 8.5, DESCRIPTION_WIDTH) : [];
-    const height = nameLines.length * 13 + variantLines.length * 11.5 + 10;
+    const height = nameLines.length * 13 + variantLines.length * 11.5 + 11.5 + 10;
     if (w.y - height < PAGE.margin + FOOTER_SPACE) {
       w.addPage();
       masthead(w, number, true);
@@ -334,6 +335,7 @@ export async function renderInvoicePdf(order: InvoiceSource): Promise<Uint8Array
     const rowTop = w.y;
     nameLines.forEach((part, i) => w.text(part, PAGE.margin, rowTop - i * 13, { size: 9.5 }));
     variantLines.forEach((part, i) => w.text(part, PAGE.margin, rowTop - nameLines.length * 13 - i * 11.5 + 1, { size: 8.5, color: MUTED }));
+    w.text(deliveredLine, PAGE.margin, rowTop - nameLines.length * 13 - variantLines.length * 11.5 + 1, { font: fonts.mono, size: 7.5, color: MUTED });
     w.text(String(item.quantity), COLUMNS.qty, rowTop, { size: 9.5, color: MUTED, align: "right" });
     w.text(money(line?.unit ?? 0, currency), COLUMNS.unit, rowTop, { font: fonts.mono, size: 8.5, color: MUTED, align: "right" });
     w.text(money(line?.total ?? 0, currency), COLUMNS.amount, rowTop, { font: fonts.mono, size: 8.5, align: "right" });

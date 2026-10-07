@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Pin, RotateCcwKey, ShieldCheck, Timer } from "lucide-react";
+import { CreditCard, Inbox, ListCheck, ListPlus, Replace, TicketCheck } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
-import { Lamp } from "@/components/ui/Lamp";
+import { Remark } from "@/components/ui/Remark";
+import { PlatformTile } from "@/components/ui/PlatformTile";
+import { dealPercent } from "@/lib/catalog/remarks";
 import { PriceDisplay } from "@/components/shared/PriceDisplay/PriceDisplay";
 import { PaymentLogos } from "@/components/shared/PaymentLogos/PaymentLogos";
 import { QuantitySelector } from "@/components/shared/QuantitySelector/QuantitySelector";
@@ -14,12 +16,12 @@ import { useWishlist } from "@/providers/WishlistProvider";
 import { useCart } from "@/providers/CartProvider";
 import { itemQuantityCap } from "@/lib/pricing";
 import { STORE_POLICY } from "@/config/store-policy";
-import { productFace, useAddToCart, type CatalogProduct } from "./ProductCard";
+import { GateLine, productFace, useAddToCart, type CatalogProduct } from "./ProductCard";
 
 export interface PlatformAlternative {
   label: string;
   href: string;
-  tone: string;
+  number: number | null;
 }
 
 export interface BuyBoxProps {
@@ -44,7 +46,7 @@ export function BuyBox({ product, alternatives = [], priceAvailable = true, demo
   const actionRef = useRef<HTMLDivElement>(null);
   const face = productFace(product.name, product.key);
   const outOfStock = product.quantity !== undefined && product.quantity <= 0;
-  const pinned = isSaved(product.id);
+  const saved = isSaved(product.id);
   const cap = itemQuantityCap(product.quantity, product.key?.productType);
   const inCartQty = cart.items.find((i) => i.productId === product.id)?.quantity ?? 0;
   const compare = product.comparePrice != null ? Number(product.comparePrice) : null;
@@ -80,13 +82,14 @@ export function BuyBox({ product, alternatives = [], priceAvailable = true, demo
   };
 
   const rows = [
-    { key: "delivery", Icon: Timer, text: STORE_POLICY.delivery.headline, href: null as string | null, show: true },
-    { key: "secure", Icon: ShieldCheck, text: "Card payment on a hosted page with 3-D Secure.", href: null, show: STORE_POLICY.payment.hostedPage && STORE_POLICY.payment.threeDSecure },
-    { key: "guarantee", Icon: RotateCcwKey, text: `${STORE_POLICY.guarantee.headline}.`, href: "/policies/returns#when-we-refund", show: STORE_POLICY.guarantee.faultyKey },
+    { key: "delivery", Icon: Inbox, text: STORE_POLICY.delivery.headline, href: null as string | null, show: true },
+    { key: "secure", Icon: CreditCard, text: "Card payment on a hosted page with 3-D Secure.", href: null, show: STORE_POLICY.payment.hostedPage && STORE_POLICY.payment.threeDSecure },
+    { key: "guarantee", Icon: Replace, text: `${STORE_POLICY.guarantee.headline}.`, href: "/policies/returns#when-we-refund", show: STORE_POLICY.guarantee.faultyKey },
   ].filter((r) => r.show);
 
   return (
-    <section aria-label="Buy" data-buy-box="" data-platform={face.tone} className={cn("plate p-5 sm:p-6", className)}>
+    <section aria-label="Buy" data-buy-box="" className={cn("rounded-card border border-line bg-raised p-5 sm:p-6", className)}>
+      <GateLine face={face} size="md" edition className="mb-4" />
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
         {!priceAvailable ? (
           <p className="m-0 text-step-1 text-ink-muted">Price unavailable right now</p>
@@ -99,27 +102,27 @@ export function BuyBox({ product, alternatives = [], priceAvailable = true, demo
           <PriceDisplay price={price} comparePrice={compare} size="xl" layout="inline" />
         )}
         <p data-stock={outOfStock ? "out" : "in"} className="m-0 flex items-center gap-2 text-ui-md text-ink">
-          <Lamp on={!outOfStock} />
-          {outOfStock ? "Out of stock" : "In stock"}
+          {outOfStock ? null : <Remark kind={dealPercent(price, compare) ? "deal" : "on-time"} percent={dealPercent(price, compare)} />}
+          <span className="pt-0.5">{outOfStock ? "Not in stock" : "In stock"}</span>
         </p>
       </div>
       {compare && compare > price && !outOfStock ? (
-        <p className="m-0 mt-2 text-ui-xs text-ink-muted">The earlier price is the lowest price this key had in the {STORE_POLICY.deals.compareWindowDays} days before the cut.</p>
+        <p className="m-0 mt-2 text-ui-sm text-ink-muted">The earlier price is the lowest price this key had in the {STORE_POLICY.deals.compareWindowDays} days before the cut.</p>
       ) : null}
 
       <div ref={actionRef} data-action="" className="mt-5 flex flex-col gap-3">
         {outOfStock ? (
           <>
             <Button size="lg" isDisabled fullWidth>
-              Out of stock
+              Not in stock
             </Button>
             <p className="m-0 text-ui-md text-ink-muted">This key isn’t in stock right now.</p>
             {alternatives.length ? (
               <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-1 p-0">
                 {alternatives.map((alt) => (
-                  <li key={alt.href} data-platform={alt.tone}>
-                    <Link href={alt.href} className="inline-flex min-h-10 items-center gap-2 text-ui-md font-[560] text-ink underline-offset-4 hover-device:hover:underline">
-                      <span aria-hidden="true" className="size-1.5 bg-platform" />
+                  <li key={alt.href}>
+                    <Link href={alt.href} className="inline-flex min-h-10 items-center gap-2 text-ui-md font-semibold text-ink underline decoration-link decoration-2 underline-offset-4 hover-device:hover:text-accent-ink">
+                      <PlatformTile number={alt.number} size="xs" />
                       On {alt.label}
                     </Link>
                   </li>
@@ -134,18 +137,18 @@ export function BuyBox({ product, alternatives = [], priceAvailable = true, demo
         ) : inCart ? (
           <div className="flex flex-col gap-3">
             <p className="m-0 flex items-center gap-2 text-ui-md text-ink">
-              <Check size={16} aria-hidden="true" />
+              <TicketCheck size={18} aria-hidden="true" />
               In cart{inCartQty > 1 ? ` · ${inCartQty}` : ""} ·{" "}
-              <button type="button" onClick={demo ? undefined : openSheet} className="btn-text cursor-pointer font-[560] text-ink">
+              <button type="button" onClick={demo ? undefined : openSheet} className="btn-text cursor-pointer font-semibold text-ink">
                 <span data-label="">View cart</span>
               </button>
             </p>
             {demo ? (
-              <Button size="lg" fullWidth data-demo="checkout">
+              <Button size="lg" fullWidth data-demo="checkout" arrow>
                 Checkout
               </Button>
             ) : (
-              <Button size="lg" fullWidth as={Link} href="/checkout">
+              <Button size="lg" fullWidth as={Link} href="/checkout" arrow>
                 Checkout
               </Button>
             )}
@@ -170,20 +173,20 @@ export function BuyBox({ product, alternatives = [], priceAvailable = true, demo
           type="button"
           onClick={() => (demo ? undefined : toggle(product.id))}
           disabled={!demo && pending(product.id)}
-          aria-pressed={pinned}
-          className="btn-text inline-flex min-h-10 w-fit cursor-pointer items-center gap-2 text-ui-md font-[560] text-ink disabled:cursor-wait"
+          aria-pressed={saved}
+          className="btn-text inline-flex min-h-10 w-fit cursor-pointer items-center gap-2 text-ui-md font-semibold text-ink disabled:cursor-wait"
         >
-          <Pin size={18} aria-hidden="true" fill={pinned ? "currentColor" : "none"} />
-          <span data-label="">{pinned ? "Pinned" : "Pin for later"}</span>
+          {saved ? <ListCheck size={18} aria-hidden="true" /> : <ListPlus size={18} aria-hidden="true" />}
+          <span data-label="">{saved ? "Saved" : "Save for later"}</span>
         </button>
       </div>
 
       <ul className="m-0 mt-4 list-none border-t border-line p-0">
         {rows.map(({ key, Icon, text, href }) => (
           <li key={key} className="flex items-start gap-3 border-b border-line py-3">
-            <Icon size={18} aria-hidden="true" className="mt-0.5 text-ink-muted" />
+            <Icon size={18} aria-hidden="true" className="mt-0.5 text-ink" />
             {href ? (
-              <Link href={href} className="text-ui-md text-ink underline decoration-line-hover decoration-1 underline-offset-4 hover-device:hover:decoration-ink">
+              <Link href={href} className="text-ui-md text-ink underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink">
                 {text}
               </Link>
             ) : (
@@ -200,7 +203,7 @@ export function BuyBox({ product, alternatives = [], priceAvailable = true, demo
           aria-hidden={!barVisible}
           inert={!barVisible}
           className={cn(
-            "fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-between gap-4 border-t border-line bg-raised px-gutter transition-transform duration-[180ms] ease-[var(--ease-latch)] lg:hidden",
+            "fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-between gap-4 border-t border-line bg-raised px-gutter transition-transform duration-[180ms] ease-[var(--ease-sign)] lg:hidden",
             barVisible ? "translate-y-0" : "translate-y-full",
           )}
         >

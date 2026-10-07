@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, type ReactNode, type Ref, type SelectHTMLAttributes } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { FieldShell, controlClass, controlErrorClass, fieldDescribedBy } from "./Field";
 
@@ -74,7 +74,7 @@ export function Select({
             ))
           : children}
       </select>
-      <ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+      <ChevronsUpDown size={16} aria-hidden="true" className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
     </div>
   );
 

@@ -6,7 +6,9 @@ import { mentionsSupplier } from "@/lib/utils/supplier";
 import { isNewArrival, newArrivalCutoff } from "@/lib/new-arrivals";
 import type { CatalogProduct } from "@/components/product/product-face";
 import { slugify } from "@/lib/utils/slugify";
-import { GENRES, PLATFORMS, PRODUCT_TYPES, REGIONS, categorySlugFor, genreDef, platformDef, productTypeDef, regionDef, type KeySummary, type PlatformDef } from "@/lib/keys/taxonomy";
+import { PLATFORM_ORDER, ROUTE_ORDER, TYPE_ORDER, orderIndex } from "@/config/merchandising";
+import { platformInfo } from "@/lib/catalog/platforms";
+import { GENRES, PLATFORMS, PRODUCT_TYPES, REGIONS, categorySlugFor, genreDef, productTypeDef, regionDef, type KeySummary, type PlatformDef } from "@/lib/keys/taxonomy";
 import {
   CATALOG_PAGE_SIZE,
   buildCatalogHref,
@@ -210,7 +212,7 @@ async function filterConditions(params: CatalogParams, categoryIds: string[] | n
   return out;
 }
 
-function sortSql(sort: SortKey, query: string | null): Prisma.Sql {
+function sortSql(sort: SortKey, query: string | null, keyFiltered = false): Prisma.Sql {
   switch (sort) {
     case "price-asc":
       return Prisma.sql`p."price" ASC, p."createdAt" DESC, ${SORT_NAME} ASC, p."id" ASC`;
@@ -218,6 +220,8 @@ function sortSql(sort: SortKey, query: string | null): Prisma.Sql {
       return Prisma.sql`p."price" DESC, p."createdAt" DESC, ${SORT_NAME} ASC, p."id" ASC`;
     case "name-asc":
       return Prisma.sql`${SORT_NAME} ASC, p."id" ASC`;
+    case "board":
+      return keyFiltered ? Prisma.sql`k."boardRank" ASC NULLS LAST, p."id" ASC` : Prisma.sql`p."boardRank" ASC NULLS LAST, p."id" ASC`;
     case "popular":
       return Prisma.sql`COALESCE(oc."n", 0) DESC, k."releaseDate" DESC NULLS LAST, p."createdAt" DESC, ${SORT_NAME} ASC, p."id" ASC`;
     case "discount":
@@ -424,12 +428,13 @@ export async function queryCatalog(
     : null;
 
   const pageWhere = all([live, ...keys.map((f) => filters[f])]);
+  const keyFiltered = baseScope.kind !== "all" || keys.some((f) => f !== "price" && f !== "inStock" && f !== "onSale" && f !== "brand");
   const popularJoin = params.sort === "popular" ? Prisma.sql`LEFT JOIN (SELECT "productId", COUNT(*)::int AS "n" FROM "OrderItem" GROUP BY "productId") oc ON oc."productId" = p."id"` : Prisma.empty;
   const pageIdsAt = (page: number) =>
     prisma.$queryRaw<{ id: string }[]>`
       SELECT p."id" FROM "Product" p LEFT JOIN "KeyItem" k ON k."productId" = p."id" ${popularJoin}
       WHERE ${pageWhere}
-      ORDER BY ${sortSql(params.sort, query)}
+      ORDER BY ${sortSql(params.sort, query, keyFiltered)}
       LIMIT ${CATALOG_PAGE_SIZE} OFFSET ${(page - 1) * CATALOG_PAGE_SIZE}`;
 
   const [facetRows, categoryRows, firstIds] = await Promise.all([
@@ -483,10 +488,10 @@ export async function queryCatalog(
       inStockCount,
       onSaleCount: single("onSale")?.n ?? 0,
       narrowingInStock: inStockCount > 0 && inStockCount < stockBase,
-      types: listFacet("types", (key) => productTypeDef(key)?.label ?? key, (key) => PRODUCT_TYPES.findIndex((t) => t.key === key)),
-      platforms: listFacet("platforms", (key) => platformDef(key)?.label ?? key, (key) => PLATFORMS.findIndex((p) => p.key === key)),
+      types: listFacet("types", (key) => productTypeDef(key)?.label ?? key, (key) => orderIndex(TYPE_ORDER, key)),
+      platforms: listFacet("platforms", (key) => platformInfo(key).short, (key) => orderIndex(PLATFORM_ORDER, key)),
       regions: listFacet("regions", (key) => regionDef(key)?.label ?? key, (key) => REGIONS.findIndex((r) => r.key === key)),
-      genres: listFacet("genres", (key) => genreDef(key)?.label ?? key, (key) => GENRES.findIndex((g) => g.key === key)),
+      genres: listFacet("genres", (key) => genreDef(key)?.label ?? key, (key) => orderIndex(ROUTE_ORDER, key) * 1000 + GENRES.findIndex((g) => g.key === key)),
       languages: listFacet("languages", (key) => key, (key) => (key === "english" ? -1 : 0), slugify),
       years: listFacet("years", (key) => key, (key) => -Number(key)),
     },

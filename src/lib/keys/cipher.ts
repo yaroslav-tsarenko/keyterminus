@@ -4,7 +4,7 @@ import { env } from "@/lib/env";
 const VERSION = "v1";
 
 function material(info: string): Buffer {
-  return Buffer.from(hkdfSync("sha256", Buffer.from(env.KEY_ENCRYPTION_SECRET, "utf8"), Buffer.from("keyrook-key-vault"), Buffer.from(info), 32));
+  return Buffer.from(hkdfSync("sha256", Buffer.from(env.KEY_ENCRYPTION_SECRET, "utf8"), Buffer.from("keyterminus-key-store"), Buffer.from(info), 32));
 }
 
 let cached: { enc: Buffer; mac: Buffer } | null = null;

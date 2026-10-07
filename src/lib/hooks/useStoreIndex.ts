@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import { cachedFetchJSON, readCached } from "@/lib/utils/reliable-fetch";
 import type { StoreIndex } from "@/lib/catalog/store-index";
 
-const CACHE_KEY = "store-index:v1";
+const CACHE_KEY = "keyterminus-store-index:v1";
 
 let snapshot: StoreIndex | null = null;
 let request: Promise<void> | null = null;
@@ -44,7 +44,11 @@ export function useStoreIndex(): StoreIndex | null {
   return useSyncExternalStore(subscribe, () => snapshot, () => null);
 }
 
+export function roundedKeyCount(total: number): number {
+  return total > 10_000 ? Math.floor(total / 100) * 100 : total;
+}
+
 export function searchCountLabel(total: number | null | undefined): string {
   if (!total) return "Search keys";
-  return `Search ${total.toLocaleString("en-GB")} keys`;
+  return `Search ${roundedKeyCount(total).toLocaleString("en-GB")} keys`;
 }

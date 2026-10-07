@@ -5,48 +5,54 @@ type MarkProps = Omit<SVGProps<SVGSVGElement>, "children"> & {
   title?: string;
 };
 
-type Detail = "full" | "small" | "tiny";
+type Drawing = "full" | "small";
 
 function a11y(title?: string) {
   return title ? { role: "img" as const, "aria-label": title } : { "aria-hidden": true as const };
 }
 
-function MarkShape({ detail = "full" }: { detail?: Detail }) {
-  const { path, lamp } = MARK[detail];
+function MarkShape({ size = "full" }: { size?: Drawing }) {
+  const { key, bar } = MARK[size];
   return (
     <>
-      <path d={path} fill="currentColor" fillRule="evenodd" />
-      <circle cx={lamp.cx} cy={lamp.cy} r={lamp.r} fill="var(--color-accent)" />
+      <path d={key} fill="currentColor" />
+      <rect x={bar.x} y={bar.y} width={bar.width} height={bar.height} fill="var(--logo-bar, currentColor)" />
     </>
   );
 }
 
-export function Mark({ title, className, detail = "full", ...rest }: MarkProps & { detail?: Detail }) {
+export function Mark({ title, className, size = "full", ...rest }: MarkProps & { size?: Drawing }) {
+  const { crop } = MARK;
   return (
-    <svg viewBox={`0 0 ${MARK.size} ${MARK.size}`} xmlns="http://www.w3.org/2000/svg" className={className} focusable="false" {...a11y(title)} {...rest}>
-      <MarkShape detail={detail} />
+    <svg viewBox={`${crop.x} ${crop.y} ${crop.width} ${crop.height}`} xmlns="http://www.w3.org/2000/svg" className={className} focusable="false" {...a11y(title)} {...rest}>
+      <MarkShape size={size} />
     </svg>
   );
 }
 
-export function Wordmark({ title, className, mark = true, detail = "full", ...rest }: MarkProps & { mark?: boolean; detail?: Detail }) {
-  const cap = WORDMARK.cap;
+export function Wordmark({ title, className, mark = true, ...rest }: MarkProps & { mark?: boolean }) {
   if (!mark) {
+    const top = -WORDMARK.ascender;
     return (
-      <svg viewBox={`0 0 ${WORDMARK.width} ${cap + WORDMARK.descender}`} xmlns="http://www.w3.org/2000/svg" className={className} focusable="false" {...a11y(title)} {...rest}>
+      <svg
+        viewBox={`${WORDMARK.left} ${top} ${WORDMARK.width - WORDMARK.left} ${WORDMARK.ascender + WORDMARK.descender}`}
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        focusable="false"
+        {...a11y(title)}
+        {...rest}
+      >
         <path d={WORDMARK.letters} fill="currentColor" />
       </svg>
     );
   }
-  const size = LOCKUP.markToCap * cap;
-  const top = (cap - size) / 2;
-  const gap = LOCKUP.gapToCap * cap;
+  const { viewBox, mark: m, lettersX } = LOCKUP;
   return (
-    <svg viewBox={`0 ${top} ${size + gap + WORDMARK.width} ${size}`} xmlns="http://www.w3.org/2000/svg" className={className} focusable="false" {...a11y(title)} {...rest}>
-      <g transform={`translate(0 ${top}) scale(${size / MARK.size})`}>
-        <MarkShape detail={detail} />
+    <svg viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`} xmlns="http://www.w3.org/2000/svg" className={className} focusable="false" {...a11y(title)} {...rest}>
+      <g transform={`translate(${m.translateX} ${m.translateY}) scale(${m.scale})`}>
+        <MarkShape size="full" />
       </g>
-      <path d={WORDMARK.letters} fill="currentColor" transform={`translate(${size + gap} 0)`} />
+      <path d={WORDMARK.letters} fill="currentColor" transform={`translate(${lettersX} 0)`} />
     </svg>
   );
 }

@@ -8,11 +8,11 @@
   "confirm": "Confirm",
   "edit": "Edit",
   "search": "Search",
-  "noResults": "Nothing matches your search",
-  "viewAll": "View all",
+  "noResults": "Nothing on the board matches your search",
+  "viewAll": "See all",
   "backTo": "Back to {page}",
   "addedToCart": "Added to cart",
   "removedFromCart": "Removed from cart",
-  "savedChanges": "Changes saved",
+  "savedChanges": "Saved",
   "copiedToClipboard": "Copied"
 }

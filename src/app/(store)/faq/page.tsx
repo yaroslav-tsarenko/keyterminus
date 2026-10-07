@@ -47,7 +47,7 @@ export default async function FaqPage() {
       <Breadcrumbs items={[{ label: t("home"), href: "/" }, { label: t("title") }]} />
 
       <header className="measure">
-        <h1 className="m-0 text-step-5 leading-[1.04] text-ink">{t("title")}</h1>
+        <h1 className="m-0 pt-1 text-step-4 leading-[1.04] text-ink">{t("title")}</h1>
         <p className="mt-5 text-step-1 leading-[1.5] text-ink-muted [&_a]:text-ink [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4">
           {t.rich("lead", { ...VALUES, ...linkTags })}
         </p>
@@ -74,7 +74,7 @@ export default async function FaqPage() {
               <Accordion>
                 {group.items.map((item) => (
                   <AccordionItem key={item.key} id={`${group.id}-${item.key}`} title={item.q} headingLevel={3}>
-                    <div className="measure text-step-0 leading-[1.7] text-ink-muted [&_a]:font-[560] [&_a]:text-ink [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4">
+                    <div className="measure text-step-0 leading-[1.7] text-ink-muted [&_a]:font-semibold [&_a]:text-ink [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4">
                       {item.a}
                     </div>
                   </AccordionItem>

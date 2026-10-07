@@ -1,15 +1,15 @@
 {
   "home": "Home",
-  "catalog": "Shop",
+  "catalog": "Catalogue",
   "cart": "Cart",
   "account": "Account",
   "login": "Sign in",
   "register": "Create account",
   "logout": "Sign out",
   "admin": "Admin",
-  "search": "Search a game or gift card",
-  "allCategories": "All products",
+  "search": "Search keys: title, platform or genre",
+  "allCategories": "All keys",
   "contact": "Contact us",
-  "faq": "Questions",
+  "faq": "FAQ",
   "policies": "Policies"
 }

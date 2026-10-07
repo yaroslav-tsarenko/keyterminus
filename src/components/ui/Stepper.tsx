@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "./Button";
 import { Alert } from "./Alert";
-import { DialRuler } from "./Dial";
+import { RouteLine } from "./RouteLine";
 
 export interface StepperStep {
   id: string;
@@ -78,20 +78,12 @@ export function Stepper({
         {active ? `Step ${current + 1} of ${steps.length}, ${active.title}` : ""}
       </p>
       <nav aria-label={label}>
-        <ol className="sr-only">
-          {steps.map((step, index) => (
-            <li key={step.id} aria-current={index === current ? "step" : undefined}>
-              Step {index + 1}: {step.title}
-              {index < current ? ", completed" : ""}
-            </li>
-          ))}
-        </ol>
-        <DialRuler
-          detents={steps.map((s) => ({ key: s.id, label: s.short ?? s.title }))}
-          active={current}
+        <RouteLine
+          stops={steps.map((step, index) => ({ key: step.id, label: step.short ?? step.title, state: index < current ? "done" : index === current ? "current" : "upcoming", check: true }))}
+          terminus={{ tone: current >= steps.length - 1 ? "terminus" : "ink" }}
           compactLabels
-          doneIcon={<Check size={14} aria-hidden="true" className="text-ink" />}
-          className="mb-8"
+          className="mb-10"
+          data-route-line="checkout"
         />
       </nav>
 
@@ -100,10 +92,10 @@ export function Stepper({
           {done.map((step, index) => (
             <li key={step.id} data-step-summary="" className="flex min-h-12 flex-wrap items-center gap-x-4 gap-y-1 border-b border-line py-2">
               <Check size={14} aria-hidden="true" className="text-ink-muted" />
-              <span className="label-caps text-[0.75rem] text-ink-muted">{step.title}</span>
+              <span className="eyebrow">{step.title}</span>
               <span className="min-w-0 flex-1 truncate text-ui-sm text-ink-muted">{step.summary}</span>
               {onEdit ? (
-                <button type="button" onClick={() => onEdit(index)} className="btn-text min-h-11 cursor-pointer text-ui-sm font-[560] text-ink">
+                <button type="button" onClick={() => onEdit(index)} className="btn-text min-h-11 cursor-pointer text-ui-sm font-semibold text-ink">
                   <span data-label="">
                     Change<span className="sr-only"> {step.title}</span>
                   </span>
@@ -115,9 +107,9 @@ export function Stepper({
       ) : null}
 
       {active ? (
-        <section key={active.id} role="group" aria-labelledby={`${baseId}-title`} data-step={active.id} data-direction={shown.direction} className="animate-panel-in">
-          <h2 ref={headingRef} tabIndex={-1} id={`${baseId}-title`} className="m-0 mb-6 flex items-baseline gap-3 text-step-3 leading-[1.1] text-ink outline-none">
-            <span className="font-mono text-data font-medium text-ink-muted [font-stretch:100%]">{String(current + 1).padStart(2, "0")}</span>
+        <section key={active.id} role="group" aria-labelledby={`${baseId}-title`} data-step={active.id} data-direction={shown.direction} className="animate-panel-drop">
+          <h2 ref={headingRef} tabIndex={-1} id={`${baseId}-title`} className="m-0 mb-6 flex items-baseline gap-3 text-step-3 leading-[1.06] text-ink outline-none">
+            <span className="font-mono text-data font-normal text-ink-muted">{`${current + 1}/${steps.length}`}</span>
             {active.title}
           </h2>
           {errorSummary && errorSummary.fields.length > 0 ? (
@@ -150,6 +142,7 @@ export function Stepper({
                 isDisabled={continueDisabled}
                 isLoading={continueLoading}
                 className="max-sm:w-full"
+                arrow
               >
                 {resolvedContinue}
               </Button>

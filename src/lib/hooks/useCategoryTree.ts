@@ -19,7 +19,7 @@ export function subtreeCount(cat: CategoryNode): number {
   return own + (cat.children || []).reduce((sum, child) => sum + subtreeCount(child), 0);
 }
 
-const CACHE_KEY = "header:categories";
+const CACHE_KEY = "keyterminus-categories";
 const EMPTY: CategoryNode[] = [];
 
 let snapshot: CategoryNode[] = EMPTY;

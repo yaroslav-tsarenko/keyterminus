@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ArrowRight, FileDown } from "lucide-react";
-import { SkeletonBar } from "@/components/ui/ReadoutLoader";
+import { ArrowBigRight, ArrowDownToLine } from "lucide-react";
+import { SkeletonBar } from "@/components/ui/Flap";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { ProductRow } from "@/components/product/ProductCard";
 import { OrderTimeline } from "@/components/account/OrderTimeline";
@@ -56,7 +56,7 @@ export function OrderHistory() {
           {orders.map((order) => (
             <li key={order.id} data-purchase="" className="border-b border-line py-6">
               <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-                <span className="font-mono text-data font-medium text-ink">{order.number}</span>
+                <span className="font-mono text-data font-semibold text-ink">{order.number}</span>
                 <span className="font-mono text-[0.75rem] text-ink-muted">{formatOrderDate(order.createdAt)}</span>
                 <span className="price text-data text-ink">{formatPrice(order.totals.total, order.currency)}</span>
                 <OrderStatus state={order.state} />
@@ -78,15 +78,15 @@ export function OrderHistory() {
               </ul>
               <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 sm:pl-[76px]">
                 {order.invoiceAvailable ? (
-                  <a href={`/api/account/orders/${encodeURIComponent(order.id)}/invoice`} download className="inline-flex min-h-10 items-center gap-1.5 text-ui-sm font-[560] text-ink underline-offset-4 hover-device:hover:underline">
-                    <FileDown size={16} aria-hidden="true" />
-                    Invoice (PDF)
+                  <a href={`/api/account/orders/${encodeURIComponent(order.id)}/invoice`} download className="btn-text inline-flex min-h-10 items-center gap-1.5 text-ui-sm font-semibold text-ink">
+                    <ArrowDownToLine size={16} aria-hidden="true" />
+                    <span data-label="">Invoice (PDF)</span>
                   </a>
                 ) : null}
-                <Link href={`/account/orders/${order.id}`} className="inline-flex min-h-10 items-center gap-1.5 text-ui-sm font-[560] text-ink underline-offset-4 hover-device:hover:underline">
-                  {t("view")}
+                <Link href={`/account/orders/${order.id}`} className="btn-text inline-flex min-h-10 items-center gap-1.5 text-ui-sm font-semibold text-ink">
+                  <span data-label="">{t("view")}</span>
                   <span className="sr-only"> {order.number}</span>
-                  <ArrowRight size={16} aria-hidden="true" />
+                  <ArrowBigRight size={16} aria-hidden="true" />
                 </Link>
               </div>
             </li>

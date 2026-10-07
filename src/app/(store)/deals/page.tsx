@@ -31,7 +31,7 @@ export default async function DealsPage({ searchParams }: DealsPageProps) {
       <CategoryOpener
         name="Price cuts"
         count={result.facets.onSaleCount}
-        note={<p className="m-0 max-w-[68ch] border-y border-line py-3 text-ui-md text-ink">The earlier price is the lowest price this key had in the {STORE_POLICY.deals.compareWindowDays} days before the cut.</p>}
+        note={<p className="m-0 border-y border-line py-3 text-ui-md text-ink">The earlier price is the lowest this key cost here in the {STORE_POLICY.deals.compareWindowDays} days before the cut.</p>}
       />
       <CatalogBrowser
         basePath="/deals"

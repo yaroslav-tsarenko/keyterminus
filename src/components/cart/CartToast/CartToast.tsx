@@ -27,7 +27,7 @@ export function CartToast({ toastId, name, imageUrl, quantity }: CartToastProps)
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="eyebrow m-0">Added to cart{quantity > 1 ? ` · ${quantity}` : ""}</p>
-        <p className="m-0 truncate text-ui-md font-[560] text-ink">{name}</p>
+        <p className="m-0 truncate text-ui-md font-semibold text-ink">{name}</p>
         <div className="mt-1.5 flex items-center gap-4">
           <Button
             variant="ghost"

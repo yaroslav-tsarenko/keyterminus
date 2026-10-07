@@ -31,7 +31,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("currency") as Currency | null;
+      const stored = localStorage.getItem("keyterminus-currency") as Currency | null;
       if (stored && CURRENCY_LIST.includes(stored)) setCurrencyState(stored);
     } catch {}
   }, []);
@@ -48,7 +48,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const setCurrency = (c: Currency) => {
     setCurrencyState(c);
     try {
-      localStorage.setItem("currency", c);
+      localStorage.setItem("keyterminus-currency", c);
     } catch {}
   };
 

@@ -71,9 +71,10 @@ const COLUMNS: { title: string; links: { href: string; label: string }[]; cookie
 const DISCLAIMER = `${BRAND.name} is an independent store and is not affiliated with or endorsed by Valve, Microsoft, Sony Interactive Entertainment, Nintendo, Epic Games, CD PROJEKT, Electronic Arts, Ubisoft, Blizzard Entertainment or Rockstar Games. Game titles, platform names and cover art belong to their owners.`;
 
 function LinkList({ links, cookie }: { links: { href: string; label: string }[]; cookie?: boolean }) {
+  const index = useStoreIndex();
   return (
     <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-      {links.map((link) => (
+      {links.filter((link) => link.href !== "/deals" || index?.onSale !== 0).map((link) => (
         <li key={link.href}>
           <Link href={link.href} className={linkCls}>
             {link.label}

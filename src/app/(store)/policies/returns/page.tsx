@@ -37,7 +37,7 @@ const sections: PolicySection[] = [
           repeat it in your confirmation email and on your invoice.
         </p>
         <p>
-          Supply starts when a key is issued to your account. Before that, you can cancel at no cost by emailing {F.email} or using the{" "}
+          Supply begins the moment a key is issued to your account. Until then, cancelling costs nothing: write to {F.email} or use the{" "}
           <Link href="/contact">contact form</Link> with your order number. Keys are usually issued within minutes, so a cancellation that
           arrives later is handled under the rules below.
         </p>
@@ -113,7 +113,7 @@ const sections: PolicySection[] = [
     title: "Asking about a refund",
     body: (
       <p>
-        Email {F.email} or use the <Link href="/contact">contact form</Link> with your order number. We reply {F.replyTime}. If you aren’t
+        Send your order number to {F.email} or through the <Link href="/contact">contact form</Link>. We reply {F.replyTime}. If you aren’t
         happy with our answer, see the <Link href="/policies/complaints">Complaints policy</Link>.
       </p>
     ),

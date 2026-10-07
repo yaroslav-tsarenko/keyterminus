@@ -28,6 +28,6 @@
   "successTitle": "Message sent",
   "success": "Thank you. We’ll reply to {email} {replyTime}.",
   "sendAnother": "Send another message",
-  "error": "Your message wasn’t sent. Check your connection and try again; what you wrote is still here.",
+  "error": "We couldn’t send your message. Your text is still in the form, so check your connection and send it again.",
   "privacyNote": "We use these details only to reply to you. See the <privacy>Privacy policy</privacy>."
 }

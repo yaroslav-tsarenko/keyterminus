@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const NOT_SOLD_KEYS = ["marketplace", "cases", "accounts", "other"] as const;
+const NOT_SOLD_KEYS = ["resale", "cases", "accounts", "other"] as const;
 const linkCls = "font-semibold text-ink underline decoration-link decoration-2 underline-offset-[3px] hover-device:hover:text-accent-ink";
 
 export default async function AboutPage() {

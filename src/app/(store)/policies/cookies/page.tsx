@@ -6,7 +6,7 @@ import { POLICY_FACTS as F } from "@/lib/policy-facts";
 
 export const generateMetadata = policyMetadata(
   "cookies",
-  `Every cookie, local storage and session storage key ${F.brand} uses, what each one does, how long it lasts and how to change your choice.`,
+  `The cookies and browser storage keys on ${F.brand}: name, purpose, lifetime, and where to change your consent.`,
 );
 
 function CookieTable({ rows }: { rows: CookieRecord[] }) {
@@ -111,7 +111,7 @@ const sections: PolicySection[] = [
         <div className="mt-6">
           <CookieSettingsButton />
         </div>
-        <p>You can also clear cookies and site data in your browser. If you clear the necessary ones, your cart empties and you are signed out.</p>
+        <p>Your browser can delete cookies and site data too. Deleting the necessary ones signs you out and clears your cart.</p>
       </>
     ),
   },

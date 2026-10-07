@@ -67,15 +67,16 @@ function maxDate(...dates: (Date | null | undefined)[]): Date | null {
 }
 
 export async function staticPageEntries(): Promise<SitemapEntry[]> {
-  const [latest, pages] = await Promise.all([
+  const [latest, pages, priceCuts] = await Promise.all([
     latestProductUpdate(),
     prisma.page.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true }, orderBy: { slug: "asc" } }),
+    prisma.$queryRaw<{ n: number }[]>`SELECT COUNT(*)::int AS n FROM "Product" p WHERE p."status" = 'ACTIVE'::"ProductStatus" AND p."quantity" > 0 AND p."comparePrice" IS NOT NULL AND p."comparePrice" > p."price"`,
   ]);
   const policiesUpdated = new Date(`${STORE_POLICY.policiesLastUpdated}T00:00:00Z`);
   return [
     { loc: absoluteUrl("/"), lastmod: latest },
     { loc: absoluteUrl("/catalog"), lastmod: latest },
-    { loc: absoluteUrl("/deals"), lastmod: latest },
+    ...((priceCuts[0]?.n ?? 0) > 0 ? [{ loc: absoluteUrl("/deals"), lastmod: latest }] : []),
     { loc: absoluteUrl("/new-releases"), lastmod: latest },
     { loc: absoluteUrl("/how-activation-works") },
     { loc: absoluteUrl("/about") },

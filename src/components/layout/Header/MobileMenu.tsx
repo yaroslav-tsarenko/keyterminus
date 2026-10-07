@@ -91,14 +91,16 @@ export function MobileMenu({ open, onClose, index, pathname, onSearch }: MobileM
                 </Link>
               );
             })}
-            <Link href="/deals" onClick={onClose} className={bigRow}>
-              <span className="flex items-center gap-3">
-                <span aria-hidden="true" className="w-5" />
-                <span className="pt-0.5 font-display text-step-1 font-bold">Price cuts</span>
-                {index?.onSale ? <span className="font-mono text-[0.75rem] text-ink-muted">{index.onSale.toLocaleString("en-GB")}</span> : null}
-              </span>
-              <ArrowBigRight size={18} aria-hidden="true" />
-            </Link>
+            {index?.onSale !== 0 ? (
+              <Link href="/deals" onClick={onClose} className={bigRow}>
+                <span className="flex items-center gap-3">
+                  <span aria-hidden="true" className="w-5" />
+                  <span className="pt-0.5 font-display text-step-1 font-bold">Price cuts</span>
+                  {index?.onSale ? <span className="font-mono text-[0.75rem] text-ink-muted">{index.onSale.toLocaleString("en-GB")}</span> : null}
+                </span>
+                <ArrowBigRight size={18} aria-hidden="true" />
+              </Link>
+            ) : null}
             <Link href="/new-releases" onClick={onClose} className={bigRow}>
               <span className="flex items-center gap-3">
                 <span aria-hidden="true" className="w-5" />

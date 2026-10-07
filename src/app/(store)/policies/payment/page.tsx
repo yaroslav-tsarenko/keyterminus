@@ -44,7 +44,7 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Prices can be shown and paid in {F.currencies}. We set prices in {F.baseCurrency} and convert them into the other currencies at our
+          You can view prices and pay in {F.currencies}. We set prices in {F.baseCurrency} and convert them into the other currencies at our
           current exchange rate. The checkout total, in the currency you chose, is exactly what we charge.
         </p>
         <p>If your card uses another currency, the card issuer may convert the amount and add its own fee, which we don’t control.</p>

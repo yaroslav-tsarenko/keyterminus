@@ -10,7 +10,7 @@
   "backHome": "Back to the departures board",
   "serverError": "Something went wrong loading this page.",
   "serverErrorTitle": "Something went wrong",
-  "serverErrorBody": "The fault is on our side. Try again, or come back in a few minutes. If it keeps happening, email {email}.",
+  "serverErrorBody": "Something failed on our side. Reload the page or try again shortly; if it keeps failing, write to {email}.",
   "errorReference": "Reference: {digest}",
   "unauthorized": "Sign in to continue",
   "forbidden": "This page isn’t available to your account",

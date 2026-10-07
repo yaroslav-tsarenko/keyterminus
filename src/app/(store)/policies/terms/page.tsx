@@ -4,22 +4,22 @@ import { POLICY_FACTS as F } from "@/lib/policy-facts";
 
 export const generateMetadata = policyMetadata(
   "terms",
-  `The contract between you and ${F.company}, trading as ${F.brand}: who can order, product information, prices, payment, key delivery, the right to cancel, refunds and complaints.`,
+  `How ordering from ${F.brand} (${F.company}) works: eligibility, product details, prices, payment, key delivery, the right to cancel, refunds and complaints.`,
 );
 
 const sections: PolicySection[] = [
   {
     id: "about",
-    title: "Who we are and what these terms cover",
+    title: "About us and the scope of these terms",
     body: (
       <>
         <p>
-          These terms govern every order placed on {F.domain}. {F.brand} is a trading name of {F.company}; “we”, “us” and “our” mean{" "}
+          These terms apply to each order you place on {F.domain}. {F.brand} is a trading name of {F.company}; “we”, “us” and “our” mean{" "}
           {F.company}, and “you” means the person who places the order.
         </p>
         <SellerBlock />
         <p>
-          {F.company} sells every product on {F.domain}. We source keys and product information from distribution partners, but your contract
+          Every product on {F.domain} is supplied to you by {F.company}. We source keys and product information from distribution partners, but your contract
           is with {F.company} alone.
         </p>
         <p>
@@ -39,7 +39,7 @@ const sections: PolicySection[] = [
         <li><strong>Product:</strong> a key for a game or DLC, a subscription code, a gift card or top-up code, or a software licence key offered on {F.domain}.</li>
         <li><strong>Key:</strong> the activation key, code or serial number we issue to you for a product.</li>
         <li><strong>Platform:</strong> the service on which a key is redeemed, for example Steam, Xbox, PlayStation or the EA app.</li>
-        <li><strong>Publisher:</strong> the company behind the game, service, card or software a key unlocks.</li>
+        <li><strong>Publisher:</strong> whoever makes or runs the game, service, card or software that a key gives access to.</li>
       </ul>
     ),
   },
@@ -50,7 +50,7 @@ const sections: PolicySection[] = [
       <>
         <p>You must be {F.minAge} or over to open an account or order. We ask for your date of birth at registration and refuse orders from anyone younger.</p>
         <p>
-          We sell to consumers buying for their own use, not for resale. The name, email, phone number, date of birth and billing address you
+          We supply consumers buying for their own use, not for resale. The name, email, phone number, date of birth and billing address you
           give must be accurate and yours, and the card you pay with must be yours or used with its holder’s consent.
         </p>
       </>
@@ -121,12 +121,12 @@ const sections: PolicySection[] = [
     body: (
       <>
         <ol>
-          <li>You sign in to your {F.brand} account and put products in your cart.</li>
+          <li>Signed in to your {F.brand} account, you add products to your cart.</li>
           <li>At checkout you give your contact details and billing address.</li>
-          <li>We check each product’s price and stock again. If a price has risen, you see the new total before you can pay.</li>
+          <li>We check each product’s price and stock again. Any price increase is shown to you as a new total before payment.</li>
           <li>You tick the box accepting these terms and the Refund policy, tick the separate box asking for delivery straight after payment, and choose Pay.</li>
           <li>You pay by card on the payment provider’s hosted page.</li>
-          <li>When the provider confirms the payment, we email an order confirmation with your invoice. The contract between you and {F.company} is formed when we send that email.</li>
+          <li>When the provider confirms the payment, we email an order confirmation with your invoice. Sending that email is the moment the contract between you and {F.company} comes into being.</li>
         </ol>
         <p>
           To protect customers and cardholders, an order can hold up to {F.maxItemsPerOrder} keys worth up to {F.maxOrderValue} in total, and

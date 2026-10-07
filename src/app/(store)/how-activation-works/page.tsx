@@ -45,7 +45,7 @@ export default async function HowActivationWorksPage() {
           <h1 id="haw-title" className="m-0 max-w-[16ch] text-step-5 leading-none tracking-[-0.02em] text-ink">
             How activation works
           </h1>
-          <p className="measure m-0 mt-5 text-step-1 leading-[1.5] text-ink-muted">Your key is delivered to your account after payment is confirmed. You redeem it on the platform named on the product page.</p>
+          <p className="measure m-0 mt-5 text-step-1 leading-[1.5] text-ink-muted">Once payment is confirmed, the key lands in your account. Redeem it on the platform shown on the product page, in the steps below.</p>
           <nav aria-label="Jump to a platform" className="mt-10">
             <ul className="m-0 flex list-none flex-wrap gap-x-6 gap-y-3 p-0">
               {platforms.map(({ guide, info }) => (

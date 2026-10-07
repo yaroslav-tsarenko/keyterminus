@@ -527,7 +527,7 @@ export function CheckoutView() {
           <PaymentLogos height={28} />
           {STORE_POLICY.payment.hostedPage ? (
             <p className="m-0 max-w-[60ch] text-ui-sm text-ink-muted">
-              You’ll enter your card details on {providerPossessive} hosted payment page{STORE_POLICY.payment.threeDSecure ? " with 3-D Secure" : ""}. We never see or store your card number.
+              You’ll enter your card details on {providerPossessive} hosted payment page{STORE_POLICY.payment.threeDSecure ? <> with <span className="whitespace-nowrap">3-D Secure</span></> : null}. We never see or store your card number.
             </p>
           ) : (
             <p className="m-0 text-ui-sm text-ink-muted">Card payments are processed securely by {provider}. We never see or store your full card number.</p>

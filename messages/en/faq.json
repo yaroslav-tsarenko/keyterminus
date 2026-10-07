@@ -110,7 +110,7 @@
       "items": {
         "notWorking": {
           "q": "My key doesn’t work. What happens now?",
-          "a": "Check that the platform and region match your account. If it still fails, report it from the key in your account within {claimDays} days of delivery, with a screenshot of the error. We check it within {reviewDays} business days and send a replacement key, or refund it if no replacement is available. See <warranty>Key not working?</warranty>."
+          "a": "Check that the platform and region match your account. If it still fails, report it from the key in your account within {claimDays} days of delivery, with a screenshot of the error. Our check takes up to {reviewDays} business days; a faulty key is swapped for a new one, or refunded when no replacement exists. See <warranty>Key not working?</warranty>."
         },
         "cancel": {
           "q": "Can I cancel or get a refund?",
@@ -127,7 +127,7 @@
       "items": {
         "who": {
           "q": "Who can open an account?",
-          "a": "Anyone aged {minAge} or over who lives in a country we serve. We don’t open accounts in or take orders from {restricted}, or {territories}."
+          "a": "You can open one if you are {minAge} or older and live in a country we serve. We don’t open accounts in or take orders from {restricted}, or {territories}."
         },
         "password": {
           "q": "I forgot my password.",

@@ -201,6 +201,69 @@ export function DeparturesBoard({ pages, live, legend }: { pages: BoardRowView[]
 
   return (
     <div className="dep-grid">
+      <form role="search" onSubmit={submit} className="dep-kiosk">
+        <label htmlFor={inputId} className="sr-only">
+          {t("searchLabel")}
+        </label>
+        <div className="relative min-w-0 flex-1">
+          <Search size={20} aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink" />
+          <input
+            id={inputId}
+            name="q"
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setSearchFocus(true)}
+            onBlur={() => setSearchFocus(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && query) {
+                e.preventDefault();
+                setQuery("");
+              }
+            }}
+            placeholder={t("searchPlaceholder", { live: live.toLocaleString("en-GB") })}
+            autoComplete="off"
+            enterKeyHint="search"
+            aria-describedby={`${inputId}-readout`}
+            className="h-14 w-full rounded-control border border-control bg-raised pl-12 pr-4 text-[1.0625rem] text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [&::-webkit-search-cancel-button]:hidden"
+          />
+        </div>
+        <Button type="submit" size="lg" className="h-14 shrink-0 max-sm:px-4" arrow>
+          {t("searchSubmit")}
+        </Button>
+      </form>
+
+      <div className="dep-controls" role="group" aria-label={t("controls")}>
+        <Button
+          variant="outline"
+          size="sm"
+          onPress={() => {
+            if (stopped) {
+              setUserPaused(false);
+              setCycles(0);
+            } else setUserPaused(true);
+          }}
+          aria-pressed={stopped}
+          isDisabled={mode === "search"}
+          className={cn("motion-reduce:hidden", (count < 2 || mode === "search") && "hidden")}
+          startContent={stopped ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
+        >
+          {stopped ? t("play") : t("pause")}
+        </Button>
+        <p id={`${inputId}-readout`} aria-live="polite" className="m-0 min-w-0 flex-1 truncate font-mono text-data text-on-board-muted">
+          {readout}
+        </p>
+        {mode === "search" ? (
+          <Link href={`/search?q=${encodeURIComponent(results!.q)}`} className="btn-text inline-flex min-h-9 shrink-0 items-center text-ui-sm font-semibold text-on-board">
+            <span data-label="">{t("allResults")}</span>
+          </Link>
+        ) : count > 1 ? (
+          <Button variant="outline" size="sm" onPress={next} className="shrink-0">
+            {t("next")}
+          </Button>
+        ) : null}
+      </div>
+
       <div
         ref={rootRef}
         data-board-root=""
@@ -269,69 +332,6 @@ export function DeparturesBoard({ pages, live, legend }: { pages: BoardRowView[]
       </div>
 
       <p className="dep-legend m-0">{legend}</p>
-
-      <form role="search" onSubmit={submit} className="dep-kiosk">
-        <label htmlFor={inputId} className="sr-only">
-          {t("searchLabel")}
-        </label>
-        <div className="relative min-w-0 flex-1">
-          <Search size={20} aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink" />
-          <input
-            id={inputId}
-            name="q"
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setSearchFocus(true)}
-            onBlur={() => setSearchFocus(false)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape" && query) {
-                e.preventDefault();
-                setQuery("");
-              }
-            }}
-            placeholder={t("searchPlaceholder", { live: live.toLocaleString("en-GB") })}
-            autoComplete="off"
-            enterKeyHint="search"
-            aria-describedby={`${inputId}-readout`}
-            className="h-14 w-full rounded-control border border-control bg-raised pl-12 pr-4 text-[1.0625rem] text-ink placeholder:text-ink-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [&::-webkit-search-cancel-button]:hidden"
-          />
-        </div>
-        <Button type="submit" size="lg" className="h-14 shrink-0 max-sm:px-4" arrow>
-          {t("searchSubmit")}
-        </Button>
-      </form>
-
-      <div className="dep-controls" role="group" aria-label={t("controls")}>
-        <Button
-          variant="outline"
-          size="sm"
-          onPress={() => {
-            if (stopped) {
-              setUserPaused(false);
-              setCycles(0);
-            } else setUserPaused(true);
-          }}
-          aria-pressed={stopped}
-          isDisabled={mode === "search"}
-          className={cn("motion-reduce:hidden", (count < 2 || mode === "search") && "hidden")}
-          startContent={stopped ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
-        >
-          {stopped ? t("play") : t("pause")}
-        </Button>
-        <p id={`${inputId}-readout`} aria-live="polite" className="m-0 min-w-0 flex-1 truncate font-mono text-data text-on-board-muted">
-          {readout}
-        </p>
-        {mode === "search" ? (
-          <Link href={`/search?q=${encodeURIComponent(results!.q)}`} className="btn-text inline-flex min-h-9 shrink-0 items-center text-ui-sm font-semibold text-on-board">
-            <span data-label="">{t("allResults")}</span>
-          </Link>
-        ) : count > 1 ? (
-          <Button variant="outline" size="sm" onPress={next} className="shrink-0">
-            {t("next")}
-          </Button>
-        ) : null}
-      </div>
     </div>
   );
 }

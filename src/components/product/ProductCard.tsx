@@ -83,11 +83,11 @@ export function GateStrip({ face, size = "sm", className }: { face: ProductFace;
   const md = size === "md";
   return (
     <div data-surface="board" data-gate-strip="" aria-hidden="true" className={cn("gate-strip justify-between", md ? "h-9 px-3" : "h-[30px] px-2.5", className)}>
-      <span className="flex min-w-0 items-center gap-2">
+      <span className="flex min-w-0 shrink-0 items-center gap-2">
         <PlatformTile number={face.platformNumber} size={md ? "sm" : "xs"} data-gate="" className={md ? "h-[26px]" : "h-[20px]"} />
         <span className={cn("truncate pt-px font-display font-bold uppercase leading-none tracking-[0.1em] text-on-board", md ? "text-[0.8125rem]" : "text-[0.75rem]")}>{face.platformShort}</span>
       </span>
-      <span className={cn("shrink-0 font-mono font-semibold uppercase leading-none text-on-board-muted", md ? "text-[0.8125rem]" : "text-[0.75rem]")}>{face.regionTag}</span>
+      <span className={cn("ml-2 min-w-0 truncate font-mono font-semibold uppercase leading-none text-on-board-muted", md ? "text-[0.8125rem]" : "text-[0.75rem]")}>{face.regionTag}</span>
     </div>
   );
 }

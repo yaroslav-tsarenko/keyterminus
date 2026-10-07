@@ -20,7 +20,7 @@ export function PaymentLogos({ height = 28, withPci = true, strip = false, class
     <ul aria-label="Accepted payments" data-logo-strip={strip ? "" : undefined} className={cn("m-0 flex list-none flex-wrap items-center gap-3 p-0", strip && "w-fit shrink-0 flex-nowrap gap-3.5 rounded-sign bg-logo-strip px-3.5 py-2", className)}>
       {logos.map((logo) => (
         <li key={logo.key} className="flex">
-          <Image src={logo.src} alt={logo.alt} width={Math.round(height * logo.ratio)} height={height} unoptimized className="block w-auto" style={{ height }} />
+          <Image src={logo.src} alt={logo.alt} width={Math.round(height * logo.ratio)} height={height} unoptimized loading="eager" className="block w-auto" style={{ height }} />
         </li>
       ))}
     </ul>

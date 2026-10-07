@@ -38,7 +38,7 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Most keys are issued within minutes of payment confirmation. We don’t promise an exact number of minutes, because a check by your
+          In most cases a key reaches your account a few minutes after the payment is confirmed. We don’t promise an exact number of minutes, because a check by your
           bank, a security review of the order or a delay at our distribution partner can add time.
         </p>
         <p>
@@ -105,7 +105,7 @@ const sections: PolicySection[] = [
     body: (
       <p>
         We serve customers in the {F.marketCountries}. We don’t accept orders from {F.restrictedCountries} or {F.restrictedTerritories}, and we
-        don’t list keys whose activation region is limited to them. Don’t use a VPN or proxy to redeem a key outside its region: the
+        don’t list keys whose activation region is limited to them. Redeeming a key outside its region through a VPN or proxy breaks platform rules: the
         platform may block the key or your account.
       </p>
     ),

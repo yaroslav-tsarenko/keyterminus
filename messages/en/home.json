@@ -51,7 +51,7 @@
   "theater": {
     "eyebrow": "How it works",
     "title": "Watch your key depart",
-    "lead": "Five short demos with sample data: checking in a key, paying on the hosted page, your key arriving on your board, redeeming it, and getting help if it doesn't work.",
+    "lead": "Five short walkthroughs with sample data: checking in a key, paying on the hosted page, your key arriving on your board, redeeming it, and getting help if it doesn't work.",
     "link": "Read how activation works"
   },
   "routes": {
@@ -100,7 +100,7 @@
     "choose": "Platform to redeem on",
     "need": "You need {need}.",
     "guide": "Full guide for {name}",
-    "stillLabel": "Illustration of redeeming a key on {name}, with sample data",
+    "stillLabel": "Sample-data still: a key being redeemed on {name}",
     "step": "Step {n}"
   },
   "gate": {
@@ -111,7 +111,7 @@
     "handledKeysPlain": "Your keys, kept in your account and shown only when you choose Reveal.",
     "handledOrders": "Your orders and invoices, kept for {years} years as the law requires.",
     "never": "Never handled by us",
-    "neverCard": "Your card number, expiry date and security code. You enter them on the payment provider's hosted page.",
+    "neverCard": "Card number, expiry date and security code go straight to the payment provider’s hosted page, not to us.",
     "neverBank": "Your bank's 3-D Secure check, which happens between you and your bank.",
     "faulty": "If a key doesn't work, we replace it, or refund it if no replacement is available.",
     "failed": "If a payment fails, you aren't charged.",

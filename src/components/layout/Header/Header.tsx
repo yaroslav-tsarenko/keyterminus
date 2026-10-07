@@ -192,6 +192,13 @@ function StoreHeader() {
                   window.clearTimeout(mapTimer.current);
                   setMapOpen((v) => !v);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key !== "ArrowDown") return;
+                  e.preventDefault();
+                  window.clearTimeout(mapTimer.current);
+                  setMapOpen(true);
+                  requestAnimationFrame(() => document.getElementById(mapId)?.querySelector<HTMLAnchorElement>("a")?.focus());
+                }}
                 onPointerEnter={(e) => {
                   if (e.pointerType === "mouse") openMap(150);
                 }}
@@ -203,7 +210,7 @@ function StoreHeader() {
                 Platforms
                 <SquareChevronDown size={14} aria-hidden="true" className={cn("transition-transform duration-[180ms]", mapOpen && "rotate-180")} />
               </button>
-              {NAV.map((link) => (
+              {NAV.filter((link) => link.href !== "/deals" || index?.onSale !== 0).map((link) => (
                 <Link key={link.href} href={link.href} aria-current={active(pathname, link.href) ? "page" : undefined} className={cn(navLink, link.from)}>
                   {link.label}
                 </Link>

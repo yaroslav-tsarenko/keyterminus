@@ -14,7 +14,7 @@ const purposes: { purpose: string; data: string; basis: string }[] = [
   { purpose: "Running your account", data: "Name, email, phone, date of birth, address, password (stored as a hash), orders, saved keys", basis: "Contract" },
   { purpose: "Recording your request for delivery straight after payment", data: "The wording you agreed to and when you ticked the box", basis: "Legal obligation" },
   { purpose: `Confirming you are ${F.minAge} or over`, data: "Date of birth", basis: "Contract and legitimate interests" },
-  { purpose: "Replying to messages and complaints", data: "Name, email, order number, your message and the IP address it came from", basis: "Contract and legitimate interests" },
+  { purpose: "Answering your messages and complaints", data: "Name, email, order number, your message and the IP address it came from", basis: "Contract and legitimate interests" },
   { purpose: "Refunds, chargebacks and fraud prevention", data: "Order details, payment result, transaction reference, IP address", basis: "Legal obligation and legitimate interests" },
   { purpose: "Refusing orders from restricted countries and territories", data: "Billing country and address", basis: "Legal obligation" },
   { purpose: "Accounting and tax", data: "Order and refund records", basis: "Legal obligation" },
@@ -29,12 +29,11 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          {F.company}, trading as {F.brand}, is the controller of the personal data described here. For customers in the United Kingdom this
-          policy follows the UK GDPR and the Data Protection Act 2018; for customers in the European Union, the EU General Data Protection
-          Regulation.
+          {F.company}, trading as {F.brand}, is the controller of the personal data described here. We apply the UK GDPR and the Data Protection Act 2018
+          to customers in the United Kingdom, and the EU General Data Protection Regulation to customers in the European Union.
         </p>
         <SellerBlock />
-        <p>Questions about your data, or requests to use your rights, go to {F.email}.</p>
+        <p>Write to {F.email} with any question about your data or to exercise your rights.</p>
       </>
     ),
   },
@@ -136,7 +135,7 @@ const sections: PolicySection[] = [
       <ul>
         <li>Order, payment and refund records: {F.retention.orderRecordsYears} years from the order, as accounting and tax law require.</li>
         <li>Your account: until you ask us to close it, or after {F.retention.inactiveAccountYears} years with no sign-in or order. Order records then follow the rule above.</li>
-        <li>Messages and complaints: {F.retention.supportMessagesMonths} months after the conversation ends.</li>
+        <li>Support messages and complaints: kept for {F.retention.supportMessagesMonths} months after the last reply.</li>
         <li>Newsletter: until you unsubscribe.</li>
       </ul>
     ),

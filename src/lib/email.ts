@@ -440,7 +440,7 @@ export async function sendOrderInvoiceEmail(data: OrderEmailData): Promise<boole
 ${orderFacts(data)}
 ${itemsTable(data)}
 ${paragraph(`Paid in full: ${money(totals.total, currency)}. Your card details were entered on the payment provider’s page; we never receive or store your full card number.`, "font-size:13px;")}
-${paragraph(`${attachments.length ? "The PDF invoice is attached. " : ""}Keep this email as proof of purchase. Questions about this invoice: <a href="mailto:${COMPANY.email}" style="color:${C.ink};">${COMPANY.email}</a>.`, "font-size:13px;margin:0;")}`,
+${paragraph(`${attachments.length ? "The PDF invoice is attached. " : ""}This email is your proof of purchase. For anything about the invoice, write to <a href="mailto:${COMPANY.email}" style="color:${C.ink};">${COMPANY.email}</a>.`, "font-size:13px;margin:0;")}`,
       { sign: "Invoice", strip: { order: ref, status: "Paid" }, preheader: `Invoice for ${BRAND.name} order ${ref}: ${money(totals.total, currency)}` },
     ),
   });
@@ -476,7 +476,7 @@ export async function sendOrderStatusEmail(data: OrderEmailData, status: "DELIVE
     DELIVERED: {
       subject: `All keys issued for order ${ref}`,
       title: "Every key in this order is ready",
-      message: `all keys in your order are now in your account. Reveal each one when you’re ready to redeem it. If a key doesn’t work, tell us within ${STORE_POLICY.guarantee.claimDays} days of delivery and we replace it, or refund it if no replacement is available.`,
+      message: `every key from this order is waiting in your account. Reveal a key only when you are about to redeem it. If a key doesn’t work, tell us within ${STORE_POLICY.guarantee.claimDays} days of delivery and we replace it, or refund it if no replacement is available.`,
       cta: "View your keys",
       href: `${SITE_URL}/account/keys`,
       sign: "Key ready",
@@ -485,7 +485,7 @@ export async function sendOrderStatusEmail(data: OrderEmailData, status: "DELIVE
     CANCELLED: {
       subject: `Order ${ref} cancelled`,
       title: "Your order is cancelled",
-      message: `if you were charged, we refund ${refunded} to ${STORE_POLICY.returns.refundMethod} within ${refundDays} days.`,
+      message: `if a payment was taken, ${refunded} goes back to ${STORE_POLICY.returns.refundMethod} within ${refundDays} days.`,
       cta: "Browse the catalogue",
       href: `${SITE_URL}/catalog`,
       sign: "Order cancelled",

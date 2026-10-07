@@ -10,7 +10,7 @@ const sections: PolicySection[] = [
     title: "Who these rules apply to",
     body: (
       <p>
-        Everyone who visits {F.domain} or opens an account. These rules are part of the <Link href="/policies/terms">Terms and conditions</Link>.
+        Anyone using {F.domain}, with or without an account. The rules below form part of the <Link href="/policies/terms">Terms and conditions</Link>.
       </p>
     ),
   },
@@ -49,7 +49,7 @@ const sections: PolicySection[] = [
     title: "When the rules are broken",
     body: (
       <>
-        <p>We may cancel and refund an order, or suspend or close the account. Where the law requires it, for example with card fraud, we report it to the relevant authority.</p>
+        <p>Depending on what happened, we can cancel an order and refund it, or suspend or close the account. Where the law requires it, for example with card fraud, we report it to the relevant authority.</p>
         <p>If you think we got it wrong, email {F.email} and we’ll look at the decision again.</p>
       </>
     ),

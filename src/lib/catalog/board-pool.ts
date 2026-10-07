@@ -140,24 +140,32 @@ export async function getBoardPages(options: BoardPagesOptions = {}): Promise<{ 
     return true;
   };
 
-  let deals = 0;
+  const kindOf = (c: BoardCandidate) => (dealPercent(c.price, c.comparePrice) ? "deal" : isFresh(c, now) ? "new" : "on-time");
+  const quota: Record<string, number> = { deal: dealCap, new: freshCap, "on-time": total };
+  const used: Record<string, number> = { deal: 0, new: 0, "on-time": 0 };
+  const takeKind = (c: BoardCandidate) => {
+    const kind = kindOf(c);
+    if (used[kind] >= quota[kind] || !take(c)) return false;
+    used[kind]++;
+    return true;
+  };
+
   for (const c of eligible) {
-    if (deals >= dealCap) break;
-    if (dealPercent(c.price, c.comparePrice) && take(c)) deals++;
+    if (used.deal >= dealCap) break;
+    if (kindOf(c) === "deal") takeKind(c);
   }
-  let fresh = 0;
   for (const c of eligible) {
-    if (fresh >= freshCap) break;
-    if (isFresh(c, now) && !dealPercent(c.price, c.comparePrice) && take(c)) fresh++;
+    if (used.new >= freshCap) break;
+    if (kindOf(c) === "new") takeKind(c);
   }
   for (const entry of PLATFORM_BOARD.filter((p) => p.number !== null && p.number <= 4)) {
     if (picked.some((c) => c.platform === entry.key)) continue;
-    const first = eligible.find((c) => c.platform === entry.key && c.productType !== "gift-card");
-    if (first) take(first);
+    const first = eligible.find((c) => c.platform === entry.key && c.productType !== "gift-card" && used[kindOf(c)] < quota[kindOf(c)]);
+    if (first) takeKind(first);
   }
   for (const c of eligible) {
     if (picked.length >= total) break;
-    take(c);
+    takeKind(c);
   }
 
   const order = new Map(eligible.map((c, i) => [c.productId, i]));
@@ -168,9 +176,24 @@ export async function getBoardPages(options: BoardPagesOptions = {}): Promise<{ 
     lane.set(c.platform, rn);
     slot.set(c.productId, rn / platformBoard(c.platform).share);
   }
-  const rows = picked.sort((a, b) => (slot.get(a.productId) ?? 0) - (slot.get(b.productId) ?? 0) || (order.get(a.productId) ?? 0) - (order.get(b.productId) ?? 0)).map((c) => toRow(c, cells, now));
-  const pages: BoardRow[][] = [];
-  for (let i = 0; i < rows.length; i += perPage) pages.push(rows.slice(i, i + perPage));
+  const sorted = picked.sort((a, b) => (slot.get(a.productId) ?? 0) - (slot.get(b.productId) ?? 0) || (order.get(a.productId) ?? 0) - (order.get(b.productId) ?? 0));
+  const pageCount = Math.max(1, Math.ceil(sorted.length / perPage));
+  const buckets: BoardCandidate[][] = Array.from({ length: pageCount }, () => []);
+  const remarked = sorted.filter((c) => kindOf(c) !== "on-time");
+  remarked.forEach((c, i) => buckets[i % pageCount].push(c));
+  let cursor = remarked.length % pageCount;
+  for (const c of sorted.filter((c) => kindOf(c) === "on-time")) {
+    let tries = 0;
+    while (buckets[cursor].length >= perPage && tries < pageCount) {
+      cursor = (cursor + 1) % pageCount;
+      tries++;
+    }
+    buckets[cursor].push(c);
+    cursor = (cursor + 1) % pageCount;
+  }
+  const rank = new Map(sorted.map((c, i) => [c.productId, i]));
+  const pages: BoardRow[][] = buckets.filter((b) => b.length > 0).map((b) => b.sort((a, z) => (rank.get(a.productId) ?? 0) - (rank.get(z.productId) ?? 0)).map((c) => toRow(c, cells, now)));
+  const rows = pages.flat();
   const nextClaimed = new Set(claimed);
   for (const r of rows) nextClaimed.add(r.productId);
   return { pages, rows, claimed: nextClaimed };

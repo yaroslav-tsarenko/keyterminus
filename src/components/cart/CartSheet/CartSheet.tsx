@@ -18,7 +18,7 @@ import { TicketSummary } from "@/components/cart/TicketSummary";
 export const EMPTY_LINKS = [
   { href: "/catalog/games", label: "Games" },
   { href: "/catalog/gift-cards", label: "Gift cards" },
-  { href: "/deals", label: "Price cuts" },
+  { href: "/new-releases", label: "New arrivals" },
 ];
 
 export function CartSheet() {

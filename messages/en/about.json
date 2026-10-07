@@ -40,7 +40,7 @@
   "notSold": {
     "title": "What you won’t find here",
     "items": {
-      "marketplace": "Keys from other customers. {brand} is a store, not a marketplace: every key comes from us.",
+      "resale": "Keys from other customers. {brand} is a store: every key you buy here comes from us.",
       "cases": "Mystery keys, loot boxes or anything with a random outcome.",
       "accounts": "Game or platform accounts. We never ask for your platform password.",
       "other": "Keys that need a VPN, or keys for regions we don’t serve."

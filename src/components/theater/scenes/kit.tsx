@@ -29,7 +29,7 @@ function SearchField({ query, placeholder, focused, phone }: { query: string; pl
   );
 }
 
-export function DemoHeader({ device, query = "", placeholder = "Search 69,700 keys", focused = false, cart = 0, children }: { device: DeviceKind; query?: string; placeholder?: string; focused?: boolean; cart?: number; children?: ReactNode }) {
+export function DemoHeader({ device, query = "", placeholder = "Search keys", focused = false, cart = 0, children }: { device: DeviceKind; query?: string; placeholder?: string; focused?: boolean; cart?: number; children?: ReactNode }) {
   const phone = device === "phone";
   return (
     <div className="shrink-0 border-b border-line bg-rig">

@@ -55,39 +55,55 @@ const consentKey = COOKIE_TABLE.necessary.find((r) => r.name.endsWith("-consent"
 const sections: PolicySection[] = [
   {
     id: "what",
-    title: "What this policy covers",
+    title: "Operator and what cookies are",
     body: (
       <>
         <p>
-          A cookie is a small text file a website stores in your browser. Local storage and session storage are browser features that keep
-          data on your device only. This page lists every cookie and storage key {F.brand} uses on {F.domain}.
+          This Policy explains cookies and similar technologies used on {F.domain}. Read it with our{" "}
+          <Link href="/policies/privacy">Privacy policy</Link>. {F.brand} is operated by {F.company}, company number {F.companyNumber},
+          registered office {F.registeredOffice}, {F.companyCountry}. Contact: {F.email}.
         </p>
         <p>
-          It is the same list you see under “Show cookies” in Cookie settings. Keys you save for later are kept in your account on our server,
-          not in your browser.
+          Cookies are small files stored in your browser. Session cookies expire when the browser session ends; persistent cookies remain until
+          they expire or you delete them. Local storage and session storage are similar browser features that keep data on your device. In
+          this Policy, “cookies” includes these technologies.
         </p>
       </>
     ),
   },
   {
+    id: "purposes",
+    title: "Purposes",
+    body: (
+      <p>
+        Technologies used by {F.brand} may support secure sessions, your cart and checkout, fraud prevention, your saved consent choice and your
+        selected currency ({F.currencies}). The inventory below lists what the website actually sets; describing a category does not mean every
+        technology in it is present.
+      </p>
+    ),
+  },
+  {
     id: "necessary",
-    title: "Necessary cookies and storage",
+    title: "Strictly necessary cookies and storage",
     body: (
       <>
-        <p>{necessary?.purpose} They are always on because the store doesn’t work without them, and they are never used for advertising.</p>
+        <p>
+          {necessary?.purpose} They are necessary to provide a service you request or essential security, so they do not require consent and
+          are always on. They are not used for advertising. Blocking them in your browser may stop sign-in or checkout from working.
+        </p>
         <CookieTable rows={COOKIE_TABLE.necessary} />
       </>
     ),
   },
   {
     id: "optional",
-    title: "Analytics and marketing",
+    title: "Analytics, diagnostics and advertising",
     body: (
       <>
         <p>
-          {F.brand} sets no analytics or marketing cookies at the moment. Both categories appear in Cookie settings and stay off until you
-          turn them on. If we ever add such a tool, each of its cookies will be listed here first, and it will load only after you allow that
-          category.
+          {F.brand} does not currently set any analytics or advertising cookies. Both categories are in Cookie settings and are off until you
+          switch them on. If we add such a tool, we will list each of its cookies here first, and it will only load after you allow that
+          category. Browsing, scrolling or inactivity is not consent, and core purchasing functions never depend on accepting optional cookies.
         </p>
         {COOKIE_TABLE.analytics.length ? <CookieTable rows={COOKIE_TABLE.analytics} /> : null}
         {COOKIE_TABLE.marketing.length ? <CookieTable rows={COOKIE_TABLE.marketing} /> : null}
@@ -96,43 +112,58 @@ const sections: PolicySection[] = [
   },
   {
     id: "choice",
-    title: "Changing or withdrawing consent",
+    title: "Choices and changing your consent",
     body: (
       <>
         <p>
-          On your first visit the cookie banner offers Accept all, Reject all and Choose cookies. You can change your mind whenever you like
-          through <strong>Cookie settings</strong> at the foot of every page, or with the button below. Withdrawing consent is as easy as
-          giving it, and it applies immediately.
+          On your first visit, the cookie banner offers Accept all, Reject all and Customise. You can change or withdraw your choice at any time
+          from the <strong>Cookie settings</strong> link at the bottom of every page, or with the button below. Withdrawing consent is as easy
+          as giving it, takes effect straight away and does not affect earlier lawful processing.
         </p>
         <p>
-          Your choice is kept in local storage under <code className="font-mono text-ui-sm">{consentKey}</code> for 12 months, after which we
-          ask again.
+          Your choice is stored in local storage under <code className="font-mono text-ui-xs">{consentKey}</code> for 12 months. After that
+          we ask again.
         </p>
         <div className="mt-6">
           <CookieSettingsButton />
         </div>
-        <p>Your browser can delete cookies and site data too. Deleting the necessary ones signs you out and clears your cart.</p>
       </>
     ),
   },
   {
     id: "third-party",
-    title: "The payment page",
+    title: "Payment and security technologies",
     body: (
       <p>
-        When you pay, you move to the payment provider’s hosted page. The provider runs it on its own domain and may set its own cookies for
-        security and fraud prevention, under its own cookie policy. See the <Link href="/policies/payment">Payment policy</Link>.
+        When you pay, you are taken to our payment provider’s hosted page on its own domain. It may set cookies needed to authenticate the
+        payment and prevent fraud, under the provider’s own privacy information. Optional tracking does not become exempt from consent merely
+        because it appears during checkout. See our <Link href="/policies/payment">Payment policy</Link>.
+      </p>
+    ),
+  },
+  {
+    id: "browser",
+    title: "Browser controls",
+    body: (
+      <p>
+        Most browsers let you inspect, delete or block cookies, restrict third-party storage or clear data on closing. Deleting necessary
+        cookies signs you out, empties your cart and resets your currency and consent choices. Browser controls work separately from Cookie
+        settings.
       </p>
     ),
   },
   {
     id: "changes",
-    title: "Changes to this policy",
+    title: "International processing, updates and contact",
     body: (
-      <p>
-        We update this list whenever a cookie or storage key is added or removed. Send questions to {F.email}. How we handle personal data is
-        explained in the <Link href="/policies/privacy">Privacy policy</Link>.
-      </p>
+      <>
+        <p>
+          Some providers may process information outside the UK; the safeguards we use are described in our Privacy policy. We update this
+          Policy and the inventory whenever technologies, providers or legal requirements change, and ask for new consent where a new purpose
+          requires it.
+        </p>
+        <p>Questions go to {F.email}.</p>
+      </>
     ),
   },
 ];

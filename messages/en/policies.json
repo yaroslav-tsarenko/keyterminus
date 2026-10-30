@@ -24,11 +24,11 @@
       "scope": "Each cookie and browser storage key the store sets, and how to change your choices."
     },
     "returns": {
-      "title": "Refund policy",
+      "title": "Refunds and cancellation",
       "scope": "Cancelling before a key is issued, when we refund, and how and when refunds are paid."
     },
     "shipping": {
-      "title": "Delivery",
+      "title": "Delivery and activation",
       "scope": "How keys are issued to your account, how long it usually takes, regions and redeeming."
     },
     "payment": {
@@ -40,7 +40,7 @@
       "scope": "Replacement or refund if a key doesn’t work, and a refund if it isn’t issued within {hours} hours."
     },
     "complaints": {
-      "title": "Complaints",
+      "title": "Complaints and disputes",
       "scope": "How to complain, how fast we answer and where to go if you’re not satisfied."
     },
     "acceptable-use": {

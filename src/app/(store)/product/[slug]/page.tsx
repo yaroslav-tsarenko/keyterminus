@@ -25,7 +25,7 @@ import { PC_LAUNCHERS, platformInfo, regionSentence } from "@/lib/catalog/platfo
 import { activationFor } from "@/config/activation";
 import { STORE_POLICY } from "@/config/store-policy";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;

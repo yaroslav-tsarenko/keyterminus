@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { getStoreIndex } from "@/lib/catalog/store-index";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export async function GET() {
   try {
     const index = await getStoreIndex();
     return NextResponse.json(index, {
       headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=86400",
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
         "CDN-Cache-Control": "public, s-maxage=600",
       },
     });

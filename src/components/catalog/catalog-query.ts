@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { memoize, memoizeByKey } from "@/lib/utils/memo";
@@ -40,12 +41,19 @@ export interface CategoryTree {
   uniqueArt: (category: CategoryRecord) => string | null;
 }
 
+const categoryRows = unstable_cache(
+  () =>
+    prisma.category.findMany({
+      where: { isActive: true },
+      select: { id: true, name: true, slug: true, description: true, imageUrl: true, parentId: true, sortOrder: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    }),
+  ["category-rows"],
+  { revalidate: 86400, tags: ["catalog"] },
+);
+
 export const getCategoryTree = cache(async (): Promise<CategoryTree> => {
-  const all = await prisma.category.findMany({
-    where: { isActive: true },
-    select: { id: true, name: true, slug: true, description: true, imageUrl: true, parentId: true, sortOrder: true },
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-  });
+  const all = await categoryRows();
   const bySlug = new Map(all.map((c) => [c.slug, c]));
   const byId = new Map(all.map((c) => [c.id, c]));
   const childMap = new Map<string, CategoryRecord[]>();

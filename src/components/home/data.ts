@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { memoize } from "@/lib/utils/memo";
@@ -270,4 +271,7 @@ async function computeHomeData(): Promise<HomeData> {
 
 const homeData = memoize(5 * 60_000, computeHomeData, { staleMs: 60 * 60_000 });
 
-export const getHomeData = cache((): Promise<HomeData> => homeData());
+// Shared across serverless instances so the home page does not wake the database on every cold start.
+const sharedHomeData = unstable_cache(() => homeData(), ["home-data"], { revalidate: 86400, tags: ["catalog"] });
+
+export const getHomeData = cache((): Promise<HomeData> => sharedHomeData());

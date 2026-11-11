@@ -13,7 +13,7 @@ import { absoluteUrl, publicImageUrls } from "@/lib/seo/url";
 export const FEED_TITLE_MAX = 150;
 export const FEED_DESCRIPTION_MAX = 5000;
 export const FEED_ADDITIONAL_IMAGES = 10;
-export const FEED_CACHE_SECONDS = 3600;
+export const FEED_CACHE_SECONDS = 86400;
 
 export type Availability = "in_stock" | "out_of_stock";
 

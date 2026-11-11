@@ -7,7 +7,7 @@ import { genrePlatformCounts, stockedPlatformCounts } from "@/lib/catalog/live-s
 import { absoluteUrl, publicImageUrls } from "./url";
 
 export const SITEMAP_PRODUCTS_PER_FILE = 5000;
-export const SITEMAP_CACHE_SECONDS = 3600;
+export const SITEMAP_CACHE_SECONDS = 86400;
 
 export interface SitemapEntry {
   loc: string;

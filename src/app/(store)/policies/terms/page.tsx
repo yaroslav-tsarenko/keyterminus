@@ -417,8 +417,8 @@ const sections: PolicySection[] = [
     title: "Governing law and courts",
     body: (
       <p>
-        These Terms and related non-contractual obligations are governed by the laws of England and Wales. Consumers retain mandatory
-        protections applicable in their country of residence. The courts of England and Wales have jurisdiction, subject to any mandatory
+        These Terms and related non-contractual obligations are governed by the laws of the Republic of Estonia. Consumers retain mandatory
+        protections applicable in their country of residence. The courts of Estonia have jurisdiction, subject to any mandatory
         right to bring proceedings in the courts of your residence.
       </p>
     ),

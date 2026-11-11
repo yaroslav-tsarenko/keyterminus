@@ -118,15 +118,13 @@ const sections: PolicySection[] = [
           statutory rights.
         </p>
         <p>
-          Depending on the issue, you may contact your card issuer, a consumer-protection authority (Citizens Advice in England, Wales and
-          Scotland, Consumerline in Northern Ireland, or the European Consumer Centre in your EU country), a competent regulator, an
+          Depending on the issue, you may contact your card issuer, a consumer-protection authority (the Estonian Consumer Protection and Technical Regulatory Authority (TTJA) and its Consumer Disputes Committee, or the European Consumer Centre in your EU country), a competent regulator, an
           alternative dispute resolution body or a court, as described in the governing law section of our{" "}
           <Link href="/policies/terms#law">Terms and conditions</Link>. If legally required, we will identify a relevant dispute resolution
           body and say whether we use it; we do not claim membership of any scheme.
         </p>
         <p>
-          Data protection complaints can go to the Information Commissioner’s Office, Wycliffe House, Water Lane, Wilmslow, Cheshire, SK9 5AF,
-          United Kingdom (<a href="https://ico.org.uk/" rel="noopener noreferrer" target="_blank">ico.org.uk</a>), or another competent
+          Data protection complaints can go to the Estonian Data Protection Inspectorate (Andmekaitse Inspektsioon), Tatari 39, 10134 Tallinn, Estonia (<a href="https://www.aki.ee/en" rel="noopener noreferrer" target="_blank">aki.ee</a>), or another competent
           authority, as described in our <Link href="/policies/privacy#rights">Privacy policy</Link>.
         </p>
       </>

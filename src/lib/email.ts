@@ -149,7 +149,7 @@ ${preheader}
         <tr>
           <td style="padding:22px 4px 0;font-size:12px;line-height:1.6;color:${C.muted};font-family:${SANS};">
             <p style="margin:0 0 4px;color:${C.ink};font-weight:600;">${escape(COMPANY.name)}</p>
-            <p style="margin:0 0 4px;">${BRAND.name} is a trading name of ${escape(COMPANY.name)}. Company number ${escape(COMPANY.companyNumber)}.</p>
+            <p style="margin:0 0 4px;">${BRAND.name} is a trading name of ${escape(COMPANY.name)}. Registry code ${escape(COMPANY.companyNumber)}.</p>
             <p style="margin:0 0 4px;">${escape(COMPANY.registeredOffice)}, ${escape(COMPANY.country)} &middot; <a href="mailto:${COMPANY.email}" style="color:${C.ink};">${COMPANY.email}</a>${COMPANY.phone ? ` &middot; ${escape(COMPANY.phone)}` : ""}</p>
             <p style="margin:12px 0 0;">
               <a href="${SITE_URL}/policies/terms" style="${link}">Terms</a>
@@ -290,7 +290,7 @@ function sellerBlock(): string {
 <p style="margin:0;font-family:${SANS};font-size:14px;line-height:1.6;color:${C.ink};">
   <strong>${escape(COMPANY.name)}</strong>, trading as ${BRAND.name}<br>
   ${escape(COMPANY.registeredOffice)}, ${escape(COMPANY.country)}<br>
-  Company number <span style="font-family:${MONO};">${escape(COMPANY.companyNumber)}</span>${STORE_POLICY.vatRegistered ? `<br>VAT number <span style="font-family:${MONO};">${escape(COMPANY.vatNumber)}</span>` : ""}<br>
+  Registry code <span style="font-family:${MONO};">${escape(COMPANY.companyNumber)}</span>${STORE_POLICY.vatRegistered ? `<br>VAT number <span style="font-family:${MONO};">${escape(COMPANY.vatNumber)}</span>` : ""}<br>
   Merchant of record: ${escape(COMPANY.name)}
 </p>`;
 }

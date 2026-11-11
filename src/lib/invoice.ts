@@ -146,7 +146,7 @@ export function sellerLines(): string[] {
   return [
     `${BRAND.name} is a trading name of ${COMPANY.name}.`,
     `${COMPANY.registeredOffice}, ${COMPANY.country}`,
-    `Company number ${COMPANY.companyNumber}`,
+    `Registry code ${COMPANY.companyNumber}`,
     ...(COMPANY.vatRegistered ? [`VAT number ${COMPANY.vatNumber}`] : []),
     COMPANY.email,
   ];
@@ -378,7 +378,7 @@ export async function renderInvoicePdf(order: InvoiceSource): Promise<Uint8Array
     w.y -= 12.5;
   }
 
-  const footer = `${COMPANY.name} · ${COMPANY.registeredOffice}, ${COMPANY.country} · Company number ${COMPANY.companyNumber} · ${COMPANY.email}`;
+  const footer = `${COMPANY.name} · ${COMPANY.registeredOffice}, ${COMPANY.country} · Registry code ${COMPANY.companyNumber} · ${COMPANY.email}`;
   w.pages.forEach((page, index) => {
     w.page = page;
     w.rule(PAGE.margin + 18, 0.5, LINE);

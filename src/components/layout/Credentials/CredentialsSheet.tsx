@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils/cn";
 
 export function CredentialsSheet({ stacked = false, className }: { stacked?: boolean; className?: string }) {
   const rows: { label: string; value: ReactNode; mono?: boolean }[] = [
-    { label: "Company number", value: COMPANY.companyNumber, mono: true },
+    { label: "Registry code", value: COMPANY.companyNumber, mono: true },
     ...(COMPANY.vatRegistered ? [{ label: "VAT number", value: COMPANY.vatNumber, mono: true }] : []),
     { label: "Registered office", value: `${COMPANY.registeredOffice}, ${COMPANY.country}` },
     {

@@ -189,9 +189,8 @@ const sections: PolicySection[] = [
     title: "International transfers",
     body: (
       <p>
-        Some providers or systems may process information outside the UK. Where a restricted transfer occurs, we use the required lawful
-        mechanism, such as an adequacy decision, approved contractual clauses with the UK addendum, or a UK international data transfer
-        agreement. Where EU GDPR applies, the corresponding EU requirements are also addressed. Contact us for information about the
+        Some providers or systems may process information outside the European Economic Area. Where a restricted transfer occurs, we use the required lawful
+        mechanism, such as an adequacy decision of the European Commission or the EU standard contractual clauses. Where UK GDPR applies to you, the corresponding UK requirements are also addressed. Contact us for information about the
         safeguards that apply to your information.
       </p>
     ),
@@ -257,8 +256,7 @@ const sections: PolicySection[] = [
           respond within one month, explaining any lawful extension within that period. Requests are normally free.
         </p>
         <p>
-          You may also complain to the Information Commissioner’s Office, Wycliffe House, Water Lane, Wilmslow, Cheshire, SK9 5AF, United
-          Kingdom (<a href="https://ico.org.uk/" rel="noopener noreferrer" target="_blank">ico.org.uk</a>), or to the competent authority in
+          You may also complain to the Estonian Data Protection Inspectorate (Andmekaitse Inspektsioon), Tatari 39, 10134 Tallinn, Estonia (<a href="https://www.aki.ee/en" rel="noopener noreferrer" target="_blank">aki.ee</a>), or to the competent authority in
           your country.
         </p>
       </>

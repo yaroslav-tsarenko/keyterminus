@@ -29,7 +29,7 @@ const sections: PolicySection[] = [
       <p>
         Mandatory consumer rights remain unaffected. Non-delivery, a key that does not activate, an incorrect Product, material misdescription
         or another failure to meet applicable standards may entitle you to redelivery, replacement, price reduction, refund or another legal
-        remedy. Where UK statutory cancellation rules for digital content apply, the cancellation period is normally {F.withdrawalDays} days
+        remedy. Where statutory cancellation rules for digital content apply (in the EU, Directive 2011/83/EU as implemented in Estonia), the cancellation period is normally {F.withdrawalDays} days
         from contract conclusion, unless that right has lawfully ended through immediate supply as described below.
       </p>
     ),

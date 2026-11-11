@@ -178,7 +178,7 @@ export function SellerBlock() {
     <dl className="m-0 mt-5 grid grid-cols-1 gap-x-8 gap-y-3 border-y border-line py-5 text-ui-sm sm:grid-cols-[auto_minmax(0,1fr)]">
       <dt className="text-ink-muted">Merchant</dt>
       <dd className="m-0 font-medium text-ink">{COMPANY.name}, trading as {BRAND.name}</dd>
-      <dt className="text-ink-muted">Company number</dt>
+      <dt className="text-ink-muted">Registry code</dt>
       <dd className="m-0 text-ink">{COMPANY.companyNumber}</dd>
       <dt className="text-ink-muted">Registered office</dt>
       <dd className="m-0 text-ink">{COMPANY.registeredOffice}</dd>

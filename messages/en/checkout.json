@@ -55,7 +55,7 @@
     "line": "Sold by {company}, trading as {brand}.",
     "soldBy": "Sold by {company}, {address}",
     "merchantOfRecord": "Merchant of record: {company}",
-    "tradingName": "{brand} is a trading name of {company}. Company number {number}."
+    "tradingName": "{brand} is a trading name of {company}. Registry code {number}."
   },
   "counter": {
     "title": "Your ticket",
@@ -77,7 +77,7 @@
     "backToBag": "Back to cart",
     "policiesLabel": "Policies",
     "cookieSettings": "Cookie settings",
-    "credentials": "{brand} is a trading name of {company}, company number {number}, {address}. {email}",
+    "credentials": "{brand} is a trading name of {company}, registry code {number}, {address}. {email}",
     "copyright": "© {year} {brand}"
   },
   "paymentFailed": {

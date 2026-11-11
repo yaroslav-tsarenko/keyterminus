@@ -12,14 +12,14 @@ export const COMPANY: {
   email: string;
   supportHours: string;
 } = {
-  name: "ALDERROCK LTD",
-  companyNumber: "17381132",
+  name: "VELASTRIA OÜ",
+  companyNumber: "17320178",
   vatNumber: "",
   vatRegistered: false,
-  addressLine: "Dept 6984, 196 High Road, Wood Green, London, N22 8HH",
-  country: "United Kingdom",
-  registeredOffice: "Dept 6984, 196 High Road, Wood Green, London, N22 8HH",
+  addressLine: "Tartu mnt 82, Kesklinna linnaosa, 10112 Tallinn, Harju maakond",
+  country: "Estonia",
+  registeredOffice: "Tartu mnt 82, Kesklinna linnaosa, 10112 Tallinn, Harju maakond",
   phone: null,
   email: "info@keyterminus.com",
-  supportHours: "Mon–Fri, 09:00–18:00 (GMT)",
+  supportHours: "Mon–Fri, 09:00–18:00 (EET)",
 };

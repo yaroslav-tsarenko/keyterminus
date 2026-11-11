@@ -158,7 +158,7 @@ const sections: PolicySection[] = [
     body: (
       <>
         <p>
-          Some providers may process information outside the UK; the safeguards we use are described in our Privacy policy. We update this
+          Some providers may process information outside the European Economic Area; the safeguards we use are described in our Privacy policy. We update this
           Policy and the inventory whenever technologies, providers or legal requirements change, and ask for new consent where a new purpose
           requires it.
         </p>
